@@ -83,7 +83,8 @@ switch handles.indexEdit
             % Initialization
             GUI_FREQ_EigCal_Initialization(hObject, eventdata, handles)
         end
-        % Update handles structure
+        guidata(hObject, handles);
+        handles.output = hObject;
         guidata(hObject, handles);
         if dontOpen
            disp('-----------------------------------------------------');
@@ -92,7 +93,7 @@ switch handles.indexEdit
            disp('parent directory!')
            disp('-----------------------------------------------------');
         else
-           uiwait(hObject);
+%            uiwait(hObject);
         end
     case 1
         global CI
@@ -116,7 +117,9 @@ switch handles.indexEdit
         assignin('base','CI',CI);                   % save the current information to the works
         guidata(hObject, handles);  
         GUI_FREQ_EigCal_Initialization(hObject, eventdata, handles)
-        uiwait(hObject);
+        guidata(hObject, handles);
+        handles.output = hObject;
+        guidata(hObject, handles);
 end
 %
 % -------------------------------------------------------------------------
@@ -461,15 +464,16 @@ function varargout = GUI_FREQ_EigCal_OutputFcn(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 % Get default command line output from handles structure
-varargout{1} = [];
-delete(hObject);
+try
+varargout{1} = handles.output;
+end
 
 % --- Executes when user attempts to close figure.
 function figure_CloseRequestFcn(hObject, eventdata, handles)
 % hObject    handle to figure (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-uiresume(hObject);
+delete(hObject);
 
 % ---------------------------Pannel initialization-------------------------
 %
@@ -623,6 +627,8 @@ end
 set(handles.pop_numMode,    'string',StringMode)
 guidata(hObject, handles);
 %
+GUI_FREQ_EigCal_PLOT(hObject)
+%
 % -------------------------------------------------------------------------
 %
 function Fcn_pb_CalEig_Value_initialization(varargin)
@@ -711,6 +717,7 @@ data_cell       = num2cell(data_num);
 set(handles.uitable,'data',data_cell);         % Update the table
 %
 guidata(hObject, handles);
+GUI_FREQ_EigCal_PLOT(hObject)
 
 % --- Executes during object creation, after setting all properties.
 function slider_uRatio_CreateFcn(hObject, eventdata, handles)
@@ -877,14 +884,14 @@ function pb_AOC_OK_Callback(hObject, eventdata, handles)
 global CI
 CI.IsRun.GUI_FREQ_EigCal = 1;
 assignin('base','CI',CI);
-uiresume(handles.figure);
+delete(handles.figure);
 
 % --- Executes on button press in pb_Cancel.
 function pb_Cancel_Callback(hObject, eventdata, handles)
 % hObject    handle to pb_Cancel (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-uiresume(handles.figure);
+delete(handles.figure);
 
 %-------------------------------------------------------------------------
 function GUI_FREQ_EigCal_PLOT(varargin)

@@ -84,7 +84,9 @@ switch indexEdit
             % Initialization
             GUI_INI_FM_IMPORT_Initialization(hObject, eventdata, handles)
         end
-        % Update handles structure
+        handles = guidata(hObject);  
+        guidata(hObject, handles);
+        handles.output = hObject;
         guidata(hObject, handles);
         if dontOpen
            disp('-----------------------------------------------------');
@@ -93,7 +95,7 @@ switch indexEdit
            disp('parent directory!')
            disp('-----------------------------------------------------');
         else
-           uiwait(hObject);
+%            uiwait(hObject);
         end
     case 1
         global CI
@@ -118,7 +120,10 @@ switch indexEdit
         assignin('base','CI',CI);                   % save the current information to the works
         guidata(hObject, handles);  
         GUI_INI_FM_IMPORT_Initialization(hObject, eventdata, handles)
-        uiwait(hObject);
+        handles = guidata(hObject);  
+        guidata(hObject, handles);
+        handles.output = hObject;
+        guidata(hObject, handles);
 end
 %
 %-------------------------------------------------------------------------
@@ -408,8 +413,9 @@ function varargout = GUI_INI_FM_IMPORT_OutputFcn(hObject, eventdata, handles)
 % hObject    handle to figure
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-varargout{1} = [];
-delete(hObject);
+try
+varargout{1} = handles.output;
+end
 %
 %-------------------------------------------------------------------------
 %
@@ -517,7 +523,7 @@ function pb_Cancel_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 handles = guidata(hObject);
-uiresume(handles.figure);
+delete(handles.figure);
 %
 %--------------------------------------------------------------------------
 %
@@ -623,7 +629,7 @@ switch CI.FMEXP.indexIMPORT
         end 
 end  
 assignin('base','CI',CI);                   % save the current information to the works
-uiresume(handles.figure);
+delete(handles.figure);
 %
 %--------------------------------------------------------------------------
 %
@@ -632,7 +638,7 @@ function figure_CloseRequestFcn(hObject, eventdata, handles)
 % hObject    handle to figure (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-uiresume(hObject);
+delete(hObject);
 clear TEMP
 %
 %--------------------------------------------------------------------------
