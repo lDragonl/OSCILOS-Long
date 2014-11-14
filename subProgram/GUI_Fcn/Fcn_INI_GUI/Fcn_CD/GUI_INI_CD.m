@@ -22,7 +22,7 @@ function varargout = GUI_INI_CD(varargin)
 
 % Edit the above text to modify the response to help GUI_INI_CD
 
-% Last Modified by GUIDE v2.5 02-Oct-2014 13:57:27
+% Last Modified by GUIDE v2.5 14-Nov-2014 21:33:20
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -80,6 +80,7 @@ switch indexEdit
             handles.sH = mainHandles.sH;
             % Update handles structure
             guidata(hObject, handles);
+            handles.output = hObject;
             % Initialization
             GUI_INI_CD_Initialization(hObject, eventdata, handles)
         end
@@ -92,7 +93,8 @@ switch indexEdit
            disp('parent directory!')
            disp('-----------------------------------------------------');
         else
-           uiwait(hObject);
+
+%            uiwait(hObject);
         end
     case 1
         global CI
@@ -112,12 +114,17 @@ switch indexEdit
             handles.FontSize(2)=10;   
         end
         guidata(hObject, handles);
+        handles.output = hObject;
+        guidata(hObject, handles);
         CI.Ru = 8.3145;
         assignin('base','CI',CI);                   % save the current information to the works
         GUI_INI_CD_Initialization(hObject, eventdata, handles)
-        uiwait(hObject);
+%         uiwait(hObject);
 end
 %
+% --- Executes during object creation, after setting all properties.
+function figure_CreateFcn(hObject, eventdata, handles) %#ok<*DEFNU,*INUSD> 
+
 % -------------------------------------------------------------------------
 %
 function GUI_INI_CD_Initialization(varargin)
@@ -162,11 +169,11 @@ set(handles.axes1,      'units', 'points',...
 % default combustor dimensions: 
 % Denoting the distance along the tube axis by the vector x_sample
 % Radius by r_sample
-handles.RT.Default = [600 400 50]; % default dimensions of the Rijke tube
+handles.RT.Default = [300 700 50]; % default dimensions of the Rijke tube
 %
 switch CI.IsRun.GUI_INI_CD
     case 0
-    CI.CD.x_sample = [0 0.6 1.0];
+    CI.CD.x_sample = [0 0.3 1.0];
     CI.CD.r_sample = 50./1000.*[1 1 1];
     CI.CD.index    = [0 1 0];
     CI.CD.pop_CD_type = 1;
@@ -400,15 +407,19 @@ function varargout = GUI_INI_CD_OutputFcn(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 % Get default command line output from handles structure
-varargout{1} = [];
-delete(hObject);
+% varargout{1} = [];
+% delete(hObject);
+try
+varargout{1} = handles.output;
+end
 
 % --- Executes when user attempts to close figure.
 function figure_CloseRequestFcn(hObject, eventdata, handles)
 % hObject    handle to figure (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-uiresume(hObject);
+% uiresume(hObject);
+delete(hObject);
 
 
 function ed_US_Callback(hObject, eventdata, handles)
@@ -419,9 +430,11 @@ function ed_US_Callback(hObject, eventdata, handles)
 % Hints: get(hObject,'String') returns contents of ed_US as text
 %        str2double(get(hObject,'String')) returns contents of ed_US as a double
 datEdit = str2double(get(hObject, 'String'));
-if isnan(datEdit)
-    set(hObject, 'String', 0);
-    errordlg('Input must be a number','Error');
+ValDefault = 300; 
+if isnan(datEdit) || ~isreal(datEdit) ||datEdit < 0
+    set(hObject, 'String', ValDefault);
+    errordlg('Input must be a non-negative real number','Error');
+    % when the input is not a number, it is set to the default value
 end
 
 % --- Executes during object creation, after setting all properties.
@@ -444,11 +457,12 @@ function ed_DS_Callback(hObject, eventdata, handles)
 % Hints: get(hObject,'String') returns contents of ed_DS as text
 %        str2double(get(hObject,'String')) returns contents of ed_DS as a double
 datEdit = str2double(get(hObject, 'String'));
-if isnan(datEdit)
-    set(hObject, 'String', 0);
-    errordlg('Input must be a number','Error');
+ValDefault = 700; 
+if isnan(datEdit) || ~isreal(datEdit) ||datEdit < 0
+    set(hObject, 'String', ValDefault);
+    errordlg('Input must be a non-negative real number','Error');
+    % when the input is not a number, it is set to the default value
 end
-
 % --- Executes during object creation, after setting all properties.
 function ed_DS_CreateFcn(hObject, eventdata, handles)
 % hObject    handle to ed_DS (see GCBO)
@@ -470,9 +484,11 @@ function ed_Diameter_Callback(hObject, eventdata, handles)
 % Hints: get(hObject,'String') returns contents of ed_Diameter as text
 %        str2double(get(hObject,'String')) returns contents of ed_Diameter as a double
 datEdit = str2double(get(hObject, 'String'));
-if isnan(datEdit)
-    set(hObject, 'String', 0);
-    errordlg('Input must be a number','Error');
+ValDefault = 50; 
+if isnan(datEdit) || ~isreal(datEdit) ||datEdit < 0
+    set(hObject, 'String', ValDefault);
+    errordlg('Input must be a non-negative real number','Error');
+    % when the input is not a number, it is set to the default value
 end
 
 % --- Executes during object creation, after setting all properties.
@@ -581,7 +597,7 @@ Fcn_GUI_INI_CD_Update_Data(hObject, eventdata, handles);
 global CI
 CI.IsRun.GUI_INI_CD = 1;
 assignin('base','CI',CI); 
-uiresume(handles.figure);
+delete(handles.figure);
 
 % --- Executes on button press in pb_Apply.
 function pb_Apply_Callback(hObject, eventdata, handles)
@@ -619,7 +635,7 @@ function pb_Cancel_Callback(hObject, eventdata, handles)
 % hObject    handle to pb_Cancel (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-uiresume(handles.figure);
+delete(handles.figure);
 
 % --- plot the combustor shape
 function Fcn_GUI_INI_CD_Plot_CD_Shape(varargin)

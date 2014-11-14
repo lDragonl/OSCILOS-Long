@@ -83,7 +83,8 @@ switch indexEdit
             % Initialization
             GUI_INI_BC_Initialization(hObject, eventdata, handles)
         end
-        % Update handles structure
+        guidata(hObject, handles);
+        handles.output = hObject;
         guidata(hObject, handles);
         if dontOpen
            disp('-----------------------------------------------------');
@@ -92,7 +93,7 @@ switch indexEdit
            disp('parent directory!')
            disp('-----------------------------------------------------');
         else
-           uiwait(hObject);
+%            uiwait(hObject);
         end
     case 1
         global CI
@@ -116,7 +117,8 @@ switch indexEdit
         handles.indexApp = 0;
         guidata(hObject, handles);  
         GUI_INI_BC_Initialization(hObject, eventdata, handles)
-        uiwait(hObject);
+        handles.output = hObject;
+        guidata(hObject, handles);
 end
 
 function GUI_INI_BC_Initialization(varargin)
@@ -698,8 +700,9 @@ function varargout = GUI_INI_BC_OutputFcn(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 % Get default command line output from handles structure
-varargout{1} = [];
-delete(hObject);
+try
+varargout{1} = handles.output;
+end
 
 %
 % --- Executes on selection change in pop_Plot.
@@ -832,7 +835,7 @@ Fcn_GUI_INI_BC_Update_Data(hObject, eventdata, handles)
 global CI
 CI.IsRun.GUI_INI_BC = 1;
 assignin('base','CI',CI); 
-uiresume(handles.figure);
+delete(handles.figure);
 
 % --- Executes on button press in pb_Apply.
 function pb_Apply_Callback(hObject, eventdata, handles)
@@ -847,7 +850,7 @@ function pb_Cancel_Callback(hObject, eventdata, handles)
 % hObject    handle to pb_Cancel (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-uiresume(handles.figure);
+delete(handles.figure);
 
 
 % --- Executes on button press in pb_SaveFig.
@@ -1054,7 +1057,7 @@ function figure_CloseRequestFcn(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 % Hint: delete(hObject) closes the figure
-uiresume(hObject);
+delete(hObject);
 %--------------------------------------------------------------------------
 %-- Color set
 function color_type=Fcn_color_set(color_number)

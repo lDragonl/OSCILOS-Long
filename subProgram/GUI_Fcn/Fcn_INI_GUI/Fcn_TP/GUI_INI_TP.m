@@ -86,7 +86,8 @@ switch indexEdit
             handles = guidata(hObject);
             guidata(hObject, handles);
         end
-        % Update handles structure
+        guidata(hObject, handles);
+        handles.output = hObject;
         guidata(hObject, handles);
         if dontOpen
            disp('-----------------------------------------------------');
@@ -95,7 +96,7 @@ switch indexEdit
            disp('parent directory!')
            disp('-----------------------------------------------------');
         else
-           uiwait(hObject);
+%            uiwait(hObject);
         end
     case 1
         global CI
@@ -118,7 +119,10 @@ switch indexEdit
         assignin('base','CI',CI);                   % save the current information to the works
         guidata(hObject, handles);  
         GUI_INI_TP_Initialization(hObject, eventdata, handles)
-        uiwait(hObject);
+        guidata(hObject, handles);
+        handles.output = hObject;
+        guidata(hObject, handles);
+%         uiwait(hObject);
 end
 
 
@@ -130,8 +134,9 @@ function varargout = GUI_INI_TP_OutputFcn(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 % Get default command line output from handles structure
-varargout{1} = [];
-delete(hObject);
+try
+varargout{1} = handles.output;
+end
 
 
 % ----------------Mean flow properties pannel------------------------------
@@ -567,14 +572,14 @@ guidata(hObject, handles);
 global CI
 CI.IsRun.GUI_INI_TP = 1;
 assignin('base','CI',CI); 
-uiresume(handles.figure);
+delete(handles.figure);
 
 % --- Executes on button press in pb_Cancel.
 function pb_Cancel_Callback(hObject, eventdata, handles)
 % hObject    handle to pb_Cancel (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-uiresume(handles.figure);
+delete(handles.figure);
 
 % --- Executes when user attempts to close figure.
 function figure_CloseRequestFcn(hObject, eventdata, handles)
@@ -583,7 +588,7 @@ function figure_CloseRequestFcn(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 % Hint: delete(hObject) closes the figure
-uiresume(hObject);
+delete(hObject);
 
 % --- Update the data when clicking 'OK' or 'Apply'
 function Fcn_GUI_INI_TP_Calculation(varargin)
@@ -1241,43 +1246,65 @@ xlabel(hAxes1,'$x $ [m]','Color','k','Interpreter','LaTex','FontSize',handles.Fo
 set(hAxes1,'xlim',[CI.CD.x_sample(1), CI.CD.x_sample(end)],...
     'xtick',CI.CD.x_sample(1:end),...
     'YAxisLocation','left','Color','w');
+%
+N = length(CI.CD.index);
+x_plots(1,1:N-1) = CI.CD.x_sample(1:N-1);
+x_plots(2,1:N-1) = CI.CD.x_sample(2:N);
+%
 switch pop_plot
-    case 1
-        for ss=1:length(CI.CD.x_sample)-1
-            plot([CI.CD.x_sample(ss) CI.CD.x_sample(ss+1)],CI.TP.u_mean(1,ss).*[1 1],'color','r','linewidth',2,...
-    		'linestyle','-')
+    case 1  
+        for ss = 1:N-1
+            y_plots(1:2,ss) = CI.TP.u_mean(1,ss);
         end
         ylabel(hAxes1,'$\bar{u}$ [m/s]','Color','k','Interpreter','LaTex','FontSize',handles.FontSize(1));
-        yvalue_max=max(CI.TP.u_mean(1,:));
-        yvalue_min=min(CI.TP.u_mean(1,:));
-        ymax=yvalue_max+round((yvalue_max-yvalue_min).*10)./50;
-        ymin=yvalue_min-round((yvalue_max-yvalue_min).*10)./50;
-        if ymax<=ymin
-            ymax = ymax+0.1*mean(CI.TP.u_mean);
-            ymin = ymin-0.1*mean(CI.TP.u_mean);
-        end
     case 2
-        for ss=1:length(CI.CD.x_sample)-1
-            plot([CI.CD.x_sample(ss) CI.CD.x_sample(ss+1)],CI.TP.T_mean(1,ss).*[1 1],'color','r','linewidth',2,...
-    		'linestyle','-')
+        for ss = 1:N-1
+            y_plots(1:2,ss) = CI.TP.T_mean(1,ss);
         end
         ylabel(hAxes1,'$\bar{T}$ [K]','Color','k','Interpreter','LaTex','FontSize',handles.FontSize(1));
-        yvalue_max=max(CI.TP.T_mean(1,:));
-        yvalue_min=min(CI.TP.T_mean(1,:));   
-        ymax=yvalue_max+round((yvalue_max-yvalue_min).*10)./50+eps;
-        ymin=yvalue_min-round((yvalue_max-yvalue_min).*10)./50-eps;
-        if ymax<=ymin
-            ymax = ymax+10;
-            ymin = ymin-10;
-        end
 end
-        set(hAxes1,'ylim',[ymin ymax])
-hold off
-%--------------------------------
+%
+for ss = 1:N-1
+    ColorUDF{ss} = 'b';         % color of the line
+end
+indexFlame = find(CI.CD.index == 1);
+if isempty(indexFlame) == 0
+    for ss = indexFlame:N-1
+        ColorUDF{ss} = 'r';
+    end
+end
+indexLiner = find(CI.CD.index == 30);
+if isempty(indexLiner) == 0
+   switch pop_plot
+        case 1  
+            y_plots(2,indexLiner) = CI.TP.u_mean(1,indexLiner+1);
+        case 2
+            y_plots(2,indexLiner) = CI.TP.T_mean(1,indexLiner+1);
+   end
+end
+
+for ss = 1:N-1
+    plot(hAxes1,[x_plots(1,ss),x_plots(2,ss)],[y_plots(1,ss),y_plots(2,ss)],...
+        'color',ColorUDF{ss},'linewidth',2,'linestyle','-');
+end
+if isempty(indexFlame) == 0
+    plot(hAxes1,[x_plots(1,indexFlame),x_plots(1,indexFlame)],[y_plots(1,indexFlame-1),y_plots(1,indexFlame)],...
+        'color','g','linewidth',2,'linestyle','--');
+end
+yvalue_max  = max(max(y_plots));
+yvalue_min  = min(min(y_plots));  
+ymax        = yvalue_max+round((yvalue_max-yvalue_min).*10)./50+eps;
+ymin        = yvalue_min-round((yvalue_max-yvalue_min).*10)./50-eps;
+if ymax<=ymin
+    ymax = ymax+0.1*mean(mean(y_plots));
+    ymin = ymin-0.1*mean(mean(y_plots));
+end
+set(hAxes1,'ylim',[ymin ymax])
+hold off    
+%
 assignin('base','CI',CI); 
 % 
-% -----------------------------end-----------------------------------------
-
+% -------------------------------------------------------------------------
 
 % --- Executes on selection change in pop_TP_M1_u1.
 function pop_TP_M1_u1_Callback(hObject, eventdata, handles)
