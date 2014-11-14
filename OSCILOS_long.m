@@ -28,7 +28,7 @@ function varargout = OSCILOS_long(varargin)
 
 % Edit the above text to modify the response to help OSCILOS_long
 
-% Last Modified by GUIDE v2.5 24-Oct-2014 09:19:09
+% Last Modified by GUIDE v2.5 14-Nov-2014 21:15:22
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -42,7 +42,6 @@ gui_State = struct('gui_Name',       mfilename, ...
 if nargin && ischar(varargin{1})
     gui_State.gui_Callback = str2func(varargin{1});
 end
-
 if nargout
     [varargout{1:nargout}] = gui_mainfcn(gui_State, varargin{:});
 else
@@ -62,22 +61,26 @@ function OSCILOS_long_OpeningFcn(hObject, eventdata, handles, varargin)
 % Choose default command line output for OSCILOS_long
 handles.output = hObject;
 guidata(hObject, handles);
+%
+handles=guihandles(hObject);
+setappdata(0,'hgui',gcf);
 %---------------------------------
 % Initialization
 Main_program_Initialization(hObject, eventdata, handles)
 handles = guidata(hObject);
 guidata(hObject, handles);
 %---------------------------------
-% Set waiting flag in appdata
-setappdata(handles.figure,'waiting',1)
-% UIWAIT makes changeme_main wait for user response (see UIRESUME)
-uiwait(handles.figure);
- 
+% % Set waiting flag in appdata
+% setappdata(handles.figure,'waiting',0)
+% % UIWAIT makes changeme_main wait for user response (see UIRESUME)
+% uiwait(handles.figure);
+
+% --- Executes during object creation, after setting all properties.
+function figure_CreateFcn(hObject, eventdata, handles) %#ok<*DEFNU,*INUSD> 
+
 % --- Outputs from this function are returned to the command line.
 function varargout = OSCILOS_long_OutputFcn(hObject, eventdata, handles) 
-varargout{1} = [];
-% Now destroy yourself
-delete(hObject);
+varargout{1} = handles.output;
 
 % --------------------------------------------------------------------
 function FILE_Callback(hObject, eventdata, handles)
@@ -350,7 +353,7 @@ function figure_CloseRequestFcn(hObject, eventdata, handles)
       'Yes','No','Yes'); 
    switch selection, 
       case 'Yes',
-         uiresume(hObject);
+         delete(hObject);
          rmpath(genpath('./'))                    % remove directories from search path
       case 'No'
       return 
@@ -633,3 +636,10 @@ CI.IsRun.GUI_FREQ_EigCal_AD = 0;
 assignin('base','CI',CI)
 guidata(hObject, handles); 
 % --------------------------------end--------------------------------------
+
+
+% --- Executes during object deletion, before destroying properties.
+function figure_DeleteFcn(hObject, eventdata, handles)
+% hObject    handle to figure (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
