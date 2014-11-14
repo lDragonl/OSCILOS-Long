@@ -141,9 +141,11 @@ function edit_TP_p1_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 datEdit = str2double(get(hObject, 'String'));
-if isnan(datEdit)
-    set(hObject, 'String', 0);
-    errordlg('Input must be a number','Error');
+ValDefault = 101325; 
+if isnan(datEdit) || ~isreal(datEdit) ||datEdit < 0
+    set(hObject, 'String', ValDefault);
+    errordlg('Input must be a non-negative real number','Error');
+    % when the input is not a number, it is set to the default value
 end
 Fcn_disable_button(hObject)
 
@@ -163,9 +165,11 @@ function edit_TP_T1_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 datEdit = str2double(get(hObject, 'String'));
-if isnan(datEdit)
-    set(hObject, 'String', 0);
-    errordlg('Input must be a number','Error');
+ValDefault = 293.15; 
+if isnan(datEdit) || ~isreal(datEdit) ||datEdit < 0
+    set(hObject, 'String', ValDefault);
+    errordlg('Input must be a non-negative real number','Error');
+    % when the input is not a number, it is set to the default value
 end
 Fcn_disable_button(hObject)
 
@@ -186,9 +190,11 @@ function edit_TP_M1_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 datEdit = str2double(get(hObject, 'String'));
-if isnan(datEdit)
-    set(hObject, 'String', 0);
-    errordlg('Input must be a number','Error');
+ValDefault = 1e-3; 
+if isnan(datEdit) || ~isreal(datEdit) ||datEdit < 0
+    set(hObject, 'String', ValDefault);
+    errordlg('Input must be a non-negative real number','Error');
+    % when the input is not a number, it is set to the default value
 end
 Fcn_disable_button(hObject)
 
@@ -248,9 +254,11 @@ function edit_FD_effi_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 datEdit = str2double(get(hObject, 'String'));
-if isnan(datEdit)
-    set(hObject, 'String', 0);
-    errordlg('Input must be a number','Error');
+ValDefault = 1;   % combustion efficiency
+if isnan(datEdit) || ~isreal(datEdit) ||datEdit < 0
+    set(hObject, 'String', ValDefault);
+    errordlg('Input must be a non-negative real number','Error');
+    % when the input is not a number, it is set to the default value
 end
 Fcn_disable_button(hObject)
 
@@ -293,9 +301,11 @@ function edit_FD_phi_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 datEdit = str2double(get(hObject, 'String'));
-if isnan(datEdit)
-    set(hObject, 'String', 0);
-    errordlg('Input must be a number','Error');
+ValDefault = 1; 
+if isnan(datEdit) || ~isreal(datEdit) ||datEdit < 0
+    set(hObject, 'String', ValDefault);
+    errordlg('Input must be a non-negative real number','Error');
+    % when the input is not a number, it is set to the default value
 end
 Fcn_disable_button(hObject)
 
@@ -317,9 +327,11 @@ function edit_FD_dilute_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 datEdit = str2double(get(hObject, 'String'));
-if isnan(datEdit)
-    set(hObject, 'String', 0);
-    errordlg('Input must be a number','Error');
+ValDefault = 0; 
+if isnan(datEdit) || ~isreal(datEdit) ||datEdit < 0
+    set(hObject, 'String', ValDefault);
+    errordlg('Input must be a non-negative real number','Error');
+    % when the input is not a number, it is set to the default value
 end
 Fcn_disable_button(hObject)
 
@@ -341,9 +353,11 @@ function edit_TD_Tratio_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 datEdit = str2double(get(hObject, 'String'));
-if isnan(datEdit)
-    set(hObject, 'String', 0);
-    errordlg('Input must be a number','Error');
+ValDefault = 1; 
+if isnan(datEdit) || ~isreal(datEdit) ||datEdit < 0
+    set(hObject, 'String', ValDefault);
+    errordlg('Input must be a non-negative real number','Error');
+    % when the input is not a number, it is set to the default value
 end
 Fcn_disable_button(hObject)
 
@@ -507,6 +521,16 @@ function pb_Cal_Callback(hObject, eventdata, handles)
 handles = guidata(hObject);
 guidata(hObject, handles);
 hMsg = msgbox('The calculation may take several seconds, please wait!','Calculation...');
+%
+hChildren       = get(hMsg,'children');
+set(hChildren(2),       'units', 'points',...
+                        'Fontunits','points',...
+                        'fontsize',handles.FontSize(2),...
+                        'string','OK',...
+                        'backgroundcolor',handles.bgcolor{3},...
+                        'visible','off',...
+                        'enable','off')
+%
 pause(1)
 delete(hMsg)
 %
@@ -889,7 +913,7 @@ set(handles.pop_TP_M1_u1,...
                         'Fontunits','points',...
                         'position',[pW*6.5/10 pH*2.25/10 pW*1.5/10 pH*4.0/10],...
                         'fontsize',handles.FontSize(2),...
-                        'string',{'M1_mean [-]:';'Mean velocity [m/s]'},...
+                        'string',{'M1_mean [-]:';'Mean velocity [m/s]:'},...
                         'backgroundcolor',handles.bgcolor{1},...
                         'horizontalalignment','left',...
                         'enable','on',...
