@@ -51,7 +51,7 @@ function GUI_INI_FMEXP_OpeningFcn(hObject, eventdata, handles, varargin)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 % varargin   command line arguments to GUI_INI_FMEXP (see VARARGIN)
-indexEdit = 1;
+indexEdit = 0;
 switch indexEdit 
     case 0
         %--------------------------------------------------------------------------
@@ -84,7 +84,8 @@ switch indexEdit
             % Initialization
             GUI_INI_FMEXP_Initialization(hObject, eventdata, handles)
         end
-        % Update handles structure
+        guidata(hObject, handles);
+        handles.output = hObject;
         guidata(hObject, handles);
         if dontOpen
            disp('-----------------------------------------------------');
@@ -93,7 +94,7 @@ switch indexEdit
            disp('parent directory!')
            disp('-----------------------------------------------------');
         else
-           uiwait(hObject);
+%            uiwait(hObject);
         end
     case 1
         global CI
@@ -121,7 +122,8 @@ switch indexEdit
         handles.indexApp = 0;
         guidata(hObject, handles);  
         GUI_INI_FMEXP_Initialization(hObject, eventdata, handles)
-        uiwait(hObject);
+        handles.output = hObject;
+        guidata(hObject, handles);
 end
 
 
@@ -351,7 +353,7 @@ if CI.FMEXP.nFTF>0
     set(handles.pb_SaveFig,'enable','on');
     guidata(hObject, handles);
     assignin('base','CI',CI);                   % save the current information to the workspace
-    uiresume(handles.figure);
+    delete(handles.figure);
 else
     errordlg('No FTF created!','Error');
 end
@@ -374,9 +376,10 @@ function varargout = GUI_INI_FMEXP_OutputFcn(hObject, eventdata, handles)
 % hObject    handle to figure
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-varargout{1} = [];
-delete(hObject);
-%
+try
+varargout{1} = handles.output;
+end
+%UI
 
 function Fcn_GUI_INI_FMEXP_plot(varargin)
 hObject     = varargin{1};
@@ -507,7 +510,7 @@ function pb_Cancel_Callback(hObject, eventdata, handles)
 % hObject    handle to pb_Cancel (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-uiresume(handles.figure);
+delete(handles.figure);
 
 % --- Executes when user attempts to close figure.
 function figure_CloseRequestFcn(hObject, eventdata, handles)
@@ -516,7 +519,7 @@ function figure_CloseRequestFcn(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 % Hint: delete(hObject) closes the figure
-uiresume(hObject);
+delete(hObject);
 %--------------------------------------------------------------------------
 
 % --- Executes on selection change in pop_Plot.
@@ -607,7 +610,7 @@ if  isempty(indexDelete)
 else
     String_Listbox(indexDelete)     = [];
     set(handles.listbox_EXP,'string',String_Listbox,'value',1);
-    CI.FMEXP.FTF(indexDelete)       = [];
+    CI.FMEXP.FTF{indexDelete}       = [];
     CI.FMEXP.uRatio(indexDelete)    = []; 
     CI.FMEXP.nFTF                   = CI.FMEXP.nFTF - 1; 
     Fcn_GUI_INI_FMEXP_Enable(hObject,CI.FMEXP.nFTF)

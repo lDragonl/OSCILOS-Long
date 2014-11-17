@@ -84,7 +84,8 @@ switch handles.indexEdit
             % Initialization
             GUI_INI_FM_Initialization(hObject, eventdata, handles)
         end
-        % Update handles structure
+        guidata(hObject, handles);
+        handles.output = hObject;
         guidata(hObject, handles);
         if dontOpen
            disp('-----------------------------------------------------');
@@ -93,7 +94,7 @@ switch handles.indexEdit
            disp('parent directory!')
            disp('-----------------------------------------------------');
         else
-           uiwait(hObject);
+%            uiwait(hObject);
         end
     case 1
         global CI
@@ -119,7 +120,8 @@ switch handles.indexEdit
         handles.indexApp = 0;
         guidata(hObject, handles);  
         GUI_INI_FM_Initialization(hObject, eventdata, handles)
-        uiwait(hObject);
+        handles.output = hObject;
+        guidata(hObject, handles);
 end
 
 
@@ -706,7 +708,7 @@ guidata(hObject, handles);
 global CI
 CI.IsRun.GUI_INI_FM = 1;
 assignin('base','CI',CI); 
-uiresume(handles.figure);
+delete(handles.figure);
 %
 % --- Executes on button press in pb_Apply.
 function pb_Apply_Callback(hObject, eventdata, handles)
@@ -726,8 +728,9 @@ function varargout = GUI_INI_FM_OutputFcn(hObject, eventdata, handles)
 % hObject    handle to figure
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-varargout{1} = [];
-delete(hObject);
+try
+varargout{1} = handles.output;
+end
 %
 %-------------------------------------------------------------------------
 function Fcn_GUI_INI_FM_Plot(varargin)
@@ -1041,14 +1044,14 @@ function pb_Cancel_Callback(hObject, eventdata, handles)
 % hObject    handle to pb_Cancel (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-uiresume(handles.figure);
+delete(handles.figure);
 %
 % --- Executes when user attempts to close figure.
 function figure_CloseRequestFcn(hObject, eventdata, handles)
 % hObject    handle to figure (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-uiresume(hObject);
+delete(hObject);
 %
 % --- Executes on selection change in pop_Plot.
 function pop_Plot_Callback(hObject, eventdata, handles)
