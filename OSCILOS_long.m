@@ -149,6 +149,7 @@ switch selection
         if CI.IsRun.GUI_INI_BC == 1;
             set(handles.FREQ,           'enable','on')
             set(handles.FREQ_EigCal,    'enable','on')
+            set(handles.TD,             'enable','on')
         end
     catch
     end
@@ -271,16 +272,6 @@ function TD_SIM_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-function EX_Callback(hObject, eventdata, handles)
-% hObject    handle to EX (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-function EX_RT_Callback(hObject, eventdata, handles)
-% hObject    handle to EX_RT (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-GUI_RijkeTube('OSCILOS_long', handles.figure);
 
 function HP_Callback(hObject, eventdata, handles)
 % hObject    handle to HP (see GCBO)
@@ -518,11 +509,11 @@ set(handles.FREQ_EigCal,...
 % Time domain analysis
 
 set(handles.TD,...
-                        'Enable',   'on',...
+                        'Enable',   'off',...
                         'ForegroundColor',      handles.bgcolor{2},...
                         'Label',                'Time domain simulation',...
                         'Position',             4,...
-                        'visible',              'off',...
+                        'visible',              'on',...
                         'Accelerator',          '' )
 set(handles.TD_GreenFcn,...
                         'Enable',   'on',...
@@ -533,9 +524,9 @@ set(handles.TD_GreenFcn,...
                         'Accelerator',          '' )
                     
 set(handles.TD_SIM,...
-                        'Enable',   'on',...
+                        'Enable',   'off',...
                         'ForegroundColor',      handles.bgcolor{2},...
-                        'Label',                'Simulation',...
+                        'Label',                'Simulation...',...
                         'Position',             2,...
                         'visible',              'on',...
                         'Accelerator',          '' )
@@ -623,6 +614,8 @@ set(handles.listbox_Info,...
 %  index indicates that if the sub GUI program has ever been run
 % if index == 0, the sub GUI program has not been run
 % if index == 1, has been run
+%
+% Initialization pannels
 CI.IsRun.GUI_INI_CD         = 0;
 CI.IsRun.GUI_INI_TP         = 0;
 CI.IsRun.GUI_INI_FM         = 0;
@@ -630,9 +623,12 @@ CI.IsRun.GUI_INI_FMEXP      = 0;
 CI.IsRun.GUI_INI_BC         = 0;
 CI.IsRun.GUI_INI_BC_Entropy = 0;
 %
+% Frequency domain calculation pannels
 CI.IsRun.GUI_FREQ_EigCal    = 0;
 CI.IsRun.GUI_FREQ_EigCal_AD = 0;
 %
+% Time domain simulation
+CI.IsRun.GUI_TD_Convg       = 0;            
 assignin('base','CI',CI)
 guidata(hObject, handles); 
 % --------------------------------end--------------------------------------
