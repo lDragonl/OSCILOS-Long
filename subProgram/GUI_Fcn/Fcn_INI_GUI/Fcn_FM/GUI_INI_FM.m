@@ -22,7 +22,7 @@ function varargout = GUI_INI_FM(varargin)
 
 % Edit the above text to modify the response to help GUI_INI_FM
 
-% Last Modified by GUIDE v2.5 08-Oct-2014 10:09:19
+% Last Modified by GUIDE v2.5 18-Nov-2014 17:00:38
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -151,7 +151,11 @@ switch CI.IsRun.GUI_INI_FM
         % -------------------------
         % G-EQuation (Williams 1985)
         CI.FM.NL.Model4.nb_points = 35; % Number of points used for discretisation along r
-        CI.FM.NL.Model4.SU   = 3; % in m/s
+        CI.FM.NL.Model4.rb = CI.CD.r_sample(1); % this might need edition for multiple section sizes
+        CI.FM.NL.Model4.ra   = CI.FM.NL.Model4.rb/2; % in m
+        CI.FM.NL.Model4.xi = zeros(1,CI.FM.NL.Model4.nb_points);
+        CI.FM.NL.Model4.U1 = CI.TP.u_mean(1,1); % this might need edition for multiple section sizes
+        CI.FM.NL.Model4.SU   = CI.FM.NL.Model4.U1 * 0.088; % in m/s
         % -------------------------
 end
 assignin('base','CI',CI);                   % save the current information to the workspace
@@ -391,6 +395,7 @@ set(handles.edit_NL_a3,...
                         'backgroundcolor',handles.bgcolor{1},...
                         'horizontalalignment','right',...
                         'Enable','off');  
+
 %----------------------------------------
 %
 % pannel AOC                   
@@ -577,7 +582,7 @@ switch pop_NL_type
                                                'string','taufN [ms]'); 
    case 4
         set(handles.pop_Plot,                  'enable','off');
-        set(handles.pb_Apply,                   'enable','off');
+        set(handles.pb_Apply,                  'enable','off');
         set(handles.edit_NL_a1,                'visible','on',...
                                                'string', num2str(CI.FM.NL.Model4.SU));
         set(handles.text_NL_a1,                'visible','on',...
@@ -586,8 +591,10 @@ switch pop_NL_type
                                                'string', num2str(CI.FM.NL.Model4.nb_points));
         set(handles.text_NL_a2,                'visible','on',...
                                                'string','Num. points'); 
-        set(handles.edit_NL_a3,                'visible','off')
-        set(handles.text_NL_a3,                'visible','off')
+        set(handles.edit_NL_a3,                'visible','on',...
+                                               'string', num2str(CI.FM.NL.Model4.ra));
+        set(handles.text_NL_a3,                'visible','on',...
+                                               'string','ra [m]'); 
 end
 guidata(hObject, handles);
 %
@@ -654,15 +661,13 @@ switch CI.FM.NL.style
                                                         CI.FM.NL.Model3.beta,...
                                                         DuRatio,uRatioMax);                                            
     case 4
-        CI.FM.NL.Model4.alpha       = str2double(get(handles.edit_NL_a1,'String'));
-        CI.FM.NL.Model4.beta        = str2double(get(handles.edit_NL_a2,'String'));
-        CI.FM.NL.Model4.taufN       = str2double(get(handles.edit_NL_a3,'String')).*1e-3;
-        DuRatio                     = 1e-3;
-        uRatioMax                   = 5;
-        [CI.FM.NL.Model3.uRatio,CI.FM.NL.Model3.Lf]...
-            = Fcn_GUI_INI_FM_Nonlinear_model_J_Li_A_Morgas(   CI.FM.NL.Model3.alpha,...
-            CI.FM.NL.Model3.beta,...
-            DuRatio,uRatioMax);
+        CI.FM.NL.Model4.SU       = str2double(get(handles.edit_NL_a1,'String'));
+        CI.FM.NL.Model4.nb_points        = str2double(get(handles.edit_NL_a2,'String'));
+        CI.FM.NL.Model4.y_vec = linspace(CI.FM.NL.Model4.ra,CI.FM.NL.Model4.rb,CI.FM.NL.Model4.nb_points);
+        CI.FM.NL.Model4.area_ratio = 1.0 -(CI.FM.NL.Model4.ra/CI.FM.NL.Model4.rb)^2;
+        CI.FM.NL.Model4.Ugs = CI.FM.NL.Model4.U1/CI.FM.NL.Model4.area_ratio;
+        CI.FM.NL.Model4.xi       = ...
+            Fcn_TD_Gequ_steady_flame( CI.FM.NL.Model4.Ugs,CI.FM.NL.Model4.SU,CI.FM.NL.Model4.y_vec );
 end
 assignin('base','CI',CI);                   % save the current information to the workspace
 guidata(hObject, handles);
@@ -1281,3 +1286,26 @@ for ss=1:length(n_sample)
     color_type(ss,1:3)=cmap(n_sample(ss),1:3);
 end
 %---------------------------end-------------------------------------------
+
+
+
+function edit21_Callback(hObject, eventdata, handles)
+% hObject    handle to edit21 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of edit21 as text
+%        str2double(get(hObject,'String')) returns contents of edit21 as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function edit21_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to edit21 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
