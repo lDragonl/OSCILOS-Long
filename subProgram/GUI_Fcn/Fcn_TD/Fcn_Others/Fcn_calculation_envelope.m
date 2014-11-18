@@ -1,5 +1,5 @@
 function y = Fcn_calculation_envelope(y0,nPadding,filter)
-% This function is used to calculate the envelope of a singal
+% This function is used to calculate the envelope of a single
 % y0 is the original signal
 % nPadding is the length of zero padding signals before and after the
 % original signal y0
