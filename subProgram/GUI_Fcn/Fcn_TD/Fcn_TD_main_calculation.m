@@ -9,8 +9,9 @@ hWaitBar = waitbar(0,'Time domain calculations, please wait...');
 %
 for mm = 1:CI.TD.nPeriod
     switch CI.FM.NL.style                                                           
-        case 3
-            Fcn_TD_main_calculation_iteration_convergence(mm)                             
+        case {3,4}
+            Fcn_TD_main_calculation_iteration_convergence(mm)      
+
         otherwise
             waitbar(mm/CI.TD.nPeriod);
             drawnow
