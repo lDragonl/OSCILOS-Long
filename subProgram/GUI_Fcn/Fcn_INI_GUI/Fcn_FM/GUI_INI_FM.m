@@ -665,7 +665,7 @@ switch CI.FM.NL.style
         CI.FM.NL.Model4.nb_points        = str2double(get(handles.edit_NL_a2,'String'));
         CI.FM.NL.Model4.y_vec = linspace(CI.FM.NL.Model4.ra,CI.FM.NL.Model4.rb,CI.FM.NL.Model4.nb_points);
         CI.FM.NL.Model4.area_ratio = 1.0 -(CI.FM.NL.Model4.ra/CI.FM.NL.Model4.rb)^2;
-        CI.FM.NL.Model4.Ugs = Fcn_TD_Gequ_calc_ugutter( CI.FM.NL.Model4.U1,CI.FM.NL.Model4.area_ratio,0 );
+        CI.FM.NL.Model4.Ugs = Fcn_TD_Gequ_calc_ugutter( CI.FM.NL.Model4.U1,CI.FM.NL.Model4.area_ratio,0,0 );
         CI.FM.NL.Model4.xi       = ...
             Fcn_TD_Gequ_steady_flame( CI.FM.NL.Model4.Ugs,CI.FM.NL.Model4.SU,CI.FM.NL.Model4.y_vec );
 end

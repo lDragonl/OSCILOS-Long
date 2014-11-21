@@ -5,10 +5,13 @@ function [ grad_xi ] = Fcn_TD_Gequ_calc_grad_xi( u_gutter,SU,xi,y_vec )
 
 % Compute BC
 if u_gutter >= SU
-   BC_grad = sqrt(( u_gutter/SU)^2 - 1);
+   BC_grad = sqrt(( u_gutter/SU).^2 - 1);
+else
+   BC_grad = zeros(size(u_gutter));
 end
-    
-grad_xi = [BC_grad, diff(xi)./diff(y_vec)];
+
+prod_vec = ones(length(u_gutter),1);
+grad_xi = cat(2,BC_grad, diff(xi,1,2)./(prod_vec * diff(y_vec)));
 
 end
 

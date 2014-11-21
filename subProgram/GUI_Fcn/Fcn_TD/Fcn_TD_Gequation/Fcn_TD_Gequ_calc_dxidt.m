@@ -4,7 +4,8 @@ function [ dxidt ] = Fcn_TD_Gequ_calc_dxidt( u_gutter,SU,xi,y_vec )
 % Compute the gradient of the flame
 grad_xi = Fcn_TD_Gequ_calc_grad_xi(u_gutter,SU,xi,y_vec);
 
-dxidt = u_gutter - SU * sqrt(1 + grad_xi.^2);
+prod_vec = ones(1,size(grad_xi,2));
+dxidt = u_gutter * prod_vec - SU * sqrt(1 + grad_xi.^2);
 
 end
 
