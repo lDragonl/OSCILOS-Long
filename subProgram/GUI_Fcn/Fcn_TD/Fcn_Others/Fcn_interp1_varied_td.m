@@ -6,8 +6,10 @@ function z = Fcn_interp1_varied_td(y,Var,tau,dt)
 % dt is the time step
 % tau can be an array
 % if tau is an array, the length of tau should be equal to Var
-% 2014.11.11
-% 
+% author: Jingxuan LI (jingxuan.li@imperial.ac.uk)
+% first created:    2014-11-11
+% last edited:      2014-11-19
+%
 tauMin      = min(tau);
 tauMax      = max(tau);
 nMin        = floor(tauMin/dt);

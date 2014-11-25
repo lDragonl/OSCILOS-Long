@@ -1,6 +1,8 @@
 function Fcn_TD_main_calculation_period_uRatio_envelope(mm)
 % calculate the envelope of a period
-% last edit: 2014-11-13
+% author: Jingxuan LI (jingxuan.li@imperial.ac.uk)
+% first created:    2014-11-18
+% last edited:      2014-11-19
 %
 global CI
 Var(1)     = CI.TD.nPadding + (CI.TD.indexPeriod(mm,1)-1)*CI.TD.nGap + 1;
