@@ -101,7 +101,7 @@ switch handles.indexEdit
         handles = Fcn_GUI_default_configuration(handles);
         handles.output = hObject;
         guidata(hObject, handles);
-        CI.IsRun.GUI_TD_Para_Config = 1;
+        CI.IsRun.GUI_TD_Para_Config = 0;
         assignin('base','CI',CI);                   % save the current information to the works
         guidata(hObject, handles);  
         GUI_TD_Para_Config_Initialization(hObject, eventdata, handles)
