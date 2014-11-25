@@ -6,21 +6,23 @@ global CI
 % -------------------------------------------------------------------------
 hWaitBar = waitbar(0,'Time domain calculations, please wait...');
 %
-%
-for mm = 1:CI.TD.nPeriod
-    switch CI.FM.NL.style                                                           
-        case {3,4}
-            Fcn_TD_main_calculation_iteration_convergence(mm)      
-
-        otherwise
-            waitbar(mm/CI.TD.nPeriod);
-            drawnow
-            % --------------------------
-            Fcn_TD_calculation_one_period(mm)
-            % --------------------------
-            Fcn_TD_main_calculation_period_uRatio_envelope(mm)   % calculate the envelope
+if CI.FM.NL.style ==4 % Convergence method notr required for G-EQuation
+    
+else
+    for mm = 1:CI.TD.nPeriod
+        switch CI.FM.NL.style
+            case {3}
+                Fcn_TD_main_calculation_iteration_convergence(mm)
+                
+            otherwise
+                waitbar(mm/CI.TD.nPeriod);
+                drawnow
+                % --------------------------
+                Fcn_TD_calculation_one_period(mm)
+                % --------------------------
+                Fcn_TD_main_calculation_period_uRatio_envelope(mm)   % calculate the envelope
+        end
     end
-end
 close(hWaitBar)
 assignin('base','CI',CI);
 

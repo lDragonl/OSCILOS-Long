@@ -47,10 +47,17 @@ for ss = 1 : 50
     % --------------------------
     uRatioEnv1 = Fcn_calculation_envelope(CI.TD.uRatio(VarPad(1):VarPad(2)),N);       % calculate uRatio
     uRatioEnv1 = 0.5*(uRatioEnv1 + uRatioEnv2);
+    
+    switch CI.FM.NL.style   
+        case(3)
     [   CI.TD.Lf(Var(1):VarPad(2)),...
         CI.TD.tauf(Var(1):VarPad(2))]...
         = Fcn_flame_model_NL_JLi_AMorgans(uRatioEnv1(Var(1)-CI.TD.nPadding:end));       % only update the nonlinear value from Var(1) to VarPad(2)
-   
+        case(4)
+            [CI.FM.NL.Model4.q_ratio,CI.FM.NL.Model4.xi(Var(1):VarPad(2),:)] = Fcn_TD_Gequ_interface...
+                ( CI.FM.NL.Model4.SU, CI.FM.NL.Model4.xi(Var(1)-CI.TD.nPadding:end,:), CI.FM.NL.Model4.y_vec, CI.TD.dt, 0, CI.FM.NL.Model4.U1, ...
+                CI.FM.NL.Model4.area_ratio, uRatioEnv1(Var(1)-CI.TD.nPadding:end),CI.TP.Q * CI.FM.NL.Model4.area_ratio, CI.TP.DeltaHr,CI.FM.NL.Model4.rho1 );
+    end
     index = [Var(1), Var(1)-1+N1] - CI.TD.nPadding;
     DeltaDiff = abs(std(uRatioEnv1(index(1) : index(2)) - uRatioEnv2(index(1) : index(2))))   
     hold on

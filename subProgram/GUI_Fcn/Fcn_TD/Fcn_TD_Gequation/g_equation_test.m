@@ -54,7 +54,7 @@ uratio = amp * (alpha * cos(freq* t_vec) + beta * sin(freq * t_vec));
 
 % Sinon on essaye avec un calcul vectoriel
 xi =ones(nb_iter,1) * xi_steady; % The xi is initialised to xi_steady for all iterations (values of uratio) as xi is not updated between these values of uratio
-[q_ratio,xi] = Fcn_TD_Gequ_interface( SU, xi, y_vec, dt, t_vec, U1, area_ratio, uratio,Q_mean, deltah,rho1 );
+[q_ratio,xi] = Fcn_TD_Gequ_interface( SU, xi, y_vec, dt, 0, U1, area_ratio, uratio,Q_mean, deltah,rho1 );
 
 figure
 plot(t_vec,q_ratio)

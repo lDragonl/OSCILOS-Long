@@ -153,8 +153,9 @@ switch CI.IsRun.GUI_INI_FM
         CI.FM.NL.Model4.nb_points = 35; % Number of points used for discretisation along r
         CI.FM.NL.Model4.rb = CI.CD.r_sample(1); % this might need edition for multiple section sizes
         CI.FM.NL.Model4.ra   = CI.FM.NL.Model4.rb/2; % in m
-        CI.FM.NL.Model4.xi = zeros(1,CI.FM.NL.Model4.nb_points);
-        CI.FM.NL.Model4.U1 = CI.TP.u_mean(1,1); % this might need edition for multiple section sizes
+        CI.FM.NL.Model4.xi_steady = zeros(1,CI.FM.NL.Model4.nb_points);
+        CI.FM.NL.Model4.U1 = CI.TP.u_mean(2,1); % this might need edition for multiple section sizes
+        CI.FM.NL.Model4.rho1 = CI.TP.rho_mean(2,1); % this might need edition for multiple section sizes
         CI.FM.NL.Model4.SU   = CI.FM.NL.Model4.U1 * 0.088; % in m/s
         % -------------------------
 end
