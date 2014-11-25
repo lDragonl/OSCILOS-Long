@@ -1,4 +1,4 @@
-function Fcn_TD_initialization_constant_variables
+function Fcn_TD_INI_constant_variables
 % This function is used to pre-calculate some constant values
 %
 % last edited: 2014-11-13 09:22

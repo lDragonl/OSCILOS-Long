@@ -1,4 +1,5 @@
-function qRatio = Fcn_TD_calculation_qRatio(uRatio,yFTFGreen,Var,dt,Lf)
+function qRatio = Fcn_TD_calculation_qRatio_f(uRatio,yFTFGreen,Var,dt,Lf)
+% The flame transfer function is the function of f, but s. 
 % This function is used to calculate qRatio of flame
 % uRatio is the velocity ratio before the flame
 % yFTFGreen is the Green's function of the flame transfer function for weak
@@ -8,7 +9,9 @@ function qRatio = Fcn_TD_calculation_qRatio(uRatio,yFTFGreen,Var,dt,Lf)
 % Lf is the nonlinear gain ratio
 % time delay of flame transfer function is inclued in uRatio
 %
-% last edited: 2014-11-12 16:11
+% author: Jingxuan LI (jingxuan.li@imperial.ac.uk)
+% first created:    2014-11-11
+% last edited:      2014-11-19
 %
 global CI
 NGreen  = length(yFTFGreen);

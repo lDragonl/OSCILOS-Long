@@ -299,6 +299,7 @@ switch CI.IsRun.GUI_TD_Convg
             Nden    = length(den);
             if Nnum <=1 && Nden<=1
                 Green.indexConst(ss)   = 1;
+                Green.sys{ss}          = tf(num,den);
                 Green.y1{ss}           = num./den;
                 Green.t1{ss}           = 0;
                 Green.tauConv1(ss)     = 0;

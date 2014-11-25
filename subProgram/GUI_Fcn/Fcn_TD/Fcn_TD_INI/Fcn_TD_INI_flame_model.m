@@ -1,4 +1,4 @@
-function Fcn_TD_initialization_flame_model
+function Fcn_TD_INI_flame_model
 % -------------------------------------------------------------------------
 % ---------------------flame transfer function-----------------------------
 % -------------------------------------------------------------------------
@@ -17,8 +17,9 @@ switch  CI.FM.NL.style
         Lf = 1;
         tauf = CI.FM.FTF.tauf;
 end
-CI.TD.tauf = zeros(1,CI.TD.nTotal) + tauf;                                  % Nonlinear time delay, which varies with velocity perturbations
-CI.TD.Lf   = zeros(1,CI.TD.nTotal) + Lf;                                    % Nonlinear model, which describes the saturation of heat release
+CI.TD.tauf      = zeros(1,CI.TD.nTotal) + tauf;                             % Nonlinear time delay, which varies with velocity perturbations
+CI.TD.taufRem   = CI.TD.tauf - CI.TD.taufMin;
+CI.TD.Lf        = zeros(1,CI.TD.nTotal) + Lf;                               % Nonlinear model, which describes the saturation of heat release
                                                                             % rate with velocity perturbations
 %
 CI.TD.indexFlame = find(CI.CD.index == 1);

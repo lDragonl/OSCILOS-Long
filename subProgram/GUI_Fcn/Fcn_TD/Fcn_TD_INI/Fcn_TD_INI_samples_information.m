@@ -1,4 +1,4 @@
-function Fcn_TD_initialization_samples_information(fs,tEndRaw,uRatioMax,nGapRatio)
+function Fcn_TD_INI_samples_information(dt,tEndRaw,uRatioMax,nGapRatio)
 % This function is used to initialize the samples information
 % The sampling rate, time end, nGap, and some time samples are initialize
 % in this sub-code. Its parent program is "Fcn_TD_initialization".
@@ -10,13 +10,14 @@ function Fcn_TD_initialization_samples_information(fs,tEndRaw,uRatioMax,nGapRati
 global CI
 % -------------------------------------------------------------------------
 %
-CI.TD.fs                = fs;                                               % Sampling frequency
+CI.TD.dt                = dt;                                               % time step
+CI.TD.fs                = 1/dt;                                            % Sampling frequency
 CI.TD.tEndRaw           = tEndRaw;                                          % a raw time end, which may be slightly changed
                                                                             % in the following code
 %
 % -------------------------------------------------------------------------
 %
-CI.TD.dt                = 1/CI.TD.fs;                                       % time step
+
 CI.TD.NRaw              = round(CI.TD.tEndRaw*CI.TD.fs);                    % raw number of samples after time "0".
 %
 % -------------------------------------------------------------------------

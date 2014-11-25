@@ -802,7 +802,10 @@ main = handles.MainGUI;
 % Obtain handles using GUIDATA with the caller's handle 
 if(ishandle(main))
     mainHandles = guidata(main);
-    changeMain = mainHandles.FREQ;
+    % -------------------------------------
+    changeMain = mainHandles.FREQ;      % set the Frequency pop-up menu enable
+    set(changeMain, 'Enable', 'on');
+    changeMain = mainHandles.TD;        % set the time domain simulation pop-up menu enable
     set(changeMain, 'Enable', 'on');
     String_Listbox=get(mainHandles.listbox_Info,'string');
     ind=find(ismember(String_Listbox,'<HTML><FONT color="blue">Information 4:'));

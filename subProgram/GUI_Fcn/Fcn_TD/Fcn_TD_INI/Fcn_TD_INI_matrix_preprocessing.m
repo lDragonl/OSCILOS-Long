@@ -1,4 +1,4 @@
-function Fcn_TD_initialization_matrix_preprocessing
+function Fcn_TD_INI_matrix_preprocessing
 % This function is used to calculate the matrix connecting the components
 % at two sides of an interface. The inputs are the known values and the
 % outputs are the values to be calculated. The matrix in the technical
