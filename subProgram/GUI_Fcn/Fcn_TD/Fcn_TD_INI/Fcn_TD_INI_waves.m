@@ -1,4 +1,4 @@
-function Fcn_TD_initialization_waves
+function Fcn_TD_INI_waves
 % This function is used to initialize the waves
 % Its parent program is "Fcn_TD_initialization".
 % This function should be run after "Fcn_TD_initialization_samples_information"

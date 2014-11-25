@@ -20,11 +20,17 @@ tauPadding = max(tauPadding, CI.TP.tau_plus(1)  + CI.BC.tau_d2);
 % and A.Morgans JSV
 % We must define a maximum velocity ratio value
 uRatioLimit     = [0 1];
-LfLimit         = interp1(  CI.FM.NL.Model3.uRatio,...
-                            CI.FM.NL.Model3.Lf,...
-                            uRatioLimit,'linear','extrap');
-taufNLimit      = CI.FM.NL.Model3.taufN.*(1 - LfLimit);
+switch CI.FM.NL.style
+    case 3
+        LfLimit         = interp1(  CI.FM.NL.Model3.uRatio,...
+                                    CI.FM.NL.Model3.Lf,...
+                                    uRatioLimit,'linear','extrap');
+        taufNLimit      = CI.FM.NL.Model3.taufN.*(1 - LfLimit);
+    otherwise
+        taufNLimit      = 0;
+end
 taufLimit       = CI.FM.FTF.tauf + taufNLimit;
 tauPadding      = max(tauPadding, max(taufLimit));
+
 %
 % ------------------------ end --------------------------------------------

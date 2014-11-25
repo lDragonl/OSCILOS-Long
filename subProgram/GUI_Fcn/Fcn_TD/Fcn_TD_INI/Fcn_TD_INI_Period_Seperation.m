@@ -1,4 +1,4 @@
-function Fcn_TD_initialization_Period_Seperation(nPeriod,RatioGapPadding)
+function Fcn_TD_INI_Period_Seperation(nPeriod,RatioGapPadding)
 % In case the flame describing function is determined by the envelope of
 % velocity ratio, uRatio, iteration-convergence is necessary. 
 % The whole calculation can be divided to several intervals with
