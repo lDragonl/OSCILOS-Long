@@ -16,6 +16,10 @@ end
 close(hWaitBar)
 assignin('base','CI',CI);
 
+figure
+plot(CI.TD.tSpTotal,CI.TD.uRatio,'-k')
+
+
 % --------------------------  PLOT  ---------------------------------------
 h=figure
 scrsz = get(0,'ScreenSize');
@@ -32,6 +36,6 @@ ylabel(hAxes(1),'$u^\prime/\bar{u}$ [-]','Color','k','Interpreter','LaTex','Font
 set(hAxes(1),'xlim',[0 1],'xTick',0:0.2:1,...
     'YAxisLocation','left','Color','w');
 grid on
-title('evolution of velocity ratio before the flame','interpreter','latex')
+title('evolution of veloc')
 
 % ----------------------------end------------------------------------------

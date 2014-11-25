@@ -272,7 +272,35 @@ function TD_SIM_Callback(hObject, eventdata, handles)
 % hObject    handle to TD_SIM (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-Fcn_TD_main_calculation_without_identification_uRatio
+global CI
+switch CI.FM.NL.style                                                           
+    case 3
+        GUI_TD_Cal_JLI_AMorgans('OSCILOS_long', handles.figure);                            
+    otherwise
+        Fcn_TD_main_calculation_without_identification_uRatio;
+end
+
+% --------------------------------------------------------------------
+function TD_Sensors_Actuators_Callback(hObject, eventdata, handles)
+% hObject    handle to TD_Sensors_Actuators (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+% --------------------------------------------------------------------
+function TD_Para_Config_Callback(hObject, eventdata, handles)
+% hObject    handle to TD_Para_Config (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+guidata(hObject,handles);
+handles=guidata(hObject);
+GUI_TD_Para_Config('OSCILOS_long', handles.figure)
+
+% --------------------------------------------------------------------
+function TD_Plots_Callback(hObject, eventdata, handles)
+% hObject    handle to TD_Plots (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
 
 function HP_Callback(hObject, eventdata, handles)
 % hObject    handle to HP (see GCBO)
@@ -551,7 +579,7 @@ set(handles.TD_Plots,...
                         'ForegroundColor',      handles.bgcolor{2},...
                         'Label',                'Results Output and plot ...',...
                         'Position',             5,...
-                        'visible',              'on',...
+                        'visible',              'off',...
                         'Accelerator',          '' )
 set(handles.HP,...
                         'Enable',   'on',...
@@ -666,24 +694,4 @@ function figure_DeleteFcn(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 
-% --------------------------------------------------------------------
-function TD_Sensors_Actuators_Callback(hObject, eventdata, handles)
-% hObject    handle to TD_Sensors_Actuators (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
 
-
-% --------------------------------------------------------------------
-function TD_Para_Config_Callback(hObject, eventdata, handles)
-% hObject    handle to TD_Para_Config (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-guidata(hObject,handles);
-handles=guidata(hObject);
-GUI_TD_Para_Config('OSCILOS_long', handles.figure)
-
-% --------------------------------------------------------------------
-function TD_Plots_Callback(hObject, eventdata, handles)
-% hObject    handle to TD_Plots (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)

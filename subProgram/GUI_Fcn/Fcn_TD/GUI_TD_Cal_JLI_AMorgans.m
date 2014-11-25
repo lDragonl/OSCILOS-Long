@@ -101,8 +101,6 @@ switch indexEdit
         handles.output = hObject;
         guidata(hObject, handles);
         CI.IsRun.GUI_TD_Cal_JLI_AMorgans = 0;
-        CI.TD.JLI.iteration.tol = 1e-5;
-        CI.TD.JLI.iteration.num = 50;
         assignin('base','CI',CI);                   % save the current information to the works
         guidata(hObject, handles);  
         GUI_Pannel_Initialization(hObject, eventdata, handles)
@@ -114,6 +112,10 @@ function GUI_Pannel_Initialization(varargin)
 hObject = varargin{1};
 handles = guidata(hObject);
 global CI        
+CI.TD.JLI.iteration.tol = 1e-5;
+CI.TD.JLI.iteration.num = 50;
+CI.TD.nPeriod           = 10;
+CI.TD.RatioGapPadding   = 1;
 assignin('base','CI',CI);                   % save the current information to the workspace
 %
 set(0, 'units', 'points');
@@ -153,9 +155,7 @@ set(handles.pop_type,...
                         'Fontunits','points',...
                         'position',[pW*0.5/10 pH*9/10 pW*5.5/10 pH*0.5/10],...
                         'fontsize',handles.FontSize(2),...
-                        'string',{  'Inlet boundary condition';...
-                                    'Outlet boundary condition';...
-                                    'Flame transfer function'},...
+                        'string',{ },...
                         'backgroundcolor',handles.bgcolor{1},...
                         'horizontalalignment','left',...
                         'enable','on',...
@@ -275,6 +275,7 @@ function Fcn_main_calculation_JLI_AMorgans(varargin)
 hObject     = varargin{1};
 handles     = guidata(hObject);
 global CI
+Fcn_TD_INI_Period_Seperation(CI.TD.nPeriod,CI.TD.RatioGapPadding)
 Fcn_set_ui_enable(hObject,handles,0);
 for mm = 1:CI.TD.nPeriod
     % ------------------------
@@ -345,6 +346,8 @@ set(hAxes1,'FontName','Helvetica','FontSize',fontSize1,'LineWidth',1)
 xlabel(hAxes1,'Time [ms]','Color','k','Interpreter','LaTex','FontSize',fontSize1);
 ylabel(hAxes1,'uRatio [-]','Color','k','Interpreter','LaTex','FontSize',fontSize1)
 hold off
+
+
 %
 % -------------------------------------------------------------------------
 %
@@ -456,15 +459,22 @@ function pb_Config_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 global CI
-prompt      = {'Termination tolerance:','Maximum loops:'};
+prompt      = {'Termination tolerance:','Maximum loops:','Number of periods','Padding ratio'};
 dlg_title   = 'Iteration configuration';
 num_lines   = 1;
-def         = {'1e-5','50'};
+def         = {'1e-5','50','10','1'};
 answer      = inputdlg(prompt,dlg_title,num_lines,def);
 if ~isempty(answer)
     CI.TD.JLI.iteration.tol = str2double(answer{1});
     CI.TD.JLI.iteration.num = str2double(answer{2});
-end
+    CI.TD.nPeriod           = str2double(answer{3});
+    CI.TD.RatioGapPadding   = str2double(answer{4});
+else
+    CI.TD.JLI.iteration.tol = str2double(def{1});
+    CI.TD.JLI.iteration.num = str2double(def{2});
+    CI.TD.nPeriod           = str2double(def{3});
+    CI.TD.RatioGapPadding   = str2double(def{4});
+end    
 assignin('base','CI',CI);
 
 function Fcn_set_ui_enable(hObject,handles,indexValiable)
