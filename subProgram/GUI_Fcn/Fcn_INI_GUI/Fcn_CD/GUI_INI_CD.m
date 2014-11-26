@@ -648,6 +648,9 @@ x_sample =      CI.CD.x_sample;
 r_sample =      CI.CD.r_sample;
 index    =      CI.CD.index;
 index_flame =   find(index==1);
+
+%Compute the length downstream of a flame. If aflame is at the end of a section, use the min to set that to 0
+CI.CD.dowst_of_heat_lengths = CI.CD.x_sample(min(index_flame + 1,end)) - CI.CD.x_sample(index_flame);
 %-------------------------------------
 W           = abs(x_sample(end) - x_sample(1));             % Length of the combustor
 H           = 2*max(r_sample);                              % Diameter of the combustor
