@@ -149,15 +149,7 @@ switch CI.IsRun.GUI_INI_FM
         % Dowling's Model
         CI.FM.NL.Model2.alpha   = 0.3;
         % -------------------------
-        % G-EQuation (Williams 1985)
-        CI.FM.NL.Model4.nb_points = 35; % Number of points used for discretisation along r
-        CI.FM.NL.Model4.rb = CI.CD.r_sample(CI.CD.index_flame); % If there are multiple heat zones in the duct, this is a vector
-        CI.FM.NL.Model4.ra   = CI.FM.NL.Model4.rb/2; % in m, also a vector
-        CI.FM.NL.Model4.xi_steady = zeros(length(CI.FM.NL.Model4.rb),CI.FM.NL.Model4.nb_points); % if there are multiple heat zones, this is a matrix (lines are different heat zones, columns are variatiation along r)
-        CI.FM.NL.Model4.U1 = CI.TP.u_mean(1,max(CI.CD.index_flame - 1,1)); % This is a vector if there are multple flame. The max function is required is the flame is at the begining of the duct.
-        CI.FM.NL.Model4.rho1 = CI.TP.u_mean(1,max(CI.CD.index_flame - 1,1));% This is a vector if there are multple flame. The max function is required is the flame is at the end of the duct.
-        CI.FM.NL.Model4.SU   = CI.FM.NL.Model4.U1 * 0.088; % in m/s, this is a vector if there are multple flame.
-        % -------------------------
+ 
 end
 assignin('base','CI',CI);                   % save the current information to the workspace
 %
@@ -581,21 +573,6 @@ switch pop_NL_type
                                                'string', num2str(CI.FM.NL.Model3.taufN.*1e3));
         set(handles.text_NL_a3,                'visible','on',...
                                                'string','taufN [ms]'); 
-   case 4
-        set(handles.pop_Plot,                  'enable','off');
-        set(handles.pb_Apply,                  'enable','off');
-        set(handles.edit_NL_a1,                'visible','on',...
-                                               'string', num2str(CI.FM.NL.Model4.SU));
-        set(handles.text_NL_a1,                'visible','on',...
-                                               'string','Su [m/s]'); 
-        set(handles.edit_NL_a2,                'visible','on',...
-                                               'string', num2str(CI.FM.NL.Model4.nb_points));
-        set(handles.text_NL_a2,                'visible','on',...
-                                               'string','Num. points'); 
-        set(handles.edit_NL_a3,                'visible','on',...
-                                               'string', num2str(CI.FM.NL.Model4.ra));
-        set(handles.text_NL_a3,                'visible','on',...
-                                               'string','ra [m]'); 
 end
 guidata(hObject, handles);
 %
@@ -661,18 +638,6 @@ switch CI.FM.NL.style
       = Fcn_GUI_INI_FM_Nonlinear_model_J_Li_A_Morgas(   CI.FM.NL.Model3.alpha,...
                                                         CI.FM.NL.Model3.beta,...
                                                         DuRatio,uRatioMax);                                            
-    case 4
-        CI.FM.NL.Model4.SU = str2num(get(handles.edit_NL_a1,'String')); % vector if multiple flames. str2num required here to be able to deal with vector inputs
-        CI.FM.NL.Model4.nb_points = str2num(get(handles.edit_NL_a2,'String')); % str2num required here to be able to deal with vector inputs
-        for runner = 1:length(CI.FM.NL.Model4.ra)
-            CI.FM.NL.Model4.y_vec(runner,:) = linspace(CI.FM.NL.Model4.ra(runner),CI.FM.NL.Model4.rb(runner),CI.FM.NL.Model4.nb_points(runner)); % currently the nb of points for all flames nees to be the same
-        end
-        CI.FM.NL.Model4.area_ratio = 1.0 -(CI.FM.NL.Model4.ra./CI.FM.NL.Model4.rb).^2; % vector if there are multiple flames
-        CI.FM.NL.Model4.Ugs = Fcn_TD_Gequ_calc_ugutter( CI.FM.NL.Model4.U1,CI.FM.NL.Model4.area_ratio,0,0 ); % vector if there are multiple flames
-        CI.FM.NL.Model4.xi       = ...
-            Fcn_TD_Gequ_steady_flame( CI.FM.NL.Model4.Ugs,CI.FM.NL.Model4.SU,CI.FM.NL.Model4.y_vec ); % If there are multiple flame, this is a matrix (lines are flames in different sections, columns come along r)
-        CI.FM.NL.Model4.tau_f_factor = 0.42; 
-        CI.FM.NL.Model4.tau_f = CI.FM.NL.Model4.tau_f_factor .* CI.CD.dowst_of_heat_lengths./CI.FM.NL.Model4.Ugs;                        % vector of time delays for everyflame in the duct 
 end
 assignin('base','CI',CI);                   % save the current information to the workspace
 guidata(hObject, handles);
