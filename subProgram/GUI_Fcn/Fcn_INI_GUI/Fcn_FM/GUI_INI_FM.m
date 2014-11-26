@@ -151,12 +151,12 @@ switch CI.IsRun.GUI_INI_FM
         % -------------------------
         % G-EQuation (Williams 1985)
         CI.FM.NL.Model4.nb_points = 35; % Number of points used for discretisation along r
-        CI.FM.NL.Model4.rb = CI.CD.r_sample(1); % this might need edition for multiple section sizes
-        CI.FM.NL.Model4.ra   = CI.FM.NL.Model4.rb/2; % in m
-        CI.FM.NL.Model4.xi_steady = zeros(1,CI.FM.NL.Model4.nb_points);
-        CI.FM.NL.Model4.U1 = CI.TP.u_mean(2,1); % this might need edition for multiple section sizes
-        CI.FM.NL.Model4.rho1 = CI.TP.rho_mean(2,1); % this might need edition for multiple section sizes
-        CI.FM.NL.Model4.SU   = CI.FM.NL.Model4.U1 * 0.088; % in m/s
+        CI.FM.NL.Model4.rb = CI.CD.r_sample(CI.CD.index_flame); % If there are multiple heat zones in the duct, this is a vector
+        CI.FM.NL.Model4.ra   = CI.FM.NL.Model4.rb/2; % in m, also a vector
+        CI.FM.NL.Model4.xi_steady = zeros(length(CI.FM.NL.Model4.rb),CI.FM.NL.Model4.nb_points); % if there are multiple heat zones, this is a matrix (lines are different heat zones, columns are variatiation along r)
+        CI.FM.NL.Model4.U1 = CI.TP.u_mean(1,max(CI.CD.index_flame - 1,1)); % This is a vector if there are multple flame. The max function is required is the flame is at the begining of the duct.
+        CI.FM.NL.Model4.rho1 = CI.TP.u_mean(1,max(CI.CD.index_flame - 1,1));% This is a vector if there are multple flame. The max function is required is the flame is at the end of the duct.
+        CI.FM.NL.Model4.SU   = CI.FM.NL.Model4.U1 * 0.088; % in m/s, this is a vector if there are multple flame.
         % -------------------------
 end
 assignin('base','CI',CI);                   % save the current information to the workspace
@@ -662,13 +662,17 @@ switch CI.FM.NL.style
                                                         CI.FM.NL.Model3.beta,...
                                                         DuRatio,uRatioMax);                                            
     case 4
-        CI.FM.NL.Model4.SU       = str2double(get(handles.edit_NL_a1,'String'));
-        CI.FM.NL.Model4.nb_points        = str2double(get(handles.edit_NL_a2,'String'));
-        CI.FM.NL.Model4.y_vec = linspace(CI.FM.NL.Model4.ra,CI.FM.NL.Model4.rb,CI.FM.NL.Model4.nb_points);
-        CI.FM.NL.Model4.area_ratio = 1.0 -(CI.FM.NL.Model4.ra/CI.FM.NL.Model4.rb)^2;
-        CI.FM.NL.Model4.Ugs = Fcn_TD_Gequ_calc_ugutter( CI.FM.NL.Model4.U1,CI.FM.NL.Model4.area_ratio,0,0 );
+        CI.FM.NL.Model4.SU = str2num(get(handles.edit_NL_a1,'String')); % vector if multiple flames. str2num required here to be able to deal with vector inputs
+        CI.FM.NL.Model4.nb_points = str2num(get(handles.edit_NL_a2,'String')); % str2num required here to be able to deal with vector inputs
+        for runner = 1:length(CI.FM.NL.Model4.ra)
+            CI.FM.NL.Model4.y_vec(runner,:) = linspace(CI.FM.NL.Model4.ra(runner),CI.FM.NL.Model4.rb(runner),CI.FM.NL.Model4.nb_points(runner)); % currently the nb of points for all flames nees to be the same
+        end
+        CI.FM.NL.Model4.area_ratio = 1.0 -(CI.FM.NL.Model4.ra./CI.FM.NL.Model4.rb).^2; % vector if there are multiple flames
+        CI.FM.NL.Model4.Ugs = Fcn_TD_Gequ_calc_ugutter( CI.FM.NL.Model4.U1,CI.FM.NL.Model4.area_ratio,0,0 ); % vector if there are multiple flames
         CI.FM.NL.Model4.xi       = ...
-            Fcn_TD_Gequ_steady_flame( CI.FM.NL.Model4.Ugs,CI.FM.NL.Model4.SU,CI.FM.NL.Model4.y_vec );
+            Fcn_TD_Gequ_steady_flame( CI.FM.NL.Model4.Ugs,CI.FM.NL.Model4.SU,CI.FM.NL.Model4.y_vec ); % If there are multiple flame, this is a matrix (lines are flames in different sections, columns come along r)
+        CI.FM.NL.Model4.tau_f_factor = 0.42; 
+        CI.FM.NL.Model4.tau_f = CI.FM.NL.Model4.tau_f_factor .* CI.CD.dowst_of_heat_lengths./CI.FM.NL.Model4.Ugs;                        % vector of time delays for everyflame in the duct 
 end
 assignin('base','CI',CI);                   % save the current information to the workspace
 guidata(hObject, handles);

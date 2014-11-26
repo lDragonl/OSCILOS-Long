@@ -6,7 +6,7 @@ function [ u_gutter ] = Fcn_TD_Gequ_calc_ugutter( U1,area_ratio,uratio,current_t
 uratio_now = uratio'; % Needs to be in format (n,1)
 
 %Comupute u_gutter
-u_gutter = U1 *(1+uratio_now) / area_ratio;
+u_gutter = U1 .*(1+uratio_now) ./ area_ratio;
 
 end
 
