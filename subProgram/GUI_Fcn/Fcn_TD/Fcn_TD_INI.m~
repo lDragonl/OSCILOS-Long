@@ -4,7 +4,7 @@ global CI
 % The sampling frequency and the raw time ends,
 % and ...
 % first created: 2014-11-12
-% last edited: 2014-11-21
+% last edited: 2014-11-27
 %
 % -------------------------------------------------------------------------
 % check input 
@@ -15,7 +15,7 @@ if nargin == 0
     uRatioMax       = 1;
     nGapRatio       = 1;
     NoiseInfo.level = -40;
-    NoiseInfo.t     = [0 1];
+    NoiseInfo.t     = [-100 100];
 end
 %
 addpath(genpath('./'))                                                      % add directories to search path
