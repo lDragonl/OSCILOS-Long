@@ -48,7 +48,16 @@ for ss = 1:CI.TP.numSection-1
             %     u*(rho*c) = A1+(t-tauf) - A1-(t-tauf)
             %
             if CI.FM.NL.style == 4 % In the case of the G-equation, the value of qratio is computed from a pde, not from a transfer function using Greens function
-                CI.TD.qRatio(Var(1):Var(2)) = [CI.FM.NL.Model4.q_ratio CI.FM.NL.Model4.q_ratio]; % need to check this
+                
+                CI.TD.uRatio(Var(1):Var(2)) = Fcn_TD_calculation_uRatio(Var,ss); % compute the values of uratio in every section
+                
+                % Compute the flame shape and area
+                [CI.FM.NL.Model4.q_ratio,CI.FM.NL.Model4.xi,CI.FM.NL.Model4.bashforth_data ] = Fcn_TD_Gequ_interface...
+                ( CI.FM.NL.Model4.SU, CI.FM.NL.Model4.xi, CI.FM.NL.Model4.y_vec, CI.TD.dt, 0, CI.FM.NL.Model4.U1, ...
+                CI.FM.NL.Model4.area_ratio, CI.TD.uRatio(Var(1):Var(2)),CI.TP.Q * CI.FM.NL.Model4.area_ratio, CI.TP.DeltaHr,CI.FM.NL.Model4.rho1,...
+                CI.FM.NL.Model4.bashforth_data,CI.FM.NL.Model4.IT,CI.FM.NL.Model4.time_integration); % In this case CI.TD.uRatio(Var(1):Var(2)) should be a scalar, check
+            
+                CI.TD.qRatio(Var(1):Var(2)) = [CI.FM.NL.Model4.q_ratio CI.FM.NL.Model4.q_ratio]; % Same should be a scalar, check
             else
                 CI.TD.uRatio(Var(1):Var(2)) = Fcn_TD_calculation_uRatio(Var,ss);
                 CI.TD.qRatio(Var(1):Var(2)) = Fcn_TD_calculation_qRatio_s(  CI.TD.uRatio,...

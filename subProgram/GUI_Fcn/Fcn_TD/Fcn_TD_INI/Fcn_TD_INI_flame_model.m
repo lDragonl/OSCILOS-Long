@@ -13,14 +13,18 @@ uRatio0 = 0;                                                                % fo
 switch  CI.FM.NL.style
     case 3
         [Lf,tauf] = Fcn_flame_model_NL_JLi_AMorgans(uRatio0);
+    case 4 % G-equation case, these are filled to coherency with other models. 
+        Lf = 1;
+        tauf = CI.FM.NL.Model4.tau_f;
     otherwise
         Lf = 1;
         tauf = CI.FM.FTF.tauf;
 end
+
 CI.TD.tauf      = zeros(1,CI.TD.nTotal) + tauf;                             % Nonlinear time delay, which varies with velocity perturbations
 CI.TD.taufRem   = CI.TD.tauf - CI.TD.taufMin;
-CI.TD.Lf        = zeros(1,CI.TD.nTotal) + Lf;                               % Nonlinear model, which describes the saturation of heat release
-                                                                            % rate with velocity perturbations
+CI.TD.Lf        = zeros(1,CI.TD.nTotal) + Lf;                               % Nonlinear model, which describes the saturation of heat release rate with velocity perturbations
+                                                                            
 %
 CI.TD.indexFlame = find(CI.CD.index == 1);
 %
