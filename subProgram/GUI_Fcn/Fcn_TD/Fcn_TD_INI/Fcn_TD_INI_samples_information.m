@@ -30,8 +30,13 @@ CI.TD.NRaw              = round(CI.TD.tEndRaw*CI.TD.fs);                    % ra
                                                                             % the maximum number of samples in one calculation period.
 
 %
-CI.TD.nGapMax           = floor(CI.TD.tauMin.*CI.TD.fs);                    % nGapMax is the maximum time steps which can be calculated in one loop
-CI.TD.nGap              = round(nGapRatio.*CI.TD.nGapMax);                  % This value should be smaller than the maximum value
+if CI.FM.NL.style ==4 
+    CI.TD.nGapMax  = 1;
+    CI.TD.nGap = 1;
+else
+    CI.TD.nGapMax           = floor(CI.TD.tauMin.*CI.TD.fs);                    % nGapMax is the maximum time steps which can be calculated in one loop
+    CI.TD.nGap           = round(nGapRatio.*CI.TD.nGapMax);                     % This value should be smaller than the maximum value
+end
 CI.TD.nRound            = ceil(CI.TD.NRaw./CI.TD.nGap);                     % This is the number of loops to be calculated
 CI.TD.nCal              = CI.TD.nRound*CI.TD.nGap;                          % This is the final sampling number after time zero
 CI.TD.tSp               = (1:CI.TD.nRound*CI.TD.nGap).*CI.TD.dt;            % This is final time samples afte time zero

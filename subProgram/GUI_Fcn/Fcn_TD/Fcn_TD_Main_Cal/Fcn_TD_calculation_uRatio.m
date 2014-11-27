@@ -18,9 +18,11 @@ AM  = Fcn_interp1_varied_td(    CI.TD.AM(ss,:),...
                                 CI.TD.taufMin,...
                                 CI.TD.dt);
 uRatio = (AP - AM)./CI.TP.RhoCU(ss);
-% CI.TP.RhoCU denotes rho*c*u
-% velocity ratio limit : CI.TD.uRatioMax, which is first defined in the
-% program : Fcn_TD_initialization
-uRatio = Fcn_saturation(uRatio,CI.TD.uRatioMax);
+if CI.FM.NL.style ~= 4
+    % CI.TP.RhoCU denotes rho*c*u
+    % velocity ratio limit : CI.TD.uRatioMax, which is first defined in the
+    % program : Fcn_TD_initialization
+    uRatio = Fcn_saturation(uRatio,CI.TD.uRatioMax);
+end
 %
 % ----------------------------end------------------------------------------

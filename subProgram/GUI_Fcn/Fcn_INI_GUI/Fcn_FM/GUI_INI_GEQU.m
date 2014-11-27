@@ -486,7 +486,6 @@ rectangle(  'Position',1000*[x_sample(index_flame(s)) - flame_holder_length,-CI.
 end
 
 %plot the flame sheet
-length(index_flame)
 for s = 1:length(index_flame)
 plot(1000 * CI.FM.NL.Model4.xi(s,:) + 1000 *x_sample(index_flame(s)), 1000* CI.FM.NL.Model4.y_vec(s,:),'-r',...
     1000 * CI.FM.NL.Model4.xi(s,:) + 1000 *x_sample(index_flame(s)), -1000 * CI.FM.NL.Model4.y_vec(s,:),'-r')

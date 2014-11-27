@@ -386,6 +386,17 @@ set(handles.pb_Cancel,...
                         'fontsize',handles.FontSize(2),...
                         'string','Cancel',...
                         'backgroundcolor',handles.bgcolor{3});
+ 
+% --------------------------------
+%specific configuration for G-Equation
+if CI.FM.NL.style == 4;
+ %set(handles.uipanel_Speed,'visible','off');
+ set(handles.uipanel_Limit,'visible','off');
+  
+set(handles.edit_d2,...
+                        'string',1,...
+                        'Enable','off');        
+end
 % --------------------------------
 guidata(hObject, handles);
 if CI.IsRun.GUI_TD_Para_Config == 1
