@@ -344,23 +344,29 @@ hObject = varargin{1};
 handles = guidata(hObject);
 global CI
 % Get data from GUI cells
-        CI.FM.NL.Model4.SU = str2num(get(handles.edit_GEQU_a1,'String')); % vector if multiple flames. str2num required here to be able to deal with vector inputs
-        CI.FM.NL.Model4.tau_f_factor = str2num(get(handles.edit_GEQU_a2,'String'));
-        CI.FM.NL.Model4.nb_points = str2num(get(handles.edit_GEQU_a3,'String')); % str2num required here to be able to deal with vector inputs
-        CI.FM.NL.Model4.ra = str2num(get(handles.edit_GEQU_a4,'String'));
+CI.FM.NL.Model4.SU = str2num(get(handles.edit_GEQU_a1,'String')); % vector if multiple flames. str2num required here to be able to deal with vector inputs
+CI.FM.NL.Model4.tau_f_factor = str2num(get(handles.edit_GEQU_a2,'String'));
+CI.FM.NL.Model4.nb_points = str2num(get(handles.edit_GEQU_a3,'String')); % str2num required here to be able to deal with vector inputs
+CI.FM.NL.Model4.ra = str2num(get(handles.edit_GEQU_a4,'String'));
 % Compute important values
-        CI.FM.NL.Model4.area_ratio = 1.0 -(CI.FM.NL.Model4.ra./CI.FM.NL.Model4.rb).^2; % vector if there are multiple flames
-        CI.FM.NL.Model4.Ugs = Fcn_TD_Gequ_calc_ugutter( CI.FM.NL.Model4.U1,CI.FM.NL.Model4.area_ratio,0,0 ); % vector if there are multiple flames
-        CI.FM.NL.Model4.tau_f = CI.FM.NL.Model4.tau_f_factor .* CI.CD.dowst_of_heat_lengths./CI.FM.NL.Model4.Ugs; % vector of time delays for everyflame in the duct 
+CI.FM.NL.Model4.area_ratio = 1.0 -(CI.FM.NL.Model4.ra./CI.FM.NL.Model4.rb).^2; % vector if there are multiple flames
+CI.FM.NL.Model4.Ugs = Fcn_TD_Gequ_calc_ugutter( CI.FM.NL.Model4.U1,CI.FM.NL.Model4.area_ratio,0,0 ); % vector if there are multiple flames
+CI.FM.NL.Model4.tau_f = CI.FM.NL.Model4.tau_f_factor .* CI.CD.dowst_of_heat_lengths./CI.FM.NL.Model4.Ugs; % vector of time delays for everyflame in the duct
 
-        for runner = 1:length(CI.FM.NL.Model4.ra)
-            CI.FM.NL.Model4.y_vec(runner,:) = linspace(CI.FM.NL.Model4.ra(runner),CI.FM.NL.Model4.rb(runner),CI.FM.NL.Model4.nb_points(runner)); % currently the nb of points for all flames nees to be the same
-        end
-        CI.FM.NL.Model4.area_ratio = 1.0 -(CI.FM.NL.Model4.ra./CI.FM.NL.Model4.rb).^2; % vector if there are multiple flames
-        CI.FM.NL.Model4.Ugs = Fcn_TD_Gequ_calc_ugutter( CI.FM.NL.Model4.U1,CI.FM.NL.Model4.area_ratio,0,0 ); % vector if there are multiple flames
-        CI.FM.NL.Model4.xi       = ...
-            Fcn_TD_Gequ_steady_flame( CI.FM.NL.Model4.Ugs,CI.FM.NL.Model4.SU,CI.FM.NL.Model4.y_vec ); % If there are multiple flame, this is a matrix (lines are flames in different sections, columns come along r)
+for runner = 1:length(CI.FM.NL.Model4.ra)
+    CI.FM.NL.Model4.y_vec(runner,:) = linspace(CI.FM.NL.Model4.ra(runner),CI.FM.NL.Model4.rb(runner),CI.FM.NL.Model4.nb_points(runner)); % currently the nb of points for all flames nees to be the same
+end
+CI.FM.NL.Model4.area_ratio = 1.0 -(CI.FM.NL.Model4.ra./CI.FM.NL.Model4.rb).^2; % vector if there are multiple flames
+CI.FM.NL.Model4.Ugs = Fcn_TD_Gequ_calc_ugutter( CI.FM.NL.Model4.U1,CI.FM.NL.Model4.area_ratio,0,0 ); % vector if there are multiple flames
+CI.FM.NL.Model4.xi       = ...
+    Fcn_TD_Gequ_steady_flame( CI.FM.NL.Model4.Ugs,CI.FM.NL.Model4.SU,CI.FM.NL.Model4.y_vec ); % If there are multiple flame, this is a matrix (lines are flames in different sections, columns come along r)
 
+
+% Set the flame transfer function numerator and denominator to
+% 1, as they are used for the Green's function initilisation,
+CI.FM.FTF.num = 1;
+CI.FM.FTF.den = 1;
+        
 assignin('base','CI',CI);                   % save the current information to the workspace
 guidata(hObject, handles);
 %
@@ -565,20 +571,3 @@ function figure_CloseRequestFcn(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 delete(hObject);
-
-
-% --- Executes on key press with focus on pb_OK and none of its controls.
-function pb_OK_KeyPressFcn(hObject, eventdata, handles)
-% hObject    handle to pb_OK (see GCBO)
-% eventdata  structure with the following fields (see UICONTROL)
-%	Key: name of the key that was pressed, in lower case
-%	Character: character interpretation of the key(s) that was pressed
-%	Modifier: name(s) of the modifier key(s) (i.e., control, shift) pressed
-% handles    structure with handles and user data (see GUIDATA)
-
-
-% --- Executes on button press in pb_SaveFig.
-function pb_SaveFig_Callback(hObject, eventdata, handles)
-% hObject    handle to pb_SaveFig (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
