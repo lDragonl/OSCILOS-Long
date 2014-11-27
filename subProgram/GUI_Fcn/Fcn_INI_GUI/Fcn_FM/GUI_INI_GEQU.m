@@ -383,7 +383,7 @@ Fcn_GUI_INI_FM_GEQU_Update_Data(hObject, eventdata, handles)
 handles = guidata(hObject);
 guidata(hObject, handles);
 global CI
-CI.IsRun.GUI_INI_FM = 1;
+CI.IsRun.GUI_INI_GEQU = 1;
 assignin('base','CI',CI); 
 delete(handles.figure);
 %

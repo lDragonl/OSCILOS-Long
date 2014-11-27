@@ -143,12 +143,17 @@ switch selection
         if CI.IsRun.GUI_INI_TP == 1;
             set(handles.INI_FM,         'enable','on')
         end
-        if CI.IsRun.GUI_INI_FM == 1 || CI.IsRun.GUI_INI_FMEXP == 1;
+        if CI.IsRun.GUI_INI_FM == 1 || CI.IsRun.GUI_INI_FMEXP == 1 || CI.IsRun.GUI_INI_GEQU == 1
             set(handles.INI_BC,         'enable','on')
         end
         if CI.IsRun.GUI_INI_BC == 1;
-            set(handles.FREQ,           'enable','on')
-            set(handles.FREQ_EigCal,    'enable','on')
+            if CI.FM.NL.style == 4 % G-Equation can't be computed in Freq. domain
+                set(handles.FREQ,           'enable','off')
+                set(handles.FREQ_EigCal,    'enable','off')
+            else
+                set(handles.FREQ,           'enable','on')
+                set(handles.FREQ_EigCal,    'enable','on')
+            end
             set(handles.TD,             'enable','on')
         end
     catch
@@ -278,7 +283,9 @@ function TD_SIM_Callback(hObject, eventdata, handles)
 global CI
 switch CI.FM.NL.style                                                           
     case 3
-        GUI_TD_Cal_JLI_AMorgans('OSCILOS_long', handles.figure);                            
+        GUI_TD_Cal_JLI_AMorgans('OSCILOS_long', handles.figure);      
+    case 4 % G-equation
+        Fcn_TD_main_calculation
     otherwise
         Fcn_TD_main_calculation_without_identification_uRatio;
 end
@@ -673,6 +680,7 @@ set(handles.listbox_Info,...
 CI.IsRun.GUI_INI_CD         = 0;
 CI.IsRun.GUI_INI_TP         = 0;
 CI.IsRun.GUI_INI_FM         = 0;
+CI.IsRun.GUI_INI_GEQU       = 0;
 CI.IsRun.GUI_INI_FMEXP      = 0;
 CI.IsRun.GUI_INI_BC         = 0;
 CI.IsRun.GUI_INI_BC_Entropy = 0;
