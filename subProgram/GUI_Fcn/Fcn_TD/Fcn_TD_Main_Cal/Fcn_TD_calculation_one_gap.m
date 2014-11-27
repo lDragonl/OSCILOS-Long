@@ -47,10 +47,10 @@ for ss = 1:CI.TP.numSection-1
             %     [ E2  ]       [ E1  ]   [    ]
             %     u*(rho*c) = A1+(t-tauf) - A1-(t-tauf)
             %
-            CI.TD.uRatio(Var(1):Var(2)) = Fcn_TD_calculation_uRatio(Var,ss);
             if CI.FM.NL.style == 4 % In the case of the G-equation, the value of qratio is computed from a pde, not from a transfer function using Greens function
                 CI.TD.qRatio(Var(1):Var(2)) = [CI.FM.NL.Model4.q_ratio CI.FM.NL.Model4.q_ratio]; % need to check this
             else
+                CI.TD.uRatio(Var(1):Var(2)) = Fcn_TD_calculation_uRatio(Var,ss);
                 CI.TD.qRatio(Var(1):Var(2)) = Fcn_TD_calculation_qRatio_s(  CI.TD.uRatio,...
                     CI.TD.Green.sys{3},...
                     CI.TD.Green.tauConv2(3),...
