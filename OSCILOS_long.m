@@ -272,14 +272,7 @@ function TD_SIM_Callback(hObject, eventdata, handles)
 % hObject    handle to TD_SIM (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-global CI
-switch CI.FM.NL.style                                                           
-    case 3
-        GUI_TD_Cal_JLI_AMorgans('OSCILOS_long', handles.figure);                            
-    otherwise
-        Fcn_TD_main_calculation_without_identification_uRatio;
-end
-
+Fcn_TD_main_calculation(0)
 % --------------------------------------------------------------------
 function TD_Sensors_Actuators_Callback(hObject, eventdata, handles)
 % hObject    handle to TD_Sensors_Actuators (see GCBO)

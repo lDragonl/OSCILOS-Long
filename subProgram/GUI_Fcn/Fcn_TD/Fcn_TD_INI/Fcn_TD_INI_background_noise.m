@@ -15,6 +15,13 @@ if nargin == 0
     NoiseInfo.level     = -40;                                                  % pNoise level 0.01 Pa
     NoiseInfo.t(1)      = CI.TD.tSpTotal(1);
     NoiseInfo.t(end)    = CI.TD.tSpTotal(end);
+else
+    if NoiseInfo.t(1) < CI.TD.tSpTotal(1)
+        NoiseInfo.t(1) = CI.TD.tSpTotal(1);
+    end
+    if NoiseInfo.t(end) > CI.TD.tSpTotal(end)
+        NoiseInfo.t(end) = CI.TD.tSpTotal(end);
+    end
 end
 CI.TD.NoiseInfo         = NoiseInfo;                                            % background noise level = 10^(value/20) Pa;
 CI.TD.pNoiseBG          = wgn(1,CI.TD.nTotal,CI.TD.NoiseInfo.level);            % background noise
