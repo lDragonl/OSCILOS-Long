@@ -121,6 +121,7 @@ end
 function GUI_TD_Para_Config_Initialization(varargin)
 hObject = varargin{1};
 handles = guidata(hObject); 
+Fcn_PreProcessing
 global CI
 set(0, 'units', 'points');
 screenSize  = get(0, 'ScreenSize');                 % get the screen size
