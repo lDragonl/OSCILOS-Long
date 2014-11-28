@@ -272,7 +272,7 @@ function TD_SIM_Callback(hObject, eventdata, handles)
 % hObject    handle to TD_SIM (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-Fcn_TD_main_calculation(0)
+Fcn_TD_main_calculation(1)
 % --------------------------------------------------------------------
 function TD_Sensors_Actuators_Callback(hObject, eventdata, handles)
 % hObject    handle to TD_Sensors_Actuators (see GCBO)
