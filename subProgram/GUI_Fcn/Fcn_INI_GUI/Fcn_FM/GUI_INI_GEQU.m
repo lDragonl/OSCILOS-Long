@@ -137,11 +137,9 @@ switch CI.IsRun.GUI_INI_GEQU
         CI.FM.NL.Model4.nb_points = 35; % Number of points used for discretisation along r
         CI.FM.NL.Model4.rb = CI.CD.r_sample(CI.CD.index_flame); % If there are multiple heat zones in the duct, this is a vector
         CI.FM.NL.Model4.ra   = CI.FM.NL.Model4.rb/2; % in m, also a vector
-        CI.FM.NL.Model4.xi_steady = zeros(length(CI.FM.NL.Model4.rb),CI.FM.NL.Model4.nb_points); % if there are multiple heat zones, this is a matrix (lines are different heat zones, columns are variatiation along r)
         CI.FM.NL.Model4.U1 = CI.TP.u_mean(1,max(CI.CD.index_flame - 1,1)); % This is a vector if there are multple flame. The max function is required is the flame is at the begining of the duct.
         CI.FM.NL.Model4.rho1 = CI.TP.u_mean(1,max(CI.CD.index_flame - 1,1));% This is a vector if there are multple flame. The max function is required is the flame is at the end of the duct.
         CI.FM.NL.Model4.SU   = CI.FM.NL.Model4.U1 * 0.088; % in m/s, this is a vector if there are multple flame.
-        CI.FM.NL.Model4.bashforth_data = zeros(length(CI.FM.NL.Model4.rb),CI.FM.NL.Model4.nb_points,3); % Three dimentional matrix for three step adam bashforth
         CI.FM.NL.Model4.time_integration = 3; % Set to adam bashforth
 end
 assignin('base','CI',CI);                   % save the current information to the workspace
@@ -360,9 +358,10 @@ for runner = 1:length(CI.FM.NL.Model4.ra)
 end
 CI.FM.NL.Model4.area_ratio = 1.0 -(CI.FM.NL.Model4.ra./CI.FM.NL.Model4.rb).^2; % vector if there are multiple flames
 CI.FM.NL.Model4.Ugs = Fcn_TD_Gequ_calc_ugutter( CI.FM.NL.Model4.U1,CI.FM.NL.Model4.area_ratio,0,0 ); % vector if there are multiple flames
-CI.FM.NL.Model4.xi       = ...
+CI.FM.NL.Model4.xi_steady       = ...
     Fcn_TD_Gequ_steady_flame( CI.FM.NL.Model4.Ugs,CI.FM.NL.Model4.SU,CI.FM.NL.Model4.y_vec ); % If there are multiple flame, this is a matrix (lines are flames in different sections, columns come along r)
-CI.FM.NL.Model4.xi_steady = CI.FM.NL.Model4.xi;
+CI.FM.NL.Model4.xi = CI.FM.NL.Model4.xi_steady; % initialise xi value
+CI.FM.NL.Model4.bashforth_data = zeros(length(CI.FM.NL.Model4.rb),CI.FM.NL.Model4.nb_points,3); % Three dimentional matrix for three step adam bashforth
 
 % Set the flame transfer function numerator and denominator to
 % 1, as they are used for the Green's function initilisation,
