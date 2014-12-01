@@ -31,7 +31,7 @@ ylabel('r [m]');
 % Now define the time iteration, and teh value of uratio
 end_time = dt*(nb_iter - 1);
 t_vec = linspace(0,end_time,nb_iter);
-amp = 0.05;
+amp = 0.2;
 freq = 333;
 alpha = 2;
 beta = 5.4;

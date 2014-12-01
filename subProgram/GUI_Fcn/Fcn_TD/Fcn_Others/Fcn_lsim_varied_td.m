@@ -31,23 +31,21 @@ nSys        = ceil(1.2*tSys./dt);                   % increase the length of Gre
 %
 index1      = Var(1) - (nMax + 1) - (nSys - 1);     % start index of padded input
 index2      = Var(2) - nMin;                        % end index of padded input7
+
+tIntp       = ((Var(1):Var(2)) - index1).*dt - td;  % time samples corresponded to the arbitary input
+
 if index1 == index2 % This occurs if we have one operation per time step, as in the G-equation
-    index2 = index1 + 1;
-    t0          = (0:index2-index1).*dt;                % corresponding time samples
-    tIntp       = ((Var(1):Var(2)+1) - index1).*dt - td;  % time samples corresponded to the arbitary input
-    % lsim
-    z0          = lsim(Sys,y(index1:index2),t0);        % lsim
-    %
-    z_vec           = interp1(t0,z0,tIntp,'linear','extrap'); % do interpolation to have required response
-    z = z_vec(end);
-else
-    t0          = (0:index2-index1).*dt;                % corresponding time samples
-    tIntp       = ((Var(1):Var(2)) - index1).*dt - td;  % time samples corresponded to the arbitary input
-    % lsim
-    z0          = lsim(Sys,y(index1:index2),t0);        % lsim
-    %
-    z           = interp1(t0,z0,tIntp,'linear','extrap'); % do interpolation to have required response
+    index2 = index2 +1 ; % in this case simulate two time steps. The interpolation will take care of getting teh correct value
+    index1 = index1 - 1;
 end
+
+t0          = (0:index2-index1).*dt;                % corresponding time samples
+
+% lsim
+z0          = lsim(Sys,y(index1:index2),t0);        % lsim
+%
+z           = interp1(t0,z0,tIntp,'linear','extrap'); % do interpolation to have required response
+
 
 %
 % ------------------------ end --------------------------------------------

@@ -23,7 +23,7 @@ function Fcn_TD_main_calculation_with_GUI
 global CI
 switch CI.FM.NL.style                                                           
     case 3
-        GUI_TD_Cal_JLI_AMorgans('OSCILOS_long', handles.figure);                            
+        GUI_TD_Cal_JLI_AMorgans('OSCILOS_long', handles.figure);   
     otherwise
         Fcn_TD_main_calculation_without_identification_uRatio;
 end

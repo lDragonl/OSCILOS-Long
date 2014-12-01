@@ -3,7 +3,7 @@ function [ q_ratio,xi,bashforth_data ] = Fcn_TD_Gequ_interface( SU, xi, y_vec, d
 %required variables, and gives out the heat release ratio to be used in
 %the acoustics calculations
 
-% The G_equation is a three step operation, First findf the velocity right before the flame
+% The G_equation is a three step operation, First find the velocity right before the flame
 u_gutter = Fcn_TD_Gequ_calc_ugutter( U1,area_ratio,uratio,current_time);
 
 % Then compute the new flame shape

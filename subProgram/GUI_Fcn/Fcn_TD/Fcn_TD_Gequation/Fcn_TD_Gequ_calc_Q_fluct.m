@@ -18,6 +18,5 @@ flame_area = flame_area * 2; % multiply by 2 so that the flame area for top and 
 % laminar_burning_vel * rho1 * delta_h  (where delta_h is the heat
 % release per unit mass of fuel mix)
 Q_fluct = flame_area *SU*rho1*delta_h - Q_mean;
-
 end
 
