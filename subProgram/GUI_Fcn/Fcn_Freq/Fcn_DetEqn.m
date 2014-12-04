@@ -21,7 +21,7 @@ for ss = 1:CI.TP.numSection-1
     switch CI.CD.index(ss+1)
         case 0
             Z       = CI.TPM.BC{ss}*D1;
-        case 1
+        case {10,11} 
             B2b     = zeros(3);
             B2b(3,2)= CI.TP.DeltaHr./CI.TP.c_mean(2,ss+1)./CI.TP.c_mean(1,ss)./CI.TP.Theta(ss).*FDF;
             Bsum    = CI.TPM.B1{2,ss}*(CI.TPM.B2{1,ss}\CI.TPM.B1{1,ss}) + B2b;
