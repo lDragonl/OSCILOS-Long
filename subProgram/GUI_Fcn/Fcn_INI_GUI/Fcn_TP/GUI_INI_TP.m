@@ -270,7 +270,7 @@ set(handles.edit_TP_M1,...
                         'Fontunits','points',...
                         'position',[pW*8.25/10 pH*2./10 pW*1.25/10 pH*4.5/10],...
                         'fontsize',handles.FontSize(2),...
-                        'string',0.001,...
+                        'string',0.01,...
                         'backgroundcolor',handles.bgcolor{1},...
                         'horizontalalignment','right');
 %----------------------------------------                    
@@ -670,13 +670,13 @@ pop_type_MU = get(hObject,'value');
 global CI
 switch pop_type_MU 
     case 1
-        set(handles.edit_TP_M1,'string','0.001')
+        set(handles.edit_TP_M1,'string','0.01')
         try
         set(handles.edit_TP_M1,'string',num2str(CI.TP.M_mean(1,1)))
         catch
         end
     case 2
-        set(handles.edit_TP_M1,'string','1')
+        set(handles.edit_TP_M1,'string','10')
         try
         set(handles.edit_TP_M1,'string',num2str(CI.TP.u_mean(1,1)))
         catch
@@ -1088,6 +1088,9 @@ set(handles.pb_Cal,             'enable','on');
 set(handles.pb_Plot,            'enable','on');
 set(handles.pb_saveFig,         'enable','on');
 set(handles.pb_OK,              'enable','on');
+guidata(hObject, handles);
+Fcn_GUI_INI_TP_plot(handles.axes1,handles);
+handles = guidata(hObject);
 guidata(hObject, handles);
 % -------------------------------------------------------------------------
 

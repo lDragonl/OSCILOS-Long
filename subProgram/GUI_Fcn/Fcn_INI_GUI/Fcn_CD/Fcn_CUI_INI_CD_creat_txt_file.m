@@ -10,15 +10,16 @@ ri_sample   = [4 12.5 0]./1000;
 r_sample    = (ro_sample.^2-ri_sample.^2).^0.5;
 x_sample    = [0,cumsum(l_sample)];
 r_sample    = [r_sample,r_sample(end)];
-index       = [0 0 11 0];
-data        = cat(1,x_sample,r_sample,index);
+SectionIndex= [0 0 11 0];
+TubeIndex   = [0 0 0 0];
+data        = cat(1,x_sample,r_sample,SectionIndex,TubeIndex);
 % ---------------------------------
 currentFolder   = pwd;
 currentFolder   = fullfile(currentFolder,CI.SD.name_program,'CD_example.txt');
 fid             = fopen(currentFolder,'wt');
-data_title      = {'x[m]','r[m]','Section index'};
+data_title      = {'x[m]','r[m]','SectionIndex','TubeIndex'};
 fprintf(fid,'%s\b',data_title{1:end});
 fprintf(fid,'\n');
-fprintf(fid,'%6.5f\b%6.5f\b%6.0f\n',data);
+fprintf(fid,'%6.5f\b%6.5f\b%6.0f\b%6.0f\b\n',data);
 fclose(fid);
 % -----------------------------end-----------------------------------------

@@ -76,7 +76,7 @@ for ss = 1:CI.TP.numSection-1
     %
     % --------------step 2-------------------------
     %
-    switch CI.CD.index(ss+1)
+    switch CI.CD.SectionIndex(ss+1)
         case 0
             % in case 0, no changes
         case {10,11}                                    % with HA

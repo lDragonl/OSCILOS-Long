@@ -142,12 +142,12 @@ switch CI.IsRun.GUI_INI_FM
         CI.FM.FTF.xi        = 1;
         % --------------------------
         % J.Li and A.Morgans's model
-        CI.FM.NL.Model3.alpha      = 0.75;
-        CI.FM.NL.Model3.beta       = 30;
-        CI.FM.NL.Model3.taufN      = 0e-3;
+        CI.FM.NL.Model3.alpha       = 0.75;
+        CI.FM.NL.Model3.beta        = 30;
+        CI.FM.NL.Model3.taufN       = 0e-3;
         % -------------------------
         % Dowling's Model
-        CI.FM.NL.Model2.alpha   = 0.3;
+        CI.FM.NL.Model2.alpha       = 0.3;
         % -------------------------
  
 end

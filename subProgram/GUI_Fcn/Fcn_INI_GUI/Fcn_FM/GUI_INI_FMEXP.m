@@ -302,9 +302,11 @@ set(handles.pb_Cancel,...
 handles.ObjVisible_EXP      = findobj('-regexp','Tag','EXP');
 set(handles.ObjVisible_EXP,    'visible','on')
 guidata(hObject, handles);
-Fcn_GUI_INI_FMEXP_Listbox_update(hObject)
+Fcn_GUI_INI_FMEXP_Listbox_update(hObject);
+handles = guidata(hObject);
 guidata(hObject, handles);
 Fcn_GUI_INI_FMEXP_Enable(hObject,CI.FMEXP.nFTF)
+handles = guidata(hObject);
 guidata(hObject, handles);
 assignin('base','CI',CI);                   % save the current information to the workspace   
 % ------------------------------------------------------------------------
@@ -327,14 +329,14 @@ function Fcn_GUI_INI_FMEXP_Listbox_update(varargin)
 hObject = varargin{1};
 handles = guidata(hObject);
 global CI
-try
-    for ss = 1:CI.FMEXP.nCount
+% try
+    for ss = 1:CI.FMEXP.nFTF
         uRatio = CI.FMEXP.uRatio(ss);
         String_Listbox{ss} = ['Velocity ratio u''/u_mean = ' num2str(uRatio)];
     end
     set(handles.listbox_EXP,'string',String_Listbox,'value',1);
-catch
-end
+% catch
+% end
 assignin('base','CI',CI);                   % save the current information to the workspace
 guidata(hObject, handles);
 % ------------------------------------------------------------------------
@@ -415,9 +417,16 @@ xlabel(hAxes1,'','Color','k','Interpreter','LaTex','FontSize',fontSize1);
 ylabel(hAxes1,'Gain [-]','Color','k','Interpreter','LaTex','FontSize',fontSize1)
 set(hAxes1,'xlim',[xmin xmax],'xTick',0:100:xmax,'xticklabel',{},...
 'YAxisLocation','left','Color','w');
-hold off
+
 hl=legend('show');
 set(hl,'interpreter','latex','Fontsize',handles.FontSize(2),'box','off','Unit','points')
+% --------------------------
+for ss = 1:CI.FMEXP.nFTF
+    Y   = CI.FMEXP.FTF{ss}; 
+    hLine = plot(hAxes1,Y.Gain_exp(:,1),Y.Gain_exp(:,2),'s','color',color_type(ss,1:3),'Linewidth',2);
+    clear Y
+end
+hold off
 %--------------------------------
 cla(hAxes2,'reset')
 axes(hAxes2)
@@ -426,6 +435,7 @@ for ss = 1:CI.FMEXP.nFTF
     Y   = CI.FMEXP.FTF{ss}; 
     hLine = plot(hAxes2,Y.xfit,unwrap(angle(Y.yfit),1.9*pi)./pi,...
         '-','color',color_type(ss,1:3),'Linewidth',2);
+    plot(hAxes2,Y.Phase_exp(:,1),unwrap(Y.Phase_exp(:,2),1.9*pi)./pi,'s','color',color_type(ss,1:3),'Linewidth',2);
 end
 set(hAxes2,'YColor','k','Box','on','ygrid','on','xgrid','on');
 set(hAxes2,'FontName','Helvetica','FontSize',fontSize1,'LineWidth',1)
@@ -433,6 +443,7 @@ xlabel(hAxes2,'$f$ [Hz]','Color','k','Interpreter','LaTex','FontSize',fontSize1)
 ylabel(hAxes2,'Phase/$\pi$ [-]','Color','k','Interpreter','LaTex','FontSize',fontSize1)
 set(hAxes2,'xlim',get(hAxes1,'xlim'),'xTick',get(hAxes1,'xTick'),...
 'YAxisLocation','left','Color','w');
+
 hold off
 guidata(hObject, handles)
 %
@@ -482,22 +493,24 @@ copyobj(handles.axes1, Fig);
 copyobj(handles.axes2, Fig);
 hAxes               = get(Fig,'children');
 set(hAxes(1),       'units','points',...
-                    'position',[60 60 200 150],...
-                    'ActivePositionProperty','position')
+                    'position',[60 60 300 200],...
+                    'ActivePositionProperty','position',...
+                    'Fontsize',handles.FontSize(1))
 set(hAxes(2),       'units','points',...
-                    'position',[60 210 200 150],...
-                    'ActivePositionProperty','position')
+                    'position',[60 260 300 200],...
+                    'ActivePositionProperty','position',...
+                    'Fontsize',handles.FontSize(1))
 pos1                = get(hAxes(1),'position');
 pos2                = get(hAxes(2),'position');
-posAxesOuter = [0 0 300 400];
+posAxesOuter = [0 0 600 600];
 hChildren = get(hAxes(2), 'children');
-for ss = 1:length(hChildren)
+for ss = 1:round((length(hChildren))/2)
 set(get(get(hChildren(ss),'Annotation'),'LegendInformation'),'IconDisplayStyle','on'); 
 set(hChildren(ss),'DisplayName',['$\hat{u}_1/\bar{u}_1=$' num2str(CI.FMEXP.uRatio(end+1-ss))]);
 end
 axes(hAxes(2))
 hl=legend('show');
-set(hl,'interpreter','latex','Fontsize',handles.FontSize(2),'box','off','Unit','points')
+set(hl,'interpreter','latex','Fontsize',handles.FontSize(1)+2,'box','off','Unit','points')
 set(hAxes(1),       'position',pos1)
 set(Fig,        'units','points',...
                 'position', [posFig(1)+0.5*posFig(3)-0.5*posAxesOuter(3),...
