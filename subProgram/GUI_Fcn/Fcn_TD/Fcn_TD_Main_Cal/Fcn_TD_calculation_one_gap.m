@@ -37,7 +37,7 @@ for ss = 1:CI.TP.numSection-1
     y(2,1:CI.TD.nGap)   = Fcn_interp1_varied_td(CI.TD.AM(ss+1,:),  Var, CI.TP.tau_minus(ss+1), CI.TD.dt);
     y(3,1:CI.TD.nGap)  = 0; 
     switch CI.CD.index(ss+1)
-        case 0   % only area change
+        case {0,10}   % only area change, or mean heat addition
             % ---------------------------
             %     [ A2+ ]       [ A1+ ]
             %     [ A1- ] =  [Z][ A2- ]
@@ -45,7 +45,7 @@ for ss = 1:CI.TP.numSection-1
             %
             x = CI.TD.IF.Z{ss}*y;
             % ---------------------------
-        case 1   % with heat addition
+        case 11   % with heat addition and perturbations
             % ---------------------------
             %     [ A2+ ]       [ A1+ ]   [    ]
             %     [ A1- ] =  [Z][ A2- ] + [ Ar ] conv(FTF,u*rho*c)
