@@ -9,9 +9,9 @@ function Fcn_TD_INI_matrix_preprocessing
 global CI
 for ss = 1:CI.TP.numSection-1 
     switch CI.CD.index(ss+1)
-        case 0
+        case {0,10} % case of no heat release, or mean heat release only
             CI.TD.IF.Z{ss} = Fcn_TD_matrix_reorganization_no_flame(CI.TPM.BC{ss}); 
-        case 1
+        case {11} % case of heat release perturbations
             % heat addition coefficient
             K       = CI.TP.DeltaHr./CI.TP.c_mean(2,ss+1)./CI.TP.c_mean(1,ss)./CI.TP.Theta(ss);
             % right side, first term
