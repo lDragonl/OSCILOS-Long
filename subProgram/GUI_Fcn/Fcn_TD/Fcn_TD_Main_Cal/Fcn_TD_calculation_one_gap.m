@@ -36,7 +36,7 @@ for ss = 1:CI.TP.numSection-1
     y(1,1:CI.TD.nGap)   = Fcn_interp1_varied_td(CI.TD.AP(ss,:),    Var, CI.TP.tau_plus(ss),    CI.TD.dt);
     y(2,1:CI.TD.nGap)   = Fcn_interp1_varied_td(CI.TD.AM(ss+1,:),  Var, CI.TP.tau_minus(ss+1), CI.TD.dt);
     y(3,1:CI.TD.nGap)  = 0; 
-    switch CI.CD.index(ss+1)
+    switch CI.CD.SectionIndex(ss+1)
         case {0,10}   % only area change, or mean heat addition
             % ---------------------------
             %     [ A2+ ]       [ A1+ ]

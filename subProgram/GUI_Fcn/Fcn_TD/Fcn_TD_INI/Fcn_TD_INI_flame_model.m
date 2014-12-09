@@ -26,7 +26,7 @@ CI.TD.taufRem   = CI.TD.tauf - CI.TD.taufMin;
 CI.TD.Lf        = zeros(1,CI.TD.nTotal) + Lf;                               % Nonlinear model, which describes the saturation of heat release rate with velocity perturbations
                                                                             
 %
-CI.TD.indexFlame = find(CI.CD.index == 1);
+CI.TD.indexFlame = find(CI.CD.SectionIndex == 11);
 %
 assignin('base','CI',CI);
 %

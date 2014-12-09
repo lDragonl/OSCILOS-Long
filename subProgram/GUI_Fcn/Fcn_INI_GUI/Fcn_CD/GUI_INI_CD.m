@@ -770,7 +770,7 @@ end
 CI.CD.pop_CD_type = get(handles.pop_CB_type,'Value');
 
 %Compute the length downstream of a flame. If a flame is at the end of a section, use the min to set that to 0
-index_flame =   find(CI.CD.index==11);
+index_flame =   find(CI.CD.SectionIndex==11);
 CI.CD.dowst_of_heat_lengths = CI.CD.x_sample(min(index_flame + 1,end)) - CI.CD.x_sample(index_flame);
 CI.CD.index_flame = index_flame; % This is needed for other functions
 

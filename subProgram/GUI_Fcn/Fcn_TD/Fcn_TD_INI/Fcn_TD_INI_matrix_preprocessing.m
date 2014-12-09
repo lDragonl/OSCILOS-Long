@@ -8,7 +8,7 @@ function Fcn_TD_INI_matrix_preprocessing
 %
 global CI
 for ss = 1:CI.TP.numSection-1 
-    switch CI.CD.index(ss+1)
+    switch CI.CD.SectionIndex(ss+1)
         case {0,10} % case of no heat release, or mean heat release only
             CI.TD.IF.Z{ss} = Fcn_TD_matrix_reorganization_no_flame(CI.TPM.BC{ss}); 
         case {11} % case of heat release perturbations
