@@ -7,11 +7,11 @@ function Fcn_GUI_INI_TP_HA_visible(varargin)
 global CI
 hObject = varargin{1};
 handles = guidata(hObject);
-switch CI.TP.isNoHA
-    case 1 
+switch CI.CD.isHA
+    case 0 
         set(handles.uipanel_HA_style,       'visible', 'off');
         set(handles.uipanel_Heat_Config,    'visible', 'off');
-    case 0
+    case 1
         set(handles.uipanel_HA_style,       'visible', 'on');
         set(handles.uipanel_Heat_Config,    'visible', 'on');
 end

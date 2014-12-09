@@ -22,7 +22,7 @@ function varargout = GUI_FREQ_EigCal(varargin)
 
 % Edit the above text to modify the response to help GUI_FREQ_EigCal
 
-% Last Modified by GUIDE v2.5 22-Oct-2014 17:07:39
+% Last Modified by GUIDE v2.5 08-Dec-2014 14:49:51
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -82,6 +82,7 @@ switch handles.indexEdit
             guidata(hObject, handles);
             % Initialization
             GUI_FREQ_EigCal_Initialization(hObject, eventdata, handles)
+            handles = guidata(hObject);
         end
         guidata(hObject, handles);
         handles.output = hObject;
@@ -96,27 +97,10 @@ switch handles.indexEdit
 %            uiwait(hObject);
         end
     case 1
-        global CI
-        handles.bgcolor{1} = [0.95, 0.95, 0.95];
-        handles.bgcolor{2} = [0, 0, 0];
-        handles.bgcolor{3} = [.75, .75, .75];
-        handles.bgcolor{4} = [0.90,0.90,1];
-        %
-        handles.sW  = 800;
-        handles.sH  = 600;
-        %
-        if ispc
-            handles.FontSize(1)=11;                 % set the default fontsize
-            handles.FontSize(2)=9;
-        else
-            handles.FontSize(1)=12;                 % set the default fontsize
-            handles.FontSize(2)=10;   
-        end
-        CI.Ru = 8.3145;
-%         CI.IsRun.GUI_FREQ_EigCal = 0;
-        assignin('base','CI',CI);                   % save the current information to the works
+        handles = Fcn_GUI_default_configuration(handles);
         guidata(hObject, handles);  
         GUI_FREQ_EigCal_Initialization(hObject, eventdata, handles)
+        handles = guidata(hObject);
         guidata(hObject, handles);
         handles.output = hObject;
         guidata(hObject, handles);
@@ -127,9 +111,6 @@ end
 function GUI_FREQ_EigCal_Initialization(varargin)
 hObject = varargin{1};
 handles = guidata(hObject);
-handles.ObjEditEnable_AOC = findobj('-regexp','Tag','_AOC_');
-guidata(hObject, handles);  
-Fcn_PreProcessing
 global CI
 set(0, 'units', 'points');
 screenSize  = get(0, 'ScreenSize');                 % get the screen size
@@ -143,7 +124,8 @@ set(handles.figure,     'units', 'points',...
                         'color',handles.bgcolor{3});
 %----------------------------------------
 % pannel axes
-set(handles.uipanel_Axes,   'units', 'points',...
+set(handles.uipanel_Axes,...
+                        'units', 'points',...
                         'fontUnits','points',...
                         'position',[FigW*9.5/20 FigH*2.25/20 FigW*10/20 FigH*17.25/20],...
                         'Title','Plots',...
@@ -155,12 +137,14 @@ set(handles.uipanel_Axes,   'units', 'points',...
 pannelsize=get(handles.uipanel_Axes,'position');
 pW=pannelsize(3);
 pH=pannelsize(4);                
-set(handles.axes1,  'units', 'points',...
+set(handles.axes1,...
+                        'units', 'points',...
                         'position',[pW*2/10 pH*5.0/10 pW*6.0/10 pH*3.5/10],...
                         'fontsize',handles.FontSize(1),...
                         'color',handles.bgcolor{1},...
                         'box','on');  
-set(handles.axes2, 'units', 'points',...
+set(handles.axes2,...
+                        'units', 'points',...
                         'position',[pW*2/10 pH*1.5/10 pW*6.0/10 pH*3.5/10],...
                         'fontsize',handles.FontSize(1),...
                         'color',handles.bgcolor{1},...
@@ -184,7 +168,6 @@ set(handles.pop_PlotType,...
                         'backgroundcolor',handles.bgcolor{1},...
                         'horizontalalignment','left',...
                         'enable','off'); 
-
 guidata(hObject, handles);
 %----------------------------------------
 % pannel initialize velocity range information 
@@ -192,7 +175,7 @@ set(handles.uipanel_INI,...
                         'units', 'points',...
                         'fontUnits','points',...
                         'position',[FigW*0.5/20 FigH*12.5/20 FigW*8.5/20 FigH*7/20],...
-                        'Title','Set velocity perturbation ratio range ',...
+                        'Title','Set velocity perturbation ratio range before the flame ',...
                         'visible','on',...
                         'highlightcolor',handles.bgcolor{3},...
                         'borderwidth',1,...
@@ -201,7 +184,7 @@ set(handles.uipanel_INI,...
 pannelsize = get(handles.uipanel_INI,'position');
 pW=pannelsize(3);
 pH=pannelsize(4);  
-set(handles.text_min,...
+set(handles.text_uRatio_min,...
                         'units', 'points',...
                         'fontUnits','points',...
                         'position',[pW*0.5/10 pH*7.0/10 pW*6/10 pH*1.0/10],...
@@ -209,7 +192,7 @@ set(handles.text_min,...
                         'string','Minimum value (u''/u_bar): [-]',...
                         'backgroundcolor',handles.bgcolor{3},...
                         'horizontalalignment','left');                         
-set(handles.edit_min,...
+set(handles.edit_uRatio_min,...
                         'units', 'points',...
                         'fontUnits','points',...
                         'position',[pW*7/10 pH*7/10 pW*2.5/10 pH*1.25/10],...
@@ -218,7 +201,7 @@ set(handles.edit_min,...
                         'backgroundcolor',handles.bgcolor{1},...
                         'horizontalalignment','right',...
                         'Enable','on');
-set(handles.text_max,...
+set(handles.text_uRatio_max,...
                         'units', 'points',...
                         'fontUnits','points',...
                         'position',[pW*0.5/10 pH*5.0/10 pW*6/10 pH*1.0/10],...
@@ -226,7 +209,7 @@ set(handles.text_max,...
                         'string','Maximum value (u''/u_bar): [-]',...
                         'backgroundcolor',handles.bgcolor{3},...
                         'horizontalalignment','left');                         
-set(handles.edit_max,...
+set(handles.edit_uRatio_max,...
                         'units', 'points',...
                         'fontUnits','points',...
                         'position',[pW*7/10 pH*5/10 pW*2.5/10 pH*1.25/10],...
@@ -235,7 +218,7 @@ set(handles.edit_max,...
                         'backgroundcolor',handles.bgcolor{1},...
                         'horizontalalignment','right',...
                         'Enable','on');                    
-set(handles.text_SampNum,...
+set(handles.text_uRatio_SampNum,...
                         'units', 'points',...
                         'fontUnits','points',...
                         'position',[pW*0.5/10 pH*3.0/10 pW*6/10 pH*1.0/10],...
@@ -243,7 +226,7 @@ set(handles.text_SampNum,...
                         'string','Number of velocity ratio samples: [-]',...
                         'backgroundcolor',handles.bgcolor{3},...
                         'horizontalalignment','left');                         
-set(handles.edit_SampNum,...
+set(handles.edit_uRatio_SampNum,...
                         'units', 'points',...
                         'fontUnits','points',...
                         'position',[pW*7/10 pH*3/10 pW*2.5/10 pH*1.25/10],...
@@ -325,7 +308,7 @@ set(handles.slider_uRatio,...
                         'horizontalalignment','right',...
                         'Enable','off',...
                         'min',1,...
-                        'max',str2double(get(handles.edit_SampNum,'string')),...
+                        'max',str2double(get(handles.edit_uRatio_SampNum,'string')),...
                         'value',1);
                     
 %---------------------------
@@ -374,84 +357,29 @@ set(handles.pb_Cancel,...
                         'backgroundcolor',handles.bgcolor{3});
 % --------------------------------
 %
-
+handles.ObjEditEnable_AOC       = findobj('-regexp','Tag','_AOC_');
+handles.ObjEditVisible_uRatio   = findobj('-regexp','Tag','_uRatio');
+guidata(hObject, handles);
+% lauch this function
+Fcn_PreProcessing
+%
+%
+handles = guidata(hObject);
 % default enable settings
-set(handles.ObjEditEnable_AOC,    'Enable','on');
+set(handles.ObjEditEnable_AOC,          'Enable','on');
+set(handles.ObjEditVisible_uRatio,      'visible','on');
 %
 guidata(hObject, handles);
-GUI_FREQ_EigCal_Initialization_check_ever_run(hObject)
+% GUI_FREQ_EigCal_Initialization_check_ever_run(hObject)
+handles = guidata(hObject);
+
+GUI_FREQ_EigCal_pannel_appearance(hObject)
 handles = guidata(hObject);
 %
 assignin('base','CI',CI)
 
 %----------------------------------------
 guidata(hObject, handles);
-%
-
-function GUI_FREQ_EigCal_Initialization_check_ever_run(varargin)
-hObject = varargin{1};
-handles = guidata(hObject);
-global CI
-if  CI.indexFM == 0 && CI.FM.NL.style == 1
-    set(handles.edit_min,       'string',num2str(0),...
-                                'enable','off');
-    set(handles.edit_max,       'string',num2str(1),...
-                                'enable','off');
-    set(handles.edit_SampNum,   'string',num2str(2),...
-                                'enable','off');
-end
-if  CI.indexFM == 1      % From experimental FDF
-    set(handles.edit_min,       'string',num2str(min(CI.FMEXP.uRatio)),...
-                                'enable','off');
-    set(handles.edit_max,       'string',num2str(max(CI.FMEXP.uRatio)),...
-                                'enable','off');
-    set(handles.edit_SampNum,   'string',num2str(length(CI.FMEXP.uRatio)),...
-                                'enable','off');
-end
-switch CI.IsRun.GUI_FREQ_EigCal
-    case 0
-        set(handles.ObjEditEnable_AOC,    'Enable','off');
-    case 1 
-        set(handles.ObjEditEnable_AOC,    'Enable','on');
-        set(handles.slider_uRatio,...
-                        'Enable','on',...
-                        'min',1,...
-                        'max',CI.EIG.FDF.uRatioNum,...
-                        'value',1,...
-                        'SliderStep',[1/(CI.EIG.FDF.uRatioNum-1), 1/(CI.EIG.FDF.uRatioNum-1)]);
-        set(handles.edit_uRatio,'string',num2str(CI.EIG.FDF.uRatioSp(1)));
-        set(handles.pop_numMode,    'enable','on');  
-        set(handles.pop_PlotType,   'enable','on'); 
-        set(handles.pb_AOC_Plot,         'enable','on');
-        set(handles.edit_min,       'string',num2str(CI.EIG.FDF.uRatioSp(1)));
-        set(handles.edit_max,       'string',num2str(CI.EIG.FDF.uRatioSp(end)));
-        set(handles.edit_SampNum,   'string',num2str(CI.EIG.FDF.uRatioNum));
-        eigenvalue = CI.EIG.Scan.EigValCol{1};
-        for k = 1:length(eigenvalue)
-           StringMode{k} = ['Mode number: ' num2str(k)]; 
-        end
-        set(handles.pop_numMode,    'string',StringMode)
-        %
-        data_num(:,1)=abs(imag(eigenvalue)./2./pi);
-        data_num(:,2)=real(eigenvalue);
-        data_cell=num2cell(data_num);
-        set(handles.uitable,'data',data_cell);         % Update the table
-        guidata(hObject, handles);
-        GUI_FREQ_EigCal_PLOT(hObject)
-end
-%
-switch CI.IsRun.GUI_FREQ_EigCal_AD 
-    case 0
-        CI.EIG.Scan.FreqMin = 0;
-        CI.EIG.Scan.FreqMax = 1000;
-        CI.EIG.Scan.FreqNum = 10;
-        CI.EIG.Scan.GRMin   = -200;
-        CI.EIG.Scan.GRMax   = 200;
-        CI.EIG.Scan.GRNum   = 10;
-    case 1
-end
-%
-assignin('base','CI',CI);
 %
 
 % -------------------------------------------------------------------------
@@ -477,82 +405,82 @@ delete(hObject);
 
 % ---------------------------Pannel initialization-------------------------
 %
-function edit_min_Callback(hObject, eventdata, handles)
-% hObject    handle to edit_min (see GCBO)
+function edit_uRatio_min_Callback(hObject, eventdata, handles)
+% hObject    handle to edit_uRatio_min (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-uRatio_min      = str2double(get(handles.edit_min,'string'));
-uRatio_max      = str2double(get(handles.edit_max,'string'));
+uRatio_min      = str2double(get(handles.edit_uRatio_min,'string'));
+uRatio_max      = str2double(get(handles.edit_uRatio_max,'string'));
 if isnan(uRatio_min)
-    set(handles.edit_min, 'String', 0);
+    set(handles.edit_uRatio_min, 'String', 0);
     errordlg('Input must be a number','Error');
 end
 if uRatio_min<=0
-    set(handles.edit_min, 'String', 0);
+    set(handles.edit_uRatio_min, 'String', 0);
 end
 if uRatio_max <= uRatio_min
-    set(handles.edit_min, 'String', 0);
-    set(handles.edit_max, 'String', 1);
+    set(handles.edit_uRatio_min, 'String', 0);
+    set(handles.edit_uRatio_max, 'String', 1);
     errordlg('Minimum value input must be smaller than Maximum value input','Error');
 end
 
 % --- Executes during object creation, after setting all properties.
-function edit_min_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to edit_min (see GCBO)
+function edit_uRatio_min_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to edit_uRatio_min (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
 
-function edit_max_Callback(hObject, eventdata, handles)
-% hObject    handle to edit_max (see GCBO)
+function edit_uRatio_max_Callback(hObject, eventdata, handles)
+% hObject    handle to edit_uRatio_max (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-uRatio_min      = str2double(get(handles.edit_min,'string'));
-uRatio_max      = str2double(get(handles.edit_max,'string'));
+uRatio_min      = str2double(get(handles.edit_uRatio_min,'string'));
+uRatio_max      = str2double(get(handles.edit_uRatio_max,'string'));
 if isnan(uRatio_max)
-    set(handles.edit_max, 'String', 1);
+    set(handles.edit_uRatio_max, 'String', 1);
     errordlg('Input must be a number','Error');
 end
 if uRatio_max<=0
-    set(handles.edit_max, 'String', 1);
+    set(handles.edit_uRatio_max, 'String', 1);
 end
 if uRatio_max <= uRatio_min
-    set(handles.edit_min, 'String', 0);
-    set(handles.edit_max, 'String', 1);
+    set(handles.edit_uRatio_min, 'String', 0);
+    set(handles.edit_uRatio_max, 'String', 1);
     errordlg('Minimum value input must be smaller than Maximum value input','Error');
 end
 
 % --- Executes during object creation, after setting all properties.
-function edit_max_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to edit_max (see GCBO)
+function edit_uRatio_max_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to edit_uRatio_max (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
 
-function edit_SampNum_Callback(hObject, eventdata, handles)
-% hObject    handle to edit_SampNum (see GCBO)
+function edit_uRatio_SampNum_Callback(hObject, eventdata, handles)
+% hObject    handle to edit_uRatio_SampNum (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-uRatio_SampNum  = str2double(get(handles.edit_SampNum,'string'));
+uRatio_SampNum  = str2double(get(handles.edit_uRatio_SampNum,'string'));
 if isnan(uRatio_SampNum )
-    set(handles.edit_SampNum, 'String', 11);
+    set(handles.edit_uRatio_SampNum, 'String', 11);
     errordlg('Input must be a number','Error');
 end
 if uRatio_SampNum <=0
-    set(handles.edit_SampNum, 'String', 11);
+    set(handles.edit_uRatio_SampNum, 'String', 11);
     errordlg('Input must be a positive integer','Error');
 end
 if rem(uRatio_SampNum ,1)~=0
-    set(handles.edit_SampNum, 'String', num2str(ceil(datEdit)));
+    set(handles.edit_uRatio_SampNum, 'String', num2str(ceil(datEdit)));
 end
 
 % --- Executes during object creation, after setting all properties.
-function edit_SampNum_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to edit_SampNum (see GCBO)
+function edit_uRatio_SampNum_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to edit_uRatio_SampNum (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
@@ -569,135 +497,12 @@ GUI_FREQ_EigCal_AD('GUI_FREQ_EigCal', handles.figure);
 function pb_CalEig_Callback(varargin)
 hObject = varargin{1};
 handles = guidata(hObject);
-global CI
-global FDF
-%
-%
-Fcn_pb_CalEig_Value_initialization(hObject)
-handles     = guidata(hObject);
-guidata(hObject, handles);
-%
-%
-% ---------------calculate the eigenvalues---------------
-%
-hWaitBar = waitbar(0,'The calculation may take several minutes, please wait...');
-for ss =1:CI.EIG.FDF.uRatioNum
-    FDF.uRatio  = CI.EIG.FDF.uRatioSp(ss);
-    FDF.num     = CI.EIG.FDF.num{ss};
-    FDF.den     = CI.EIG.FDF.den{ss};
-    FDF.tauf    = CI.EIG.FDF.tauf(ss);
-    assignin('base','FDF',FDF);
-    CI.EIG.Scan.EigValCol{ss}   = Fcn_calculation_eigenvalues;
-    CI.EIG.Cont.ValCol{ss}      = Fcn_calculation_contour;
-    waitbar(ss/CI.EIG.FDF.uRatioNum);
-    drawnow
-end
-close(hWaitBar)
-assignin('base','CI',CI);
-% ---------------update the table---------------
-data_num(:,1)   = abs(imag(CI.EIG.Scan.EigValCol{1})./2./pi);
-data_num(:,2)   = real(CI.EIG.Scan.EigValCol{1});
-data_cell       = num2cell(data_num);
-set(handles.uitable,'data',data_cell);         % Update the table
-% ---------------update the table---------------
-%
-% ---------------update the slider---------------
-if CI.EIG.FDF.uRatioNum == 1
-    set(handles.slider_uRatio,'visible','off')
-else
-set(handles.slider_uRatio,...
-                        'Enable','on',...
-                        'min',1,...
-                        'max',CI.EIG.FDF.uRatioNum,...
-                        'value',1,...
-                        'SliderStep',[1/(CI.EIG.FDF.uRatioNum-1), 1/(CI.EIG.FDF.uRatioNum-1)]);
-end
-set(handles.edit_uRatio,'string',num2str(CI.EIG.FDF.uRatioSp(1)));
-% ---------------update the slider---------------
-set(handles.pop_numMode,        'enable','on');  
-set(handles.pop_PlotType,       'enable','on');
-set(handles.pb_AOC_Plot,        'enable','on');
-set(handles.pb_AOC_SaveFig,     'enable','on');
-set(handles.pb_AOC_OK,          'enable','on');
-% --
-eigenvalue = CI.EIG.Scan.EigValCol{1};
-for k = 1:length(eigenvalue)
-   StringMode{k} = ['Mode number: ' num2str(k)]; 
-end
-set(handles.pop_numMode,    'string',StringMode)
-guidata(hObject, handles);
-%
+GUI_FREQ_EigCal_Eigenvalues_calculation(hObject);
 GUI_FREQ_EigCal_PLOT(hObject)
 %
 % -------------------------------------------------------------------------
 %
-function Fcn_pb_CalEig_Value_initialization(varargin)
-hObject = varargin{1};
-handles = guidata(hObject);
-global CI
-%
-% -------------------- s coordinates grids --------------------------------
-% For scan
-CI.EIG.Scan.GRSp        = linspace( CI.EIG.Scan.GRMin,...
-                                    CI.EIG.Scan.GRMax,...
-                                    CI.EIG.Scan.GRNum);
-CI.EIG.Scan.FreqSp      = linspace( CI.EIG.Scan.FreqMin,...
-                                    CI.EIG.Scan.FreqMax,...
-                                    CI.EIG.Scan.FreqNum);
-% For Contour
-CI.EIG.Cont.GRSp        = linspace( CI.EIG.Scan.GRMin,...
-                                    CI.EIG.Scan.GRMax,...
-                                 10*CI.EIG.Scan.GRNum);
-CI.EIG.Cont.FreqSp      = linspace( CI.EIG.Scan.FreqMin,...
-                                    CI.EIG.Scan.FreqMax,...
-                                 10*CI.EIG.Scan.FreqNum);
-%
-% -------------------- Flame describing function information --------------
-%
-%  
-if  CI.indexFM == 0      % From flame model
-    uRatioMin           = str2double(get(handles.edit_min,'string'));
-    uRatioMax           = str2double(get(handles.edit_max,'string'));
-    uRatioNum           = str2double(get(handles.edit_SampNum,'string'));
-    CI.EIG.FDF.uRatioSp = linspace(uRatioMin,uRatioMax,uRatioNum);
-    switch CI.FM.NL.style
-    case 1
-        for ss = 1:uRatioNum
-            CI.EIG.FDF.num{ss}   = CI.FM.FTF.num;
-            CI.EIG.FDF.den{ss}   = CI.FM.FTF.den;
-            CI.EIG.FDF.tauf(ss)  = CI.FM.FTF.tauf;     
-        end  
-    case 2
-        for ss = 1:uRatioNum
-            CI.EIG.FDF.num{ss}   = CI.FM.FTF.num;
-            CI.EIG.FDF.den{ss}   = CI.FM.FTF.den;
-            CI.EIG.FDF.tauf(ss)  = CI.FM.FTF.tauf;     
-            % something must be done to include the nonlinear in the Fcn_DetEqn.m
-        end  
-    case 3      
-        CI.EIG.FDF.Lf       = interp1(  CI.FM.NL.Model3.uRatio,...
-                                        CI.FM.NL.Model3.Lf,...
-                                        CI.EIG.FDF.uRatioSp,'linear','extrap');         % Nonlinear ratio
-        CI.EIG.FDF.taufNSp  = CI.FM.NL.Model3.taufN.*(1-CI.EIG.FDF.Lf);                % Nonlinear time delay
-        for ss = 1:uRatioNum
-            CI.EIG.FDF.num{ss}   = CI.EIG.FDF.Lf(ss).*CI.FM.FTF.num;
-            CI.EIG.FDF.den{ss}   = CI.FM.FTF.den;
-            CI.EIG.FDF.tauf(ss)  = CI.FM.FTF.tauf + CI.EIG.FDF.taufNSp(ss);     % Time delay of the FDF model
-        end    
-    end
-elseif CI.indexFM == 1  % From experimental FDF
-    CI.EIG.FDF.uRatioSp = CI.FMEXP.uRatio;
-    uRatioNum = length(CI.EIG.FDF.uRatioSp);
-    for ss = 1:uRatioNum
-        FTF = CI.FMEXP.FTF{ss};
-        CI.EIG.FDF.num{ss}  = FTF.num;
-        CI.EIG.FDF.den{ss}  = FTF.den;
-        CI.EIG.FDF.tauf(ss) =-FTF.tau_correction;  % Be careful: we always use a = a0 exp(-a*tau)
-    end
-end
-CI.EIG.FDF.uRatioNum = uRatioNum;
-assignin('base','CI',CI);
-%
+
 % -------------------------------------------------------------------------
 
 %
@@ -893,321 +698,22 @@ function pb_Cancel_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 delete(handles.figure);
 
-%-------------------------------------------------------------------------
-function GUI_FREQ_EigCal_PLOT(varargin)
-hObject             = varargin{1};
-handles             = guidata(hObject);
-global CI
-global FDF
-hAxes1              = handles.axes1;
-hAxes2              = handles.axes2;
-fontSize1           = handles.FontSize(1);
-fontSize2           = handles.FontSize(2);
-CI.EIG.pop_numMode  = get(handles.pop_numMode,  'Value');
-CI.EIG.pop_PlotType = get(handles.pop_PlotType, 'Value');
-ValueSlider         = get(handles.slider_uRatio,'Value');
-indexShow           = round(ValueSlider);   
-Eigenvalue          = CI.EIG.Scan.EigValCol{indexShow};
-ValueContour        = CI.EIG.Cont.ValCol{indexShow};
-pannelsize          = get(handles.uipanel_Axes,'position');
-pW = pannelsize(3);
-pH = pannelsize(4); 
-%
-guidata(hObject, handles)
-%
-switch CI.EIG.pop_PlotType
-% {'Map of eigenvalues';
-%  'Modeshape';
-%  'Evolution of eigenvalue with velocity ratio'}
-    case 1      % Map of eigenvalues;
-    set(handles.pop_numMode,'enable','off'); 
-    set(hAxes1,'position',[pW*1.5/10 pH*1.5/10 pW*7/10 pH*7/10]);  
-    position_hAxes1=get(hAxes1,'position');
-    try
-        cbh = findobj( 0, 'tag', 'Colorbar' );
-        delete(cbh)
-    catch
-    end
-    cla(hAxes1,'reset')
-    axes(hAxes1)
-    hold on
-    %
-    contourf(hAxes1,CI.EIG.Cont.GRSp./100,CI.EIG.Cont.FreqSp,20*log10(abs(ValueContour')))
-    drawnow
-    ylimitUD = [CI.EIG.Scan.FreqMin CI.EIG.Scan.FreqMax];
-    xlimitUD = [CI.EIG.Scan.GRMin   CI.EIG.Scan.GRMax]./100;
-    hold off
-    %
-    set(hAxes1,'YColor','k','Box','on');
-    set(hAxes1,'FontName','Helvetica','FontSize',fontSize1,'LineWidth',1)
-    xlabel(hAxes1,  '$ Re(s)/100: \textrm{Growth rate}~~/100~~$ [rad s$^{-1}$] ',...
-        'Color','k','Interpreter','LaTex','FontSize',fontSize1);
-    ylabel(hAxes1,'$ Im(s)/2\pi: \textrm{Frequency}~~$ [Hz]','Color','k',...
-        'Interpreter','LaTex','FontSize',fontSize1);
-    set(hAxes1,'ylim',ylimitUD,'YAxisLocation','left','Color','w');
-    set(hAxes1,'xlim',xlimitUD);
-    grid on
-    colorbar 
-    colormap(hot);
-    hcb=colorbar;
-    set(hcb,'Fontsize',fontSize2,'box','on','Unit','points')
-    set(hcb,'position',[position_hAxes1(1)+position_hAxes1(3),...
-                        position_hAxes1(2),...
-                        position_hAxes1(3)./20,...
-                        position_hAxes1(4).*1]);
-    set(hAxes1,'position',position_hAxes1)
-        hcb_ylim=get(hcb,'ylim');
-        handles.hColorbar.ylimit=[  min(min(20*log10(abs(ValueContour')))),...
-                                    max(max(20*log10(abs(ValueContour'))))];
-        guidata(hObject, handles)
-    %------------------------------------
-    cla(hAxes2,'reset')
-    axes(hAxes2)
-    set(hAxes2,'position',get(hAxes1,'position'));
-    hold on
-    plot(hAxes2,real(Eigenvalue)./100,imag(Eigenvalue)./2./pi,'p',...
-        'markersize',8,'color','k','markerfacecolor',[1,1,1])
-    drawnow
-    hold off
-    set(hAxes2,     'ylim', get(hAxes1,'ylim'),...
-                    'yTick',get(hAxes1,'ytick'),...
-                    'yticklabel',[],...
-                    'YAxisLocation','left','Color','none');
-    set(hAxes2,     'xlim', get(hAxes1,'xlim'),...
-                    'xTick',get(hAxes1,'xtick'),...
-                    'xticklabel',[],...
-                    'xcolor','b','ycolor','b','gridlinestyle','-.');
-    set(hAxes2,'FontName','Helvetica','FontSize',fontSize1,'LineWidth',0.5)
-    grid on
-    %------------------------
-    xt_pos=min((get(hAxes2,'xlim')))+1.15*(max((get(hAxes1,'xlim'))) - min((get(hAxes1,'xlim'))));
-    yt_pos=mean(get(hAxes2,'ylim'));
-    hTitle = title(hAxes2, 'Eigenvalues are located at minima');
-    set(hTitle, 'interpreter','latex', 'fontunits','points','fontsize',fontSize1)
-    guidata(hObject, handles);
-    %--------------------
-    case 2 %'Modeshape'
-    set(handles.pop_numMode,'enable','on');
-    set(hAxes1,'position',[pW*2.0/10 pH*1.5/10 pW*7/10 pH*3.5/10]); 
-    set(hAxes2,'position',[pW*2.0/10 pH*5.0/10 pW*7/10 pH*3.5/10]); 
-    try
-        cbh = findobj( 0, 'tag', 'Colorbar' );
-        delete(cbh)
-    catch
-    end
-    s_star = Eigenvalue(CI.EIG.pop_numMode);             % eigenvalue
-    FDF.num     = CI.EIG.FDF.num{indexShow};
-    FDF.den     = CI.EIG.FDF.den{indexShow};
-    FDF.tauf    = CI.EIG.FDF.tauf(indexShow);
-    assignin('base','FDF',FDF);
-    [x_resample,p,u] = Fcn_calculation_eigenmode(s_star);
-    cla(hAxes1,'reset')
-    axes(hAxes1)
-    drawnow
-    hold on
-    for k=1:length(CI.CD.x_sample)-1
-        plot(hAxes1,x_resample(k,:),abs(p(k,:)),'-','color','k','Linewidth',2)
-    end
-    ymax1=ceil(max(max(abs(p))));
-    ymin1=floor(min(min(abs(p))));
-    ylimitUD=[ymin1 ymax1+0.25*(ymax1-ymin1)];
-    ytickUD=linspace(ylimitUD(1),ylimitUD(2),6);
-    for ss=1:length(ytickUD)
-        yticklabelUD{ss}=num2str(ytickUD(ss));
-    end
-    yticklabelUD{end}='';
-    xmax1=max(max(x_resample));
-    xmin1=min(min(x_resample));
-    xlimitUD=[xmin1 xmax1];
-    xtickUD=linspace(xlimitUD(1),xlimitUD(2),6);
 
-    set(hAxes1,'YColor','k','Box','on');
-    set(hAxes1,'FontName','Helvetica','FontSize',fontSize1,'LineWidth',1)
-    xlabel(hAxes1,'$x $ [m]','Color','k','Interpreter','LaTex','FontSize',fontSize1);
-    ylabel(hAxes1,'$|~\hat{p}~|$ ','Color','k','Interpreter','LaTex','FontSize',fontSize1);
-    set(hAxes1,     'ylim', ylimitUD,...
-                    'yTick',ytickUD,...
-                    'yticklabel',yticklabelUD,...
-                    'YAxisLocation','left');
-    set(hAxes1,'xlim',xlimitUD,'xtick',xtickUD);
-    ylimit=get(hAxes1,'ylim');
-    for k=1:length(CI.CD.x_sample)
-       plot(hAxes1,[CI.CD.x_sample(k),CI.CD.x_sample(k)],ylimit,'--','linewidth',1,'color','k') 
-    end
-    grid on
-    hold off
-    %-----------------------
-    cla(hAxes2,'reset')
-    axes(hAxes2)
-    drawnow
-    hold on
-    for k=1:length(CI.CD.x_sample)-1
-        plot(hAxes2,x_resample(k,:),abs(u(k,:)),'-','color','k','Linewidth',2)
-    end
-    set(hAxes2,'YColor','k','Box','on');
-    set(hAxes2,'FontName','Helvetica','FontSize',fontSize1,'LineWidth',1)
-    set(hAxes2,     'xlim', get(hAxes1,'xlim'),...
-                    'xTick',get(hAxes1,'xtick'),...
-                    'xticklabel',[]);
-    xlabel(hAxes2,'','Color','k','Interpreter','LaTex','FontSize',fontSize1);
-    ylabel(hAxes2,'$|~\hat{u}~|$ ','Color','k','Interpreter','LaTex','FontSize',fontSize1);
-    ylimit=get(hAxes2,'ylim');
-    for k=1:length(CI.CD.x_sample)
-       plot(hAxes2,[CI.CD.x_sample(k),CI.CD.x_sample(k)],ylimit,'--','linewidth',1,'color','k') 
-    end
-    grid on
-    hold off
-    guidata(hObject, handles);
-    %--------------------------------
-    case 3 %'Evolution of eigenvalue with velocity ratio'
-    set(handles.pop_numMode,'enable','on');
-    set(hAxes1,'position',[pW*2.0/10 pH*1.5/10 pW*7/10 pH*3.5/10]); 
-    set(hAxes2,'position',[pW*2.0/10 pH*5.0/10 pW*7/10 pH*3.5/10]); 
-    try
-        cbh = findobj( 0, 'tag', 'Colorbar' );
-        delete(cbh)
-    catch
-    end    
-    x = CI.EIG.FDF.uRatioSp;
-    for k=1:length(x)
-        EIG = CI.EIG.Scan.EigValCol{k};
-        EigFreq(k) = abs(imag(EIG(CI.EIG.pop_numMode))./2./pi);
-        EigGR(k)   = real(EIG(CI.EIG.pop_numMode));
-    end
-    cla(hAxes1,'reset')
-    axes(hAxes1)
-    hold on
-    plot(hAxes1,x,EigFreq,'-o','color','k','Linewidth',1)
-    hold off
-    ymax1=ceil(max(max(EigFreq)));
-    ymin1=floor(min(min(EigFreq)));
-    ylimitUD=[ymin1-0.25*(ymax1-ymin1) ymax1+0.25*(ymax1-ymin1)];
-    ytickUD=linspace(ylimitUD(1),ylimitUD(2),7);
-    for ss=1:length(ytickUD)
-        yticklabelUD{ss}=num2str(ytickUD(ss));
-    end
-    yticklabelUD{end}='';
-    xmax1=max(max(x));
-    xmin1=min(min(x));
-    xlimitUD=[xmin1 xmax1];
-    xtickUD=linspace(xlimitUD(1),xlimitUD(2),6);
 
-    set(hAxes1,'YColor','k','Box','on');
-    set(hAxes1,'FontName','Helvetica','FontSize',fontSize1,'LineWidth',1)
-    xlabel(hAxes1,'$\hat{u}_1/\bar{u}_1 $ [-]','Color','k','Interpreter','LaTex','FontSize',fontSize1);
-    ylabel(hAxes1,'Frequency [Hz] ','Color','k','Interpreter','LaTex','FontSize',fontSize1);
-    set(hAxes1,     'ylim', ylimitUD,...
-                    'yTick',ytickUD,...
-                    'yticklabel',yticklabelUD,...
-                    'YAxisLocation','left');
-    set(hAxes1,'xlim',xlimitUD,'xtick',xtickUD);
-    grid on
-    hold off
-    %-----------------------
-    cla(hAxes2,'reset')
-    axes(hAxes2)
-    drawnow
-    hold on
-    plot(hAxes2,x,EigGR,'-o','color','k','Linewidth',1)
-    hold off
-    set(hAxes2,'YColor','k','Box','on');
-    set(hAxes2,'FontName','Helvetica','FontSize',fontSize1,'LineWidth',1)
-    set(hAxes2,     'xlim', get(hAxes1,'xlim'),...
-                    'xTick',get(hAxes1,'xtick'),...
-                    'xticklabel',[]);
-    xlabel(hAxes2,'','Color','k','Interpreter','LaTex','FontSize',fontSize1);
-    ylabel(hAxes2,'Growth rate [rad/s] ','Color','k','Interpreter','LaTex','FontSize',fontSize1);
-    grid on
-    guidata(hObject, handles);
-end
-assignin('base','CI',CI);                   % save the current information to the workspace
-
-% ----------------------------Calculate eigenvalue-------------------------
+function handles = Fcn_GUI_default_configuration(handles)
+% This function is used to set the default GUI parameters
+handles.bgcolor{1} = [1, 1, 1];
+handles.bgcolor{2} = [0, 0, 0];
+handles.bgcolor{3} = [.75, .75, .75];
+handles.bgcolor{4} = [0.90,0.90,1];
 %
-function E = Fcn_calculation_eigenvalues
-% This function is used to calculate the eigenvalue 
-global CI
-%---------------------------------
-% set the scan domain
-FreqMin     = CI.EIG.Scan.FreqMin;   
-FreqMax     = CI.EIG.Scan.FreqMax;
-FreqNum     = CI.EIG.Scan.FreqNum;
-GRMin       = CI.EIG.Scan.GRMin;   
-GRMax       = CI.EIG.Scan.GRMax;
-GRNum       = CI.EIG.Scan.GRNum;
-FreqSp      = linspace(FreqMin, FreqMax,    FreqNum);       % sample number of scan frequency
-GRSp        = linspace(GRMin,   GRMax,      GRNum);         % sample number of growth rate
-%---------------------------------
-options = optimset('Display','off');        % the calculation results by fsolve will not be shown in the workspace
-for ss = 1:length(GRSp)
-    GR = GRSp(ss);
-    for kk = 1:length(FreqSp)
-        omega = 2*pi*FreqSp(kk);
-        s0 = GR+j*omega;                                                           % initial value
-        EIG.eigenvalue(ss,kk) = fsolve(@Fcn_DetEqn,s0,options);    % solve equation
-        EIG.eigenvalue_prec(ss,kk) = floor(EIG.eigenvalue(ss,kk)./10).*10;          % this is used to set the precision
-    end
-end
-[b,m,n] = unique(EIG.eigenvalue_prec);                      % unique function is used to get rid of the same value
-EIG.eigenvalue_unique = EIG.eigenvalue(m);                  % this is the eigenvalue
-EIG.eigenvalue_unique_prec = EIG.eigenvalue_prec(m);
-%---------------------------------
-% this is used to get rid of the zero frequency value
-s_null = [];
-cal = 0;
-for ss = 1:length(EIG.eigenvalue_unique)
-    if(abs(imag(EIG.eigenvalue_unique(ss)))<1)
-        cal = cal+1;
-        s_null(cal) = ss;
-    end
-end
-EIG.eigenvalue_unique(s_null) = [];
-%---------------------------------
-% the previous processing is still not enough to get rid of the same
-% value,such as 999.9 and 1000.1 corresponding to the function `floor'
-% such as 995.1 and 994.9 corresponding to the function `round'
-cal = 0;
-EIG.eigenvalue_unique = sort(EIG.eigenvalue_unique);
-EIG.eigenvalue_unique_diff = diff(EIG.eigenvalue_unique);
-EIG.index_NULL = [];
-for kk = 1:length(EIG.eigenvalue_unique_diff)
-    if(abs(EIG.eigenvalue_unique_diff(kk))<10)
-        cal = cal+1;
-        EIG.index_NULL(cal) = kk;
-    end
-end
-EIG.eigenvalue_unique(EIG.index_NULL) = []; % this is the eigenvalue we want
-
-EIG.growthrate_limit    = [GRMin    GRMax];
-EIG.Omega_limit         = [FreqMin  FreqMax].*2.*pi;
-%-------------------------------------
-s_null=[];
-cal=0;
-for ss=1:length(EIG.eigenvalue_unique)
-    if(real(EIG.eigenvalue_unique(ss))<EIG.growthrate_limit(1)||real(EIG.eigenvalue_unique(ss))>EIG.growthrate_limit(2)||abs(imag(EIG.eigenvalue_unique(ss)))<EIG.Omega_limit(1)||abs(imag(EIG.eigenvalue_unique(ss)))>EIG.Omega_limit(2) )
-        cal=cal+1;
-        s_null(cal)=ss;
-    end
-end
-EIG.eigenvalue_unique(s_null)=[];        % Do not use semicolon since I want to show the final value
-E = EIG.eigenvalue_unique; 
-clear EIG
+handles.sW  = 800;
+handles.sH  = 600;
 %
-% ----------------------------Calculate contour values---------------------
-%
-function F = Fcn_calculation_contour
-global CI
-%
-n   = length(CI.EIG.Cont.GRSp);
-m   = length(CI.EIG.Cont.FreqSp);
-F   = zeros(n,m);
-for ss = 1:n
-    GR = CI.EIG.Cont.GRSp(ss);
-    for kk  = 1:m
-        omega       = 2*pi*CI.EIG.Cont.FreqSp(kk);
-        s           = GR+1i*omega;
-        F(ss,kk)    = Fcn_DetEqn(s);
-    end
+if ispc
+    handles.FontSize(1)=11;                 % set the default fontsize
+    handles.FontSize(2)=9;
+else
+    handles.FontSize(1)=12;                 % set the default fontsize
+    handles.FontSize(2)=10;   
 end
-%
-% -------------------------end---------------------------------------------    

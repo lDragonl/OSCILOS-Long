@@ -32,6 +32,9 @@ switch CI.IsRun.GUI_INI_TP    % This value is defined in the OSCILOS_Long.m
         Fcn_GUI_INI_TP_HA_visible(hObject)
         handles = guidata(hObject);
         guidata(hObject, handles);
+        Fcn_GUI_INI_TP_plot(handles.axes1,handles);
+        handles = guidata(hObject);
+        guidata(hObject, handles);
         %
         % -----------------------------------------------------------------
     case 0

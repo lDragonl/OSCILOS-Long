@@ -173,9 +173,10 @@ handles.RT.Default = [300 700 50]; % default dimensions of the Rijke tube
 %
 switch CI.IsRun.GUI_INI_CD
     case 0
-    CI.CD.x_sample = [0 0.3 1.0];
-    CI.CD.r_sample = 50./1000.*[1 1 1];
-    CI.CD.index    = [0 11 0];
+    CI.CD.x_sample          = [0 0.3 1.0];
+    CI.CD.r_sample          = 50./1000.*[1 1 1];
+    CI.CD.SectionIndex      = [0 11 0];
+    CI.CD.TubeIndex         = [0 0 0];
     CI.CD.pop_CD_type = 1;
     otherwise
 end 
@@ -330,13 +331,13 @@ set(handles.pb_load,...
                         'string','Load',...
                         'backgroundcolor',handles.bgcolor{3});
 %--------------
-rnames = {'x [mm]','r [mm]','Section index'};
+rnames = {'x [mm]','r [mm]','Section index', 'Tube index'};
 % section index:
 % 0: no flame, heat addition or other damping devices
 % 1: flame or heat addition
 % 2: damping devices
 % ... for future development
-table_data_num      = cat(1,1000*CI.CD.x_sample,1000*CI.CD.r_sample,CI.CD.index);
+table_data_num      = cat(1,1000*CI.CD.x_sample,1000*CI.CD.r_sample,CI.CD.SectionIndex,CI.CD.TubeIndex);
 table_data_cell     = num2cell(table_data_num);
 %
 set(handles.uitable_DM,...
@@ -572,23 +573,24 @@ switch pop_CD_type
         'The default txt file named as ''CD_example.txt'' is automatically';...
         'created in the directory ''subProgram''.'
         'The default data format is:';...
-        'x [m]    r[m]    section index';...
-        '0        0.05    0';...
-        '0.2      0.01    1';...
+        'x [m]    r[m]    SectionIndex     TubeIndex';...
+        '0        0.05    0                0';...
+        '0.2      0.01    0                1';...
+        '0.3      0.03    0                0';...
         '...'
-        '0.5      0.07    2';...
+        '0.5      0.07    11               0';...
+        '0.6      0.07    0                0';...
         '...'
         'where, x means axial position of each sectional interface,';...
         'r indicates the radius of each section,';...
-        'section index represents the type of sectional interface:';...
+        'SectionIndex represents the type of sectional interface:';...
         '0: only sectional area surface change';...
-        '10: with heat addition, but without heat perturbations';...
-        '11: with heat addition and heat perturbations'};
-%         '2: with Helmholtz resonator';...
-%         '30:left end of a perforated liner';...
-%         '31:right end of a perforated liner'};
+        '20: with heat addition, but without heat perturbations';...
+        '21: with heat addition and heat perturbations';...
+        'TubeIndex indicates the type of tube:';...
+        '0: 1-D straight tube';...
+        '1: tube with a linearly changed radius'};
         helpdlg(string,'Load combustor dimensions from an external txt file')
-        
  end
 guidata(hObject, handles);
 
@@ -627,17 +629,34 @@ if filename~=0
     fid=fopen(filename);
 %     frewind(fid);                                     % index the first row
     C_title         = textscan(fid, '%s', 4);           % read title
-    C_cell          = textscan(fid, '%f %f %f');        % read numeric data
+    C_cell          = textscan(fid, '%f %f %f %f');        % read numeric data
     fclose(fid);
     data_num(1,:)   = C_cell{1}.*1000;
     data_num(2,:)   = C_cell{2}.*1000;
     data_num(3,:)   = C_cell{3};
+    data_num(4,:)   = C_cell{4};
     data_cell       = num2cell(data_num);
     set(handles.uitable_DM,'data',data_cell);         % Update the table
-    CI.CD.x_sample = C_cell{1};                    
-    CI.CD.r_sample = C_cell{2};               
-    CI.CD.index    = C_cell{3};      
+    CI.CD.x_sample      = C_cell{1};                    
+    CI.CD.r_sample      = C_cell{2};               
+    CI.CD.SectionIndex  = C_cell{3};      
+    CI.CD.TubeIndex     = C_cell{4};     
 end
+assignin('base','CI',CI)
+%
+CI.CD.indexGC   = find(CI.CD.TubeIndex == 1);       % locate the gradually area change section
+CI.CD.isNoGC    = isempty(CI.CD.indexGC);
+assignin('base','CI',CI)
+Fcn_CD_Load_Processing
+assignin('base','CI',CI)
+% -----------------------
+clear data_num
+data_num(1,:)   = CI.CD.x_sample'.*1e3;
+data_num(2,:)   = CI.CD.r_sample'.*1e3;
+data_num(3,:)   = CI.CD.SectionIndex';
+data_num(4,:)   = CI.CD.TubeIndex';
+set(handles.uitable_DM,'data',num2cell(data_num));         % Update the table
+% -----------------------
 % Update handles structure
 guidata(hObject, handles);
  
@@ -649,7 +668,9 @@ function pb_OK_Callback(hObject, eventdata, handles)
 % Fcn_GUI_INI_CD_Update_Data(hObject, eventdata, handles);
 global CI
 CI.IsRun.GUI_INI_CD = 1;
+Fcn_GUI_INI_CD_Update_Data(hObject);
 Fcn_GUI_INI_CD_Update_Main_GUI(hObject);
+Fcn_Interface_location
 assignin('base','CI',CI); 
 delete(handles.figure);
 
@@ -730,17 +751,19 @@ switch CI.CD.pop_CD_type
         CI.CD.x_sample = cumsum(l)./1000;
         CI.CD.r_sample = 0*CI.CD.x_sample + r;
         if indexHA_mean == 1 && indexHA_pert == 1
-            CI.CD.index = [0 11 0];             % with heat addition and heat perturbations
+            CI.CD.SectionIndex = [0 11 0];             % with heat addition and heat perturbations
         elseif indexHA_mean == 1 && indexHA_pert == 0
-            CI.CD.index = [0 10 0];             % with heat addition but heat perturbations
+            CI.CD.SectionIndex = [0 10 0];             % with heat addition but heat perturbations
         elseif indexHA_mean == 0 && indexHA_pert == 0
-            CI.CD.index = [0 0 0];              % without heat addition
+            CI.CD.SectionIndex = [0 0 0];              % without heat addition
         end
+        CI.CD.TubeIndex = [0 0 0]; 
     case 2
         data_cell = get(handles.uitable_DM,'data');
-        CI.CD.x_sample  = cell2mat(data_cell(1,:))./1000;
-        CI.CD.r_sample  = cell2mat(data_cell(2,:))./1000;
-        CI.CD.index     = cell2mat(data_cell(3,:));
+        CI.CD.x_sample          = cell2mat(data_cell(1,:))./1000;
+        CI.CD.r_sample          = cell2mat(data_cell(2,:))./1000;
+        CI.CD.SectionIndex      = cell2mat(data_cell(3,:));
+        CI.CD.TubeIndex         = cell2mat(data_cell(4,:));
     otherwise
         % Code for when there is no match.
 end
@@ -772,11 +795,14 @@ if(ishandle(main))
     String_Listbox{indStart+1}=['<HTML><FONT color="blue">Information 1:'];
     String_Listbox{indStart+2}=['<HTML><FONT color="blue">Combustor dimension:'];
     String_Listbox{indStart+3}=['The combustor has ' num2str(length(CI.CD.r_sample)-1) ' sections'];
-%     String_Listbox{indStart+4}=['The flame is located after section ' num2str(CI.CD.index_flame-1)];
+%     String_Listbox{indStart+4}=['The flame is located after section ' num2str(CI.CD.SectionIndex_flame-1)];
+% try
     String_Listbox{indStart+4}=['The x-coordinates are: '];
     String_Listbox{indStart+5}=[num2str(CI.CD.x_sample) ' m'];
     String_Listbox{indStart+6}=['The r-coordinates are: '];
     String_Listbox{indStart+7}=[num2str(1000.*CI.CD.r_sample) ' mm'];
+% catch 
+% end
     set(mainHandles.listbox_Info,'string',String_Listbox,'value',1);
 end
 guidata(hObject, handles);

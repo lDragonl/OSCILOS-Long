@@ -849,7 +849,7 @@ if rem(datEdit ,1)~=0
     set(hObject, 'String', num2str(round(datEdit)));
     errordlg('Input must be a positive integer','Error');
 end
-if datEdit >20
+if datEdit >50
     set(hObject, 'String', 2);
     errordlg('Too large input number! Try a smaller one','Error');
 end
