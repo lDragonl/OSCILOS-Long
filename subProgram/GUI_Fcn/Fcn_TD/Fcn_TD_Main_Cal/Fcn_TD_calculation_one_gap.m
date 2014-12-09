@@ -8,7 +8,7 @@ function Fcn_TD_calculation_one_gap(Var)
 % first created:    2014-11-11
 % last edited:      2014-11-19
 %
-% AP is the pressure wave propagating in teh direction of flow
+% AP is the pressure wave propagating in the direction of flow
 % AM is the pressure wave propagating in the opposite direction of flow
 % the lines of AP and AM indicate the section (1 is upstream boundary, N is
 % downstream boundary). The columns are the values as a function fo time. 
