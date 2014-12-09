@@ -26,7 +26,7 @@ end
 [ Q_fluct ] = Fcn_TD_Gequ_calc_Q_fluct( y_vec,SU,xi,u_gutter, Q_mean, delta_h,rho1,y_vec);
 
 % and finally compute the Q_ratio
-q_ratio = Q_fluct/Q_mean;
+q_ratio = Q_fluct./Q_mean; % Q_mean can be a vector
 
 end
 
