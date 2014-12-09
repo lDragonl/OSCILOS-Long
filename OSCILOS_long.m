@@ -143,12 +143,17 @@ switch selection
         if CI.IsRun.GUI_INI_TP == 1;
             set(handles.INI_FM,         'enable','on')
         end
-        if CI.IsRun.GUI_INI_FM == 1 || CI.IsRun.GUI_INI_FMEXP == 1;
+        if CI.IsRun.GUI_INI_FM == 1 || CI.IsRun.GUI_INI_FMEXP == 1 || CI.IsRun.GUI_INI_GEQU == 1
             set(handles.INI_BC,         'enable','on')
         end
         if CI.IsRun.GUI_INI_BC == 1;
-            set(handles.FREQ,           'enable','on')
-            set(handles.FREQ_EigCal,    'enable','on')
+            if CI.FM.NL.style == 4 % G-Equation can't be computed in Freq. domain
+                set(handles.FREQ,           'enable','off')
+                set(handles.FREQ_EigCal,    'enable','off')
+            else
+                set(handles.FREQ,           'enable','on')
+                set(handles.FREQ_EigCal,    'enable','on')
+            end
             set(handles.TD,             'enable','on')
         end
     catch
@@ -215,15 +220,16 @@ guidata(hObject,handles);
 handles=guidata(hObject);
 global CI
 string={...
-'The flame describing function (FDF) is configured in this pannel.'...
-'One can use a simple nonlinear flame describing function model,'...
+'The flame model is configured in this pannel; choose between:'...
+'- A simple nonlinear flame describing function model,'...
 'which is assumed can be decoupled as a nonlinear model and a'...
 'linear flame transfer function (FTF) model.'...
-'One can also load experimental flame transfer functions  for'...
-'different velocities, and fit the FTF data with state-space models.'};
+' - An experimental flame transfer functions (loaded from a file) for'...
+'different velocities, and fit the FTF data with state-space models.'...
+' - The fully non-linear G-EQuation model (Williams 1988)'};
 choice = questdlg(string, ...
-	'Flame describing function setting', ...
-	'Decoupled FDF model','From experimental FDF','Decoupled FDF model');
+	'Flame function setting', ...
+	'Decoupled FDF model','From experimental FDF','G-Equation','Decoupled FDF model');
 % Handle response
 switch choice
     case 'Decoupled FDF model'
@@ -232,6 +238,8 @@ switch choice
     case 'From experimental FDF'
         CI.indexFM = 1;
         GUI_INI_FMEXP('OSCILOS_long', handles.figure);
+    case 'G-Equation'
+        GUI_INI_GEQU('OSCILOS_long', handles.figure);
 end
 assignin('base','CI',CI);
 
@@ -687,6 +695,7 @@ set(handles.listbox_Info,...
 CI.IsRun.GUI_INI_CD         = 0;
 CI.IsRun.GUI_INI_TP         = 0;
 CI.IsRun.GUI_INI_FM         = 0;
+CI.IsRun.GUI_INI_GEQU       = 0;
 CI.IsRun.GUI_INI_FMEXP      = 0;
 CI.IsRun.GUI_INI_BC         = 0;
 CI.IsRun.GUI_INI_BC_Entropy = 0;

@@ -12,8 +12,13 @@ if nargin == 0
     RatioGapPadding = 0;
 end
 global CI
-CI.TD.nPeriod               = nPeriod;                                          % number of interval
-CI.TD.numGap                = round(CI.TD.nRound./CI.TD.nPeriod);               % number of Gap counting
+if CI.FM.NL.style == 4
+    CI.TD.nPeriod               = CI.TD.nRound;  
+else
+    CI.TD.nPeriod               = nPeriod;                                          % number of interval
+end
+
+    CI.TD.numGap                = round(CI.TD.nRound./CI.TD.nPeriod);               % number of Gap counting
 switch CI.FM.NL.style                                                           % In case the envelope of uRatio is necessary, a padding is used. 
     case 3
         CI.TD.RatioGapPadding  = RatioGapPadding;                               % ratio of padding length  

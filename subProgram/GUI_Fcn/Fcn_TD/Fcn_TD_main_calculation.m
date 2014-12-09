@@ -23,7 +23,7 @@ function Fcn_TD_main_calculation_with_GUI
 global CI
 switch CI.FM.NL.style                                                           
     case 3
-        GUI_TD_Cal_JLI_AMorgans('OSCILOS_long', handles.figure);                            
+        GUI_TD_Cal_JLI_AMorgans('OSCILOS_long', handles.figure);   
     otherwise
         Fcn_TD_main_calculation_without_identification_uRatio;
 end
@@ -55,11 +55,18 @@ hWaitBar = waitbar(0,'Time domain calculations, please wait...');
 for mm = 1:CI.TD.nPeriod
     waitbar(mm/CI.TD.nPeriod);
     drawnow
-    switch CI.FM.NL.style                                                           
+    switch CI.FM.NL.style
         case 3
             Iteration.tol = 1e-5;
             Iteration.num = 50;
-            Fcn_TD_main_calculation_iteration_convergence(mm,Iteration)                             
+            Fcn_TD_main_calculation_iteration_convergence(mm,Iteration)
+            
+        case 4 % G-equation
+            CI.FM.NL.Model4.IT = mm;
+            % --------------------------
+            Fcn_TD_calculation_one_period(mm)
+            % --------------------------
+            Fcn_TD_main_calculation_period_uRatio_envelope(mm)   % calculate the envelope
         otherwise
             % --------------------------
             Fcn_TD_calculation_one_period(mm)

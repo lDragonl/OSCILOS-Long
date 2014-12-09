@@ -35,6 +35,8 @@ switch CI.FM.NL.style
         taufNLimit      = CI.FM.NL.Model3.taufN.*(1 - LfLimit);
         taufLimit       = CI.FM.FTF.tauf + taufNLimit;
         taufMin         = min(taufLimit);
+     case 4 % G-equation, the time delay here is fixed through GUI
+        taufMin = CI.FM.NL.Model4.tau_f;
 end
 tauMin          = min(tauMin, taufMin);
 %

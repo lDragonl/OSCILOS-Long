@@ -22,7 +22,7 @@ function varargout = GUI_INI_FM(varargin)
 
 % Edit the above text to modify the response to help GUI_INI_FM
 
-% Last Modified by GUIDE v2.5 08-Oct-2014 10:09:19
+% Last Modified by GUIDE v2.5 18-Nov-2014 17:00:38
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -149,6 +149,7 @@ switch CI.IsRun.GUI_INI_FM
         % Dowling's Model
         CI.FM.NL.Model2.alpha       = 0.3;
         % -------------------------
+ 
 end
 assignin('base','CI',CI);                   % save the current information to the workspace
 %
@@ -328,7 +329,8 @@ set(handles.pop_NL_type,...
                         'fontsize',handles.FontSize(2),...
                         'string',{  'None';...
                                     'Dowling''s model (Stow and Dowling JEGTP 2009)';...
-                                    'J.Li and A.S.Morgans JSV'},...
+                                    'J.Li and A.S.Morgans JSV'...
+                                  },...
                         'backgroundcolor',handles.bgcolor{1},...
                         'horizontalalignment','left',...
                         'enable','on',...
@@ -385,6 +387,7 @@ set(handles.edit_NL_a3,...
                         'backgroundcolor',handles.bgcolor{1},...
                         'horizontalalignment','right',...
                         'Enable','off');  
+
 %----------------------------------------
 %
 % pannel AOC                   
@@ -633,7 +636,7 @@ switch CI.FM.NL.style
         [CI.FM.NL.Model3.uRatio,CI.FM.NL.Model3.Lf]...
       = Fcn_GUI_INI_FM_Nonlinear_model_J_Li_A_Morgas(   CI.FM.NL.Model3.alpha,...
                                                         CI.FM.NL.Model3.beta,...
-                                                        DuRatio,uRatioMax);
+                                                        DuRatio,uRatioMax);                                            
 end
 assignin('base','CI',CI);                   % save the current information to the workspace
 guidata(hObject, handles);
@@ -1252,3 +1255,26 @@ for ss=1:length(n_sample)
     color_type(ss,1:3)=cmap(n_sample(ss),1:3);
 end
 %---------------------------end-------------------------------------------
+
+
+
+function edit21_Callback(hObject, eventdata, handles)
+% hObject    handle to edit21 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of edit21 as text
+%        str2double(get(hObject,'String')) returns contents of edit21 as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function edit21_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to edit21 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end

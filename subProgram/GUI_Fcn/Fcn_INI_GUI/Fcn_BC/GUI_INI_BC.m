@@ -804,7 +804,11 @@ if(ishandle(main))
     mainHandles = guidata(main);
     % -------------------------------------
     changeMain = mainHandles.FREQ;      % set the Frequency pop-up menu enable
-    set(changeMain, 'Enable', 'on');
+    if CI.FM.NL.style == 4 % Frequency calculation can only be run if the G-EQuation is not being used
+        set(changeMain, 'Enable', 'off');
+    else
+        set(changeMain, 'Enable', 'on');
+    end
     changeMain = mainHandles.TD;        % set the time domain simulation pop-up menu enable
     set(changeMain, 'Enable', 'on');
     String_Listbox=get(mainHandles.listbox_Info,'string');

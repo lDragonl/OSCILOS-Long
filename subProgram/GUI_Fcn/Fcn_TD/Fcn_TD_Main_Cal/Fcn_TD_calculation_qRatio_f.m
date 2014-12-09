@@ -20,6 +20,8 @@ qRatio  = conv(uRatio(index),yFTFGreen,'valid').*dt;
 switch CI.FM.NL.style
     case 2
         qRatio = Fcn_saturation(qRatio,CI.FM.NL.Model2.alpha);
+    case 4 % Case of the G-equation
+        error(' not implemented yet')
     otherwise
         qRatio = qRatio.*Lf((Var(1):Var(2)));
 %         qRatio = qRatio.*0.2;

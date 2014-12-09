@@ -52,9 +52,11 @@ for ss = 1 : Iteration.num
     % --------------------------
     uRatioEnv1 = Fcn_calculation_envelope(CI.TD.uRatio(VarPad(1):VarPad(2)),N);       % calculate uRatio
     uRatioEnv1 = 0.5*(uRatioEnv1 + uRatioEnv2);
+    
     [   CI.TD.Lf(Var(1):VarPad(2)),...
         CI.TD.tauf(Var(1):VarPad(2))]...
         = Fcn_flame_model_NL_JLi_AMorgans(uRatioEnv1(Var(1)-CI.TD.nPadding:end));       % only update the nonlinear value from Var(1) to VarPad(2)
+
         CI.TD.taufRem(Var(1):VarPad(2))  = CI.TD.tauf(Var(1):VarPad(2)) - CI.TD.taufMin;
     index = [Var(1), Var(1)-1+N1] - CI.TD.nPadding;
     DeltaDiff = abs(std(uRatioEnv1(index(1) : index(2)) - uRatioEnv2(index(1) : index(2))))   

@@ -10,6 +10,7 @@ global CI
 for nn = CI.TD.indexPeriod(indexPeriod,1):CI.TD.indexPeriod(indexPeriod,2)
     Var(1:2)     = CI.TD.nPadding + [(nn-1)*CI.TD.nGap + 1,...
                                          nn*CI.TD.nGap];
+
     % --------------------------
     Fcn_TD_calculation_one_gap(Var)
     % --------------------------

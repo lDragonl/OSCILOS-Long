@@ -334,6 +334,7 @@ function Fcn_Update_Plots(varargin)
 hObject = varargin{1};
 handles = guidata(hObject);
 global Green
+global CI
 ss = get(handles.pop_type,'Value');
 switch Green.indexConst(ss)
     case 0
@@ -341,11 +342,20 @@ switch Green.indexConst(ss)
         Green.tauConv2(ss) = str2double(get(handles.edit_a2, 'string'))./1e3;
         [Green.y2{ss},Green.t2{ss}]   = impulse(Green.sys{ss},Green.tauConv2(ss));
     case 1
-        set(handles.edit_a2,    'enable','off');
+        if ss == 3 && CI.FM.NL.style == 4 % Flame transfer function selected with the G-Equation
+            set(handles.edit_a2,    'enable','off');
             string={...
-            'The transfer function is a constant value!';...
-            'Examination of the Green''s function is not necessary!'};
-        helpdlg(string,'')
+                'You have selected a G-Equation flame model,';...
+                'Its transfer function is not available.';...
+                'Examination of the Green''s function is not necessary!'};
+            helpdlg(string,'')
+        else
+            set(handles.edit_a2,    'enable','off');
+            string={...
+                'The transfer function is a constant value!';...
+                'Examination of the Green''s function is not necessary!'};
+            helpdlg(string,'')
+        end
 end
 assignin('base','Green',Green);
 guidata(hObject, handles)
