@@ -50,7 +50,6 @@ z0          = lsim(Sys,y(index1:index2),t0);        % lsim
 %
 z           = interp1(t0,z0,tIntp,'linear','extrap'); % do interpolation to have required response
 
-pause
 
 
 
