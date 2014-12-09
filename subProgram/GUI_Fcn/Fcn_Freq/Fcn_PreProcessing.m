@@ -32,7 +32,7 @@ for ss = 1:CI.TP.numSection-1
             CI.TPM.B1{2,ss}         = eye(3);           % second step
             CI.TPM.B2{2,ss}         = eye(3);
             CI.TPM.BC{ss}           = (B2*CI.TPM.C2)\(B1*CI.TPM.C1);
-        case 1
+        case {10,11} 
             [B1,B2] = Fcn_Matrix_calculation_WO_Addition_effect(ss,1,2);
             CI.TPM.B1{1,ss}         = B1;               % first step
             CI.TPM.B2{1,ss}         = B2;
