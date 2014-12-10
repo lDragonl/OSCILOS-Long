@@ -179,7 +179,8 @@ switch selection
                                          'Save as');
     if filename~=0
         try
-            save(filename,'CI')  
+            matfile = fullfile(pathname, filename);
+            save(matfile,'CI') 
         catch 
         end
     end
