@@ -56,12 +56,6 @@ for ss = 1:CI.TP.numSection-1
                 
                 CI.TD.uRatio(Var(1):Var(2)) = Fcn_TD_calculation_uRatio(Var,ss); % compute the values of uratio in every section
                 
-%                 amp = 0.17;
-%                 freq = 333;
-%                 alpha = 2;
-%                 beta = 5.4;
-%                 uratio = amp * (alpha * cos(freq* CI.TD.tSpTotal(Var(1):Var(2))) + beta * sin(freq * CI.TD.tSpTotal(Var(1):Var(2))));
-%                 CI.TD.uRatio(Var(1):Var(2)) = uratio;
                 % Compute the flame shape and area
                 [CI.FM.NL.Model4.q_ratio,CI.FM.NL.Model4.xi,CI.FM.NL.Model4.bashforth_data ] = Fcn_TD_Gequ_interface...
                 ( CI.FM.NL.Model4.SU, CI.FM.NL.Model4.xi, CI.FM.NL.Model4.y_vec, CI.TD.dt, 0, CI.FM.NL.Model4.U1, ...
@@ -69,12 +63,7 @@ for ss = 1:CI.TP.numSection-1
                 CI.FM.NL.Model4.bashforth_data,CI.FM.NL.Model4.IT,CI.FM.NL.Model4.time_integration); % In this case CI.TD.uRatio(Var(1):Var(2)) this is a scalar
                 CI.FM.NL.Model4.q_ratio_vector(CI.FM.NL.Model4.IT) = CI.FM.NL.Model4.q_ratio;
                 CI.TD.qRatio(Var(1):Var(2)) = CI.FM.NL.Model4.q_ratio; % This is a scalar
-                
-                set(0,'CurrentFigure',CI.FM.NL.Model4.flame_fig)
-                plot(CI.FM.NL.Model4.xi,CI.FM.NL.Model4.y_vec)
-%                 drawnow
-                
-
+              
             else
                 CI.TD.uRatio(Var(1):Var(2)) = Fcn_TD_calculation_uRatio(Var,ss);
                 CI.TD.qRatio(Var(1):Var(2)) = Fcn_TD_calculation_qRatio_s(  CI.TD.uRatio,...

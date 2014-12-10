@@ -141,7 +141,6 @@ switch CI.IsRun.GUI_INI_GEQU
         CI.FM.NL.Model4.rho1 = CI.TP.u_mean(1,max(CI.CD.index_flame - 1,1));% This is a vector if there are multple flame. The max function is required is the flame is at the end of the duct.
         CI.FM.NL.Model4.SU   = CI.FM.NL.Model4.U1 * 0.088; % in m/s, this is a vector if there are multple flame.
         CI.FM.NL.Model4.time_integration = 1; % Set to adam bashforth
-        CI.FM.NL.Model4.flame_fig = figure; 
 end
 assignin('base','CI',CI);                   % save the current information to the workspace
         
