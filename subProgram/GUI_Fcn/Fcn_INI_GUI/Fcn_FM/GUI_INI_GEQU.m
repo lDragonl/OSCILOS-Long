@@ -361,7 +361,7 @@ CI.FM.NL.Model4.Ugs = Fcn_TD_Gequ_calc_ugutter( CI.FM.NL.Model4.U1,CI.FM.NL.Mode
 CI.FM.NL.Model4.xi_steady       = ...
     Fcn_TD_Gequ_steady_flame( CI.FM.NL.Model4.Ugs,CI.FM.NL.Model4.SU,CI.FM.NL.Model4.y_vec ); % If there are multiple flame, this is a matrix (lines are flames in different sections, columns come along r)
 CI.FM.NL.Model4.xi = CI.FM.NL.Model4.xi_steady; % initialise xi value
-CI.FM.NL.Model4.bashforth_data = zeros(length(CI.FM.NL.Model4.rb),CI.FM.NL.Model4.nb_points,3); % Three dimentional matrix for three step adam bashforth
+CI.FM.NL.Model4.bashforth_data = zeros(length(CI.FM.NL.Model4.rb),max(CI.FM.NL.Model4.nb_points),3); % Three dimentional matrix for three step adam bashforth
 
 % Set the flame transfer function numerator and denominator to
 % 1, as they are used for the Green's function initilisation,
