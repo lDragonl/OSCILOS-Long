@@ -217,32 +217,33 @@ function INI_FM_Callback(hObject, eventdata, handles)
 % hObject    handle to INI_FM (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-guidata(hObject,handles);
-handles=guidata(hObject);
-global CI
-string={...
-'The flame model is configured in this pannel; choose between:'...
-'- A simple nonlinear flame describing function model,'...
-'which is assumed can be decoupled as a nonlinear model and a'...
-'linear flame transfer function (FTF) model.'...
-' - An experimental flame transfer functions (loaded from a file) for'...
-'different velocities, and fit the FTF data with state-space models.'...
-' - The fully non-linear G-EQuation model (Williams 1988)'};
-choice = questdlg(string, ...
-	'Flame function setting', ...
-	'Decoupled FDF model','From experimental FDF','G-Equation','Decoupled FDF model');
-% Handle response
-switch choice
-    case 'Decoupled FDF model'
-        GUI_INI_FM('OSCILOS_long', handles.figure);
-        CI.indexFM = 0;
-    case 'From experimental FDF'
-        CI.indexFM = 1;
-        GUI_INI_FMEXP('OSCILOS_long', handles.figure);
-    case 'G-Equation'
-        GUI_INI_GEQU('OSCILOS_long', handles.figure);
-end
-assignin('base','CI',CI);
+% guidata(hObject,handles);
+% handles=guidata(hObject);
+% global CI
+% string={...
+% 'The flame model is configured in this pannel; choose between:'...
+% '- A simple nonlinear flame describing function model,'...
+% 'which is assumed can be decoupled as a nonlinear model and a'...
+% 'linear flame transfer function (FTF) model.'...
+% ' - An experimental flame transfer functions (loaded from a file) for'...
+% 'different velocities, and fit the FTF data with state-space models.'...
+% ' - The fully non-linear G-EQuation model (Williams 1988)'};
+% choice = questdlg(string, ...
+% 	'Flame function setting', ...
+% 	'Decoupled FDF model','From experimental FDF','G-Equation','Decoupled FDF model');
+% % Handle response
+% switch choice
+%     case 'Decoupled FDF model'
+%         GUI_INI_FM('OSCILOS_long', handles.figure);
+%         CI.indexFM = 0;
+%     case 'From experimental FDF'
+%         CI.indexFM = 1;
+%         GUI_INI_FMEXP('OSCILOS_long', handles.figure);
+%     case 'G-Equation'
+%         GUI_INI_GEQU('OSCILOS_long', handles.figure);
+% end
+% assignin('base','CI',CI);
+GUI_INI_FM_Sel(handles.figure);
 
 
 
@@ -261,7 +262,14 @@ function FREQ_EigCal_Callback(hObject, eventdata, handles)
 % hObject    handle to FREQ_EigCal (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-GUI_FREQ_EigCal('OSCILOS_long', handles.figure);
+global CI
+numHPNL = length(find(CI.FM.indexFM > 1));
+if numHPNL>1
+    errordlg('The current version still does not support this situation!','Error');
+%     return
+else
+    GUI_FREQ_EigCal('OSCILOS_long', handles.figure);
+end
 
 
 function TD_Callback(hObject, eventdata, handles)
@@ -545,7 +553,6 @@ set(handles.FREQ_EigCal,...
                         'Separator',             'on')
 
 % Time domain analysis
-
 set(handles.TD,...
                         'Enable',   'off',...
                         'ForegroundColor',      handles.bgcolor{2},...
@@ -662,12 +669,7 @@ pannelsize=get(handles.uipanel_Info,'position');
 pW=pannelsize(3);
 pH=pannelsize(4); 
 
-% --------------
-
-% msg={   '<HTML><FONT color="red">Welcome to OSCILOS_long!';...
-%         'version 1.4';...
-%         ''};
-    
+% --------------    
 msg = {     '<HTML><FONT color="red">Welcome to OSCILOS_long!';...
             'version 1.4';...
             '';...
@@ -695,6 +697,7 @@ set(handles.listbox_Info,...
 % Initialization pannels
 CI.IsRun.GUI_INI_CD         = 0;
 CI.IsRun.GUI_INI_TP         = 0;
+CI.IsRun.GUI_INI_FM_Sel     = 0;
 CI.IsRun.GUI_INI_FM         = 0;
 CI.IsRun.GUI_INI_GEQU       = 0;
 CI.IsRun.GUI_INI_FMEXP      = 0;
@@ -712,11 +715,7 @@ CI.IsRun.GUI_TD_Cal_JLI_AMorgans = 0;
 assignin('base','CI',CI)
 guidata(hObject, handles); 
 
-
-
-
 % --------------------------------end--------------------------------------
-
 
 % --- Executes during object deletion, before destroying properties.
 function figure_DeleteFcn(hObject, eventdata, handles)

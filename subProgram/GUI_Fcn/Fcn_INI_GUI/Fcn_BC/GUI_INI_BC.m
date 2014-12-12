@@ -797,20 +797,29 @@ assignin('base','CI',CI);                   % save the current information to th
 function Fcn_GUI_INI_BC_Update_Data(hObject, eventdata, handles)
 global CI
 Fcn_GUI_INI_BC_PLOT_BC_TF(hObject, eventdata, handles) 
-try
+% try
 main = handles.MainGUI;
 % Obtain handles using GUIDATA with the caller's handle 
 if(ishandle(main))
     mainHandles = guidata(main);
     % -------------------------------------
-    changeMain = mainHandles.FREQ;      % set the Frequency pop-up menu enable
-    if CI.FM.NL.style == 4 % Frequency calculation can only be run if the G-EQuation is not being used
-        set(changeMain, 'Enable', 'off');
-    else
-        set(changeMain, 'Enable', 'on');
+    changeMain1 = mainHandles.FREQ;      % set the Frequency pop-up menu enable
+    changeMain2 = mainHandles.TD; % set the TD pop-up menu enable
+    % default 
+    set(changeMain1, 'Enable', 'on');
+    set(changeMain2, 'Enable', 'on');
+    % ------------
+    if ~isempty(CI.CD.indexHP)            % with heat perturbations
+        if ~isempty(find(CI.FM.indexFM == 4))   % Frequency calculation can only be run if the G-EQuation is not being used
+            set(changeMain1, 'Enable', 'off');
+            set(changeMain2, 'Enable', 'on');
+        end
+        if ~isempty(find(CI.FM.indexFM == 3))   % with loaded experimental/CFD FDF, time domain code is not avaliable
+            set(changeMain1, 'Enable', 'on');
+            set(changeMain2, 'Enable', 'off');
+        end
     end
-    changeMain = mainHandles.TD;        % set the time domain simulation pop-up menu enable
-    set(changeMain, 'Enable', 'on');
+    % ---------------
     String_Listbox=get(mainHandles.listbox_Info,'string');
     ind=find(ismember(String_Listbox,'<HTML><FONT color="blue">Information 4:'));
     nLength=size(String_Listbox);
@@ -828,7 +837,7 @@ if(ishandle(main))
     String_Listbox{indStart+4}=['Outlet boundary condition type:' num2str(CI.BC.StyleOutlet) ];
     set(mainHandles.listbox_Info,'string',String_Listbox);
 end
-end
+% end
 guidata(hObject, handles);
 % guidata(hObject, handles);
 assignin('base','CI',CI);                   % save the current information to the workspace

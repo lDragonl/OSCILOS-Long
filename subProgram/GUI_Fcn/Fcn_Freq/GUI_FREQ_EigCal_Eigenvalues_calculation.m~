@@ -104,18 +104,16 @@ if  CI.EIG.APP_style == 21     % From flame model, CI.FM.indexFM == 2
                                         HP.FDF.uRatioSp,'linear','extrap');         % Nonlinear ratio
         CI.EIG.FDF.taufNSp  = HP.NL.Model3.taufN.*(1-CI.EIG.FDF.Lf);                % Nonlinear time delay
         for ss = 1:uRatioNum
-            CI.EIG.FDF.num{ss}   = CI.EIG.FDF.Lf(ss).*HP.FTF.num;
-            CI.EIG.FDF.den{ss}   = HP.FTF.den;
-            CI.EIG.FDF.tauf(ss)  = HP.FTF.tauf + CI.EIG.FDF.taufNSp(ss);     % Time delay of the FDF model
+            CI.EIG.FDF.num{ss}   = CI.EIG.FDF.Lf(ss).*CI.FM.FTF.num;
+            CI.EIG.FDF.den{ss}   = CI.FM.FTF.den;
+            CI.EIG.FDF.tauf(ss)  = CI.FM.FTF.tauf + CI.EIG.FDF.taufNSp(ss);     % Time delay of the FDF model
         end    
     end
-elseif CI.EIG.APP_style == 22  % From experimental FDF
-    
-    HP = CI.FM.HP{CI.FM.indexMainHPinHp};
-    CI.EIG.FDF.uRatioSp             = HP.FMEXP.uRatio;
-    uRatioNum            = length(CI.EIG.FDF.uRatioSp);
+elseif CI.indexFM == 1  % From experimental FDF
+    CI.EIG.FDF.uRatioSp = CI.FMEXP.uRatio;
+    uRatioNum = length(CI.EIG.FDF.uRatioSp);
     for ss = 1:uRatioNum
-        FTF = HP.FMEXP.FTF{ss};
+        FTF = CI.FMEXP.FTF{ss};
         CI.EIG.FDF.num{ss}  = FTF.num;
         CI.EIG.FDF.den{ss}  = FTF.den;
         CI.EIG.FDF.tauf(ss) =-FTF.tau_correction;  % Be careful: we always use a = a0 exp(-a*tau)

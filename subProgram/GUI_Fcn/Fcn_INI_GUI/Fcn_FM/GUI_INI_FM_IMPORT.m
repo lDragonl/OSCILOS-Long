@@ -98,7 +98,7 @@ switch indexEdit
 %            uiwait(hObject);
         end
     case 1
-        global CI
+        global HP
         handles.bgcolor{1} = [0.95, 0.95, 0.95];
         handles.bgcolor{2} = [0, 0, 0];
         handles.bgcolor{3} = [.75, .75, .75];
@@ -115,9 +115,8 @@ switch indexEdit
             handles.FontSize(2)=10;   
         end
         handles.indexApp = 0;
-        CI.Ru = 8.3145;
-        CI.FMEXP.indexIMPORT = 1;
-        assignin('base','CI',CI);                   % save the current information to the works
+        HP.FMEXP.indexIMPORT = 1;
+        assignin('base','HP',HP);                   % save the current information to the works
         guidata(hObject, handles);  
         GUI_INI_FM_IMPORT_Initialization(hObject, eventdata, handles)
         handles = guidata(hObject);  
@@ -383,13 +382,13 @@ handles.ObjVisible_FIT      = findobj('-regexp','Tag','FIT');
 handles.ObjEditEnable_FIT   = findobj('-regexp','Tag','edit_FIT');
 set(handles.ObjVisible_FIT,         'visible','on')
 set(handles.ObjEditEnable_FIT,      'enable', 'on')
-global CI
+global HP
 guidata(hObject, handles);
-switch CI.FMEXP.indexIMPORT 
+switch HP.FMEXP.indexIMPORT 
     case 1
         set(handles.pb_Import,              'enable','on'); 
     case 2  % edit selected FTF
-        handles.FMFit   = CI.FMEXP.FTF{CI.FMEXP.indexModify};        
+        handles.FMFit   = HP.FMEXP.FTF{HP.FMEXP.indexModify};        
         fmin            = handles.FMFit.freq_band(1);
         fmax            = handles.FMFit.freq_band(2);
         set(handles.edit_uRatio,    'string', num2str(handles.FMFit.uRatio));
@@ -594,15 +593,15 @@ guidata(hObject,handles);
 function pb_SaveFitting_Callback(varargin)
 hObject = varargin{1};
 handles = guidata(hObject);
-global CI
+global HP
 set(handles.pb_SaveFig, 'enable','on')
-switch CI.FMEXP.indexIMPORT 
+switch HP.FMEXP.indexIMPORT 
     case 1  % add new FTF
-        nCount                      = CI.FMEXP.nFTF + 1;
-        CI.FMEXP.nFTF              = nCount;
-        CI.FMEXP.FTF{nCount}       = handles.FMFit;
-        CI.FMEXP.uRatio(nCount)    = handles.FMFit.uRatio; 
-        assignin('base','CI',CI);                  
+        nCount                      = HP.FMEXP.nFTF + 1;
+        HP.FMEXP.nFTF              = nCount;
+        HP.FMEXP.FTF{nCount}       = handles.FMFit;
+        HP.FMEXP.uRatio(nCount)    = handles.FMFit.uRatio; 
+        assignin('base','HP',HP);                  
         main = handles.MainGUI;
         if(ishandle(main))
             mainHandles             = guidata(main);
@@ -614,10 +613,10 @@ switch CI.FMEXP.indexIMPORT
             set(changeMain,'string',String_Listbox,'value',nCount);
         end   
     case 2  % edit selected FTF
-        nCount                      = CI.FMEXP.indexModify;
-        CI.FMEXP.FTF{nCount}       = handles.FMFit;
-        CI.FMEXP.uRatio(nCount)    = handles.FMFit.uRatio; 
-        assignin('base','CI',CI);                  
+        nCount                      = HP.FMEXP.indexModify;
+        HP.FMEXP.FTF{nCount}       = handles.FMFit;
+        HP.FMEXP.uRatio(nCount)    = handles.FMFit.uRatio; 
+        assignin('base','HP',HP);                  
         main = handles.MainGUI;
         if(ishandle(main))
             mainHandles             = guidata(main);
@@ -628,7 +627,7 @@ switch CI.FMEXP.indexIMPORT
             set(changeMain,'string',String_Listbox,'value',nCount);
         end 
 end  
-assignin('base','CI',CI);                   % save the current information to the works
+assignin('base','HP',HP);                   % save the current information to the works
 delete(handles.figure);
 %
 %--------------------------------------------------------------------------

@@ -18,7 +18,7 @@ E(1)        = 0;
 A_plus(1)   = R1.*A_minus(1);
 Array(:,1)  = [A_plus(1),A_minus(1),E(1)]';
 %
-
+indexHP = 0;    % index of unsteady heat sources
 % -------------------------------------------------------------------------
 for ss = 1:CI.TP.numSection-1 
     D1 = diag([ exp(-s_star*tau_plus(ss)),...
@@ -36,11 +36,12 @@ for ss = 1:CI.TP.numSection-1
             CI.TPM.Z{ss}       = (BC2\BC1)*D1;
         case 11
             % linear flame transfer function
-            FTF     = Fcn_flame_model(s_star);
+            indexHP = indexHP + 1;
+            FTF     = Fcn_flame_model(s_star,indexHP);
             B2b     = zeros(3);
             temp    = D1*Array(:,ss);
             uf      = abs((temp(1) - temp(2))./(CI.TP.c_mean(1,ss).*CI.TP.rho_mean(1,ss)));         % velocity before the flame
-            B2b(3,2)= CI.TP.DeltaHr./CI.TP.c_mean(2,ss+1)./CI.TP.c_mean(1,ss)./CI.TP.Theta(ss).*FTF;
+            B2b(3,2)= CI.TP.DeltaHr(CI.FM.indexHPinHA(indexHP))./CI.TP.c_mean(2,ss+1)./CI.TP.c_mean(1,ss)./CI.TP.Theta(ss).*FTF;
             Bsum    = CI.TPM.B1{2,ss}*(CI.TPM.B2{1,ss}\CI.TPM.B1{1,ss}) + B2b;
             BC1     = Bsum*CI.TPM.C1;
             BC2     = CI.TPM.B2{2,ss}*CI.TPM.C2;
@@ -100,19 +101,13 @@ switch CI.BC.ET.pop_type_model
 end                        
 %
 % ----------------------linear Flame transfer function --------------------
-%
-% !!! further development
-% function F = Fcn_flame_model(s,indexHP)
-% global CI
-% num = CI.FM.FTF.num{indexHP};
-% den = CI.FM.FTF.den{indexHP};
-% tauf = CI.FM.FTF.tauf(indexHP);
-% F = polyval(num,s)./polyval(den,s).*exp(-s.*tauf);            
-function F = Fcn_flame_model(s)
+%         
+function F = Fcn_flame_model(s,indexHP)
 global CI
-num = CI.FM.FTF.num;
-den = CI.FM.FTF.den;
-tauf = CI.FM.FTF.tauf;
-F = polyval(num,s)./polyval(den,s).*exp(-s.*tauf);        
+HP      = CI.FM.HP{indexHP};
+num     = HP.FTF.num;
+den     = HP.FTF.den;
+tauf    = HP.FTF.tauf;
+F       = polyval(num,s)./polyval(den,s).*exp(-s.*tauf);          
 %
 % -----------------------------end-----------------------------------------

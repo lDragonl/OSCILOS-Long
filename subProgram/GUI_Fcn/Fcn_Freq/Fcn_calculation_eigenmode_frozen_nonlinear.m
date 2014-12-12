@@ -20,7 +20,7 @@ E(1)        = 0;
 A_plus(1)   = R1.*A_minus(1);
 Array(:,1)  = [A_plus(1),A_minus(1),E(1)]';
 %
-
+indexHP = 0;    % index of unsteady heat sources
 % -------------------------------------------------------------------------
 for ss = 1:CI.TP.numSection-1 
     D1 = diag([ exp(-s_star*tau_plus(ss)),...
@@ -37,12 +37,16 @@ for ss = 1:CI.TP.numSection-1
             BC2     = CI.TPM.B2{2,ss}*CI.TPM.C2;
             CI.TPM.Z{ss}       = (BC2\BC1)*D1;
         case 11
-            % linear flame transfer function
-            FTF     = Fcn_flame_model(s_star);
+            indexHP = indexHP + 1;
+            if indexHP == CI.FM.indexMainHPinHp
+                FTF = Fcn_nonlinear_flame_model(s_star);
+            else
+                FTF = Fcn_linear_flame_model(s_star,indexHP);
+            end
             B2b     = zeros(3);
             temp    = D1*Array(:,ss);
-            uRatio      = abs((temp(1) - temp(2))./(CI.TP.c_mean(1,ss).*CI.TP.rho_mean(1,ss).*CI.TP.u_mean(1,ss)))         % velocity ratio before the flame
-            B2b(3,2)= CI.TP.DeltaHr./CI.TP.c_mean(2,ss+1)./CI.TP.c_mean(1,ss)./CI.TP.Theta(ss).*FTF;
+            uRatio  = abs((temp(1) - temp(2))./(CI.TP.c_mean(1,ss).*CI.TP.rho_mean(1,ss).*CI.TP.u_mean(1,ss)));         % velocity ratio before the flame
+            B2b(3,2)= CI.TP.DeltaHr(CI.FM.indexHPinHA(indexHP))./CI.TP.c_mean(2,ss+1)./CI.TP.c_mean(1,ss)./CI.TP.Theta(ss).*FTF;
             Bsum    = CI.TPM.B1{2,ss}*(CI.TPM.B2{1,ss}\CI.TPM.B1{1,ss}) + B2b;
             BC1     = Bsum*CI.TPM.C1;
             BC2     = CI.TPM.B2{2,ss}*CI.TPM.C2;
@@ -104,13 +108,23 @@ switch CI.BC.ET.pop_type_model
         end
         Te = k.*(exp(tau*s) - exp(-tau*s))./(2*tau);
 end                        
-% ----------------------Flame transfer function ---------------------------
+% ----------------------linear Flame transfer function --------------------
+%         
+function F = Fcn_linear_flame_model(s,indexHP)
+global CI
+HP      = CI.FM.HP{indexHP};
+num     = HP.FTF.num;
+den     = HP.FTF.den;
+tauf    = HP.FTF.tauf;
+F       = polyval(num,s)./polyval(den,s).*exp(-s.*tauf);          
 %
-function F = Fcn_flame_model(s)
+% ---------------------- Nonlinear flame transfer function ----------------
+%
+function F = Fcn_nonlinear_flame_model(s)
 global FDF
 global CI
 F = polyval(FDF.num,s)./polyval(FDF.den,s).*exp(-s.*FDF.tauf);
-if CI.indexFM == 0
+if  CI.EIG.APP_style == 21    % from model
     switch CI.FM.NL.style
         case 2
             uRatio = FDF.uRatio;

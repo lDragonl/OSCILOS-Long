@@ -48,7 +48,7 @@ if(ishandle(main))
     if CI.TP.isHA_final == 0    % No heat addition
         String_Listbox{indStart+3}=['There is no heat addition!'];
         String_Listbox{indStart+4}=[''];
-    elseif  CI.TP.isHA_final == 0 
+    elseif  CI.TP.isHA_final == 1 
         String_Listbox{indStart+3}=['The mean heat release rate is (are):'];
         String_Listbox{indStart+4}=[num2str(CI.TP.Q./1000) ' kW'];
     end
@@ -62,15 +62,17 @@ if(ishandle(main))
     String_Listbox{indStart+12}=[num2str(CI.TP.c_mean(1,:)) ' m/s'];
     set(mainHandles.listbox_Info,'string',String_Listbox,'value',1);
     % -----------
-    if CI.TP.isHP_final == 0    % No heat perturbations
-        set(mainHandles.INI_FM, 'Enable', 'off',...
-                                'visible','off');
-        set(mainHandles.INI_BC, 'Enable', 'on');
-        Fcn_default_flame_model   
-    elseif CI.TP.isHP_final == 1 % with heat perturbations
-        set(mainHandles.INI_FM, 'Enable', 'on',...
-                                'visible','on');
-        set(mainHandles.INI_BC, 'Enable', 'off');
+    if CI.IsRun.GUI_INI_TP == 0
+        if CI.TP.isHP_final == 0    % No heat perturbations
+            set(mainHandles.INI_FM, 'Enable', 'off',...
+                                    'visible','off');
+            set(mainHandles.INI_BC, 'Enable', 'on');
+            Fcn_default_flame_model   
+        elseif CI.TP.isHP_final == 1 % with heat perturbations
+            set(mainHandles.INI_FM, 'Enable', 'on',...
+                                    'visible','on');
+            set(mainHandles.INI_BC, 'Enable', 'off');
+        end
     end
     guidata(hObject, handles);
 else
@@ -81,8 +83,58 @@ global CI
 % when the pannel for setting flame model is not avaliable, this function
 % is launched to initialize the parameters corresponding to the flame model
 % 
-CI.FM.FTF.num = 0;
-CI.FM.FTF.den = 1;
-CI.FM.FTF.tauf = 0;
+if ~isempty(CI.CD.indexHP)
+    NumHP = length(CI.CD.indexHP);
+    for ss = 1:NumHP
+        CI.FM.indexFM(ss)       =   1;      % defult setting: linear FTF
+        CI.FM.HP{ss}            =   Fcn_initialization_flame_model(CI.FM.indexFM(ss));
+    end
+end             
 assignin('base','CI',CI);
 % ----------------------------end------------------------------------------
+
+
+
+function HP = Fcn_initialization_flame_model(indexFM)
+% This function is used to initialize the flame model for a selected
+% unsteady heat source
+% HP means heat perturbations
+HP.IsRun = 0;    % an index to show if this flame model has ever been edited
+switch indexFM
+    case 1
+        HP.FTF.style     = 3;
+        HP.NL.style      = 1;    % when this value ==1, no nonlinear model
+        HP.FTF.af        = 1;
+        HP.FTF.tauf      = 3e-3;
+        HP.FTF.fc        = 75;
+        HP.FTF.omegac    = 2*pi*HP.FTF.fc;
+        HP.FTF.num       = HP.FTF.omegac;
+        HP.FTF.den       = [1 HP.FTF.omegac];
+        % --------------------------
+        HP.FTF.xi        = 1;    % damping coefficient in the second order filter model
+        % --------------------------
+    case 2
+        HP.FTF.style     = 3;
+        HP.NL.style      = 3;
+        HP.FTF.af        = 1;
+        HP.FTF.tauf      = 3e-3;
+        HP.FTF.fc        = 75;
+        HP.FTF.omegac    = 2*pi*HP.FTF.fc;
+        HP.FTF.num       = HP.FTF.omegac;
+        HP.FTF.den       = [1 HP.FTF.omegac];
+        % --------------------------
+        HP.FTF.xi        = 1;
+        % --------------------------
+        % J.Li and A.Morgans's model
+        HP.NL.Model3.alpha       = 0.85;
+        HP.NL.Model3.beta        = 50;
+        HP.NL.Model3.taufN       = 0e-3;
+        % -------------------------
+        % Dowling's Model
+        HP.NL.Model2.alpha       = 0.3;
+    case 3
+        HP.FMEXP.indexIMPORT    = 1;
+        HP.FMEXP.nFTF           = 0;
+        HP.FMEXP.indexModify    = 0;
+    case 4
+end

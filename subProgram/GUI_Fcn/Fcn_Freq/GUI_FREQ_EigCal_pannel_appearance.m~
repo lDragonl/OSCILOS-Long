@@ -21,27 +21,17 @@ else    % with heat perturbations
     for ss = 1:CI.FM.numHP
        CI.FM.indexFMType{ss} = find(CI.FM.indexFM == ss); 
     end
-    
-    CI.FM.numHPNL = length(find(CI.FM.indexFM > 1));    % number of nonlinear unsteady heat sources
+    CI.FM.numHPNL = find(CI.FM.indexFM > 1);    % number of nonlinear unsteady heat sources
     %    
     if CI.TP.isHP_final == 0                 % mean heat addition is zero
         CI.EIG.APP_style = 12;                  % linear system
     else                                     % with mean heat addition
         if CI.FM.indexFM == 1
             CI.EIG.APP_style = 12;
-        elseif CI.FM.numHPNL == 1 && ~isempty(find(CI.FM.indexFM == 2))
+        elseif CI.FM.numHPNL == 1 && CI.FM.indexFM == 2
             CI.EIG.APP_style = 21;           % nonlinear flame model, velocity ratios can be selected
-            % we need to find the location of the main unsteady heat
-            % sources among these unsteady heat sources
-            CI.FM.indexMainHPinHp  = find(CI.FM.indexFM == 2);
-        elseif CI.FM.numHPNL == 1 && ~isempty(find(CI.FM.indexFM == 3))
+        elseif CI.FM.numHPNL == 1 && CI.FM.indexFM == 3
             CI.EIG.APP_style = 22;           % from exp or CFD flame describing function
-            % we need to find the location of the main unsteady heat
-            % sources among these unsteady heat sources
-            CI.FM.indexMainHPinHp  = find(CI.FM.indexFM == 3);
-        else
-            errordlg('The current version still does not support this situation!','Error');
-            return 
         % further work on multi-nonlinear system
         % ...
         % ...
@@ -59,9 +49,8 @@ switch CI.IsRun.GUI_FREQ_EigCal
             case 21                             % nonlinear flame model
                 set(handles.ObjEditVisible_uRatio,      'visible','on');
             case 22                             % nonlinear flame model
-                HP = CI.FM.HP{CI.FM.indexMainHPinHp};
-                CI.EIG.FDF.uRatioSp             = HP.FMEXP.uRatio;
-                CI.EIG.FDF.uRatioNum            = length(CI.EIG.FDF.uRatioSp);
+                CI.EIG.FDF.uRatioSp = CI.FMEXP.uRatio;
+                CI.EIG.FDF.uRatioNum = length(CI.EIG.FDF.uRatioSp);
                 set(handles.edit_uRatio_min,       'string',num2str(CI.EIG.FDF.uRatioSp(1)));
                 set(handles.edit_uRatio_max,       'string',num2str(CI.EIG.FDF.uRatioSp(end)));
                 set(handles.edit_uRatio_SampNum,   'string',num2str(CI.EIG.FDF.uRatioNum));
@@ -122,7 +111,7 @@ end
 %
 if ~isempty(CI.CD.indexHA) && ~isempty(CI.CD.indexHP)
    for ss = 1:length(CI.CD.indexHP)
-       CI.FM.indexHPinHA(ss) = find(CI.CD.indexHA == CI.CD.indexHP(ss));
+       CI.FM.indexHPinHA(ss) = find(CI)
    end
 end
 

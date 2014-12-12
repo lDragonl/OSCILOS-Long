@@ -53,6 +53,7 @@ function GUI_FREQ_EigCal_OpeningFcn(hObject, eventdata, handles, varargin)
 % varargin   command line arguments to GUI_FREQ_EigCal (see VARARGIN)
 % --------------------------------------------------------------------------
 global CI
+numHPNL = length(find(CI.FM.indexFM > 1));
 handles.indexEdit = 0;
 switch handles.indexEdit 
     case 0
@@ -63,6 +64,9 @@ switch handles.indexEdit
             || (length(varargin) <= mainGuiInput) ...
             || (~ishandle(varargin{mainGuiInput+1}))
             dontOpen = true;
+        elseif numHPNL>1
+            dontOpen = true;
+            errordlg('The current version still does not support this situation!','Error');
         else
             % load from the main GUI
             % handles of main GUI
@@ -91,7 +95,9 @@ switch handles.indexEdit
         guidata(hObject, handles);
         if dontOpen
            disp('-----------------------------------------------------');
-           disp('This program cannot be currently lauched due to some reasons.') 
+           disp('This program .') 
+           disp('Please load the program "OSCILOS_long'' from the ')
+           disp('parent directory!')
            disp('-----------------------------------------------------');
         else
 %            uiwait(hObject);

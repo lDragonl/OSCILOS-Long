@@ -22,7 +22,7 @@ function varargout = GUI_INI_FM(varargin)
 
 % Edit the above text to modify the response to help GUI_INI_FM
 
-% Last Modified by GUIDE v2.5 18-Nov-2014 17:00:38
+% Last Modified by GUIDE v2.5 08-Oct-2014 10:09:19
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -51,112 +51,39 @@ function GUI_INI_FM_OpeningFcn(hObject, eventdata, handles, varargin)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 % varargin   command line arguments to GUI_INI_FM (see VARARGIN)
-handles.indexEdit = 0;
-switch handles.indexEdit 
-    case 0
-        %--------------------------------------------------------------------------
-        dontOpen = false;
-        mainGuiInput = find(strcmp(varargin, 'OSCILOS_long'));
-        if (isempty(mainGuiInput)) ...
-            || (length(varargin) <= mainGuiInput) ...
-            || (~ishandle(varargin{mainGuiInput+1}))
-            dontOpen = true;
-        else % load from the main GUI
-            % handles of main GUI
-            handles.MainGUI = varargin{mainGuiInput+1};
-            try
-                handles.ExampleGUI = varargin{mainGuiInput+2};
-            catch
-            end
-            % Obtain handles using GUIDATA with the caller's handle 
-            mainHandles = guidata(handles.MainGUI);
-            % background colors
-            handles.bgcolor=mainHandles.bgcolor;
-            % fontsize
-            handles.FontSize=mainHandles.FontSize;
-            %
-            handles.sW = mainHandles.sW;
-            handles.sH = mainHandles.sH;
-            handles.indexApp = 0;
-            GUI_INI_FM_global_value_Initialization
-            % Update handles structure
-            guidata(hObject, handles);
-            % Initialization
-            GUI_INI_FM_Initialization(hObject, eventdata, handles)
-        end
-        guidata(hObject, handles);
-        handles.output = hObject;
-        guidata(hObject, handles);
-        if dontOpen
-           disp('-----------------------------------------------------');
-           disp('This is a subprogram. It cannot be run independently.') 
-           disp('Please load the program "OSCILOS_long'' from the ')
-           disp('parent directory!')
-           disp('-----------------------------------------------------');
-        else
-%            uiwait(hObject);
-        end
-    case 1
-        global CI
-        handles.bgcolor{1} = [0.95, 0.95, 0.95];
-        handles.bgcolor{2} = [0, 0, 0];
-        handles.bgcolor{3} = [.75, .75, .75];
-        handles.bgcolor{4} = [0.90,0.90,1];
-        %
-        handles.sW  = 800;
-        handles.sH  = 600;
-        %
-        if ispc
-            handles.FontSize(1)=11;                 % set the default fontsize
-            handles.FontSize(2)=9;
-        else
-            handles.FontSize(1)=12;                 % set the default fontsize
-            handles.FontSize(2)=10;   
-        end
-        handles.indexApp = 0;
-        CI.IsRun.GUI_INI_FM = 0;
-        assignin('base','CI',CI);                   % save the current information to the works
-        GUI_INI_FM_global_value_Initialization
-        handles.indexApp = 0;
-        guidata(hObject, handles);  
-        GUI_INI_FM_Initialization(hObject, eventdata, handles)
-        handles.output = hObject;
-        guidata(hObject, handles);
-end
-
-
-function GUI_INI_FM_global_value_Initialization
 global CI
+mainGuiInput = 0;
+% handles of main GUI
+handles.MainGUI = varargin{mainGuiInput+1};
+% Obtain handles using GUIDATA with the caller's handle 
+mainHandles = guidata(handles.MainGUI);
+% background colors
+handles.bgcolor=mainHandles.bgcolor;
+% fontsize
+handles.FontSize=mainHandles.FontSize;
 %
-switch CI.IsRun.GUI_INI_FM
-    case 0
-        CI.FM.FTF.style     = 2;
-        CI.FM.NL.style      = 1;
-        CI.FM.FTF.af        = 1;
-        CI.FM.FTF.tauf      = 3e-3;
-        CI.FM.FTF.fc        = 75;
-        CI.FM.FTF.omegac    = 2*pi*CI.FM.FTF.fc;
-        CI.FM.FTF.num       = CI.FM.FTF.omegac;
-        CI.FM.FTF.den       = [1 CI.FM.FTF.omegac];
-        % --------------------------
-        CI.FM.FTF.xi        = 1;
-        % --------------------------
-        % J.Li and A.Morgans's model
-        CI.FM.NL.Model3.alpha       = 0.75;
-        CI.FM.NL.Model3.beta        = 30;
-        CI.FM.NL.Model3.taufN       = 0e-3;
-        % -------------------------
-        % Dowling's Model
-        CI.FM.NL.Model2.alpha       = 0.3;
-        % -------------------------
- 
-end
-assignin('base','CI',CI);                   % save the current information to the workspace
+handles.sW = mainHandles.sW;
+handles.sH = mainHandles.sH;
+handles.indexApp = 0;
+% --------------------------
 %
+handles.HP_num  = varargin{2};              % the index of unsteady heat source
+handles.indexFM = varargin{3};              % the index of flame model
+handles.HP = CI.FM.HP{handles.HP_num};  
+guidata(hObject, handles);
+%
+% --------------------------
+% Initialization
+GUI_INI_FM_Initialization(hObject, eventdata, handles)
+%         end
+guidata(hObject, handles);
+handles.output = hObject;
+guidata(hObject, handles);
+
+% 
 %-------------------------------------------------
 %
 function GUI_INI_FM_Initialization(varargin)
-global CI
 hObject = varargin{1};
 handles = guidata(hObject);    
 set(0, 'units', 'points');
@@ -237,7 +164,7 @@ set(handles.pop_FTF_type,...
                         'backgroundcolor',handles.bgcolor{1},...
                         'horizontalalignment','left',...
                         'enable','on',...
-                        'value',CI.FM.FTF.style );  
+                        'value',handles.HP.FTF.style );  
 set(handles.text_FTF_a1,...
                         'units', 'points',...
                         'Fontunits','points',...
@@ -329,12 +256,11 @@ set(handles.pop_NL_type,...
                         'fontsize',handles.FontSize(2),...
                         'string',{  'None';...
                                     'Dowling''s model (Stow and Dowling JEGTP 2009)';...
-                                    'J.Li and A.S.Morgans JSV'...
-                                  },...
+                                    'J.Li and A.S.Morgans JSV'},...
                         'backgroundcolor',handles.bgcolor{1},...
                         'horizontalalignment','left',...
                         'enable','on',...
-                        'value',CI.FM.NL.style);                      
+                        'value',handles.HP.NL.style);                      
 set(handles.text_NL_a1,...
                         'units', 'points',...
                         'Fontunits','points',...
@@ -387,7 +313,6 @@ set(handles.edit_NL_a3,...
                         'backgroundcolor',handles.bgcolor{1},...
                         'horizontalalignment','right',...
                         'Enable','off');  
-
 %----------------------------------------
 %
 % pannel AOC                   
@@ -447,13 +372,21 @@ handles.ObjEditEnable_NL    = findobj('-regexp','Tag','edit_NL');
 % default enable settings
 set(handles.ObjEditEnable_FTF,      'Enable','on')
 set(handles.ObjEditEnable_NL,       'Enable','on')
+
 %---------------------------------------
 guidata(hObject, handles);
 Fcn_GUI_INI_FM_FTF_POP_update(hObject)
 handles = guidata(hObject);
 guidata(hObject, handles);
-Fcn_GUI_INI_FM_NL_POP_update(hObject)
-handles = guidata(hObject);
+switch handles.indexFM
+    case 1
+        set(handles.uipanel_FDF,          'visible','off')
+    case 2
+        set(handles.uipanel_FDF,          'visible','on')
+end
+guidata(hObject, handles);
+        Fcn_GUI_INI_FM_NL_POP_update(hObject)
+        handles = guidata(hObject);
 guidata(hObject, handles);
 % 
 % ------------------------------------------------------------------------
@@ -461,13 +394,12 @@ guidata(hObject, handles);
 function Fcn_GUI_INI_FM_FTF_POP_update(varargin)
 hObject         = varargin{1};
 handles         = guidata(hObject);
-global CI
 pop_FTF_type    = get(handles.pop_FTF_type,'Value');
 %
 switch pop_FTF_type
     case 1
         set(handles.edit_FTF_a1,                'visible','on',...
-                                                'string', num2str(CI.FM.FTF.af));
+                                                'string', num2str(handles.HP.FTF.af));
         set(handles.text_FTF_a1,                'visible','on',...
                                                 'string','af [-]'); 
         set(handles.edit_FTF_a2,                'visible','off');
@@ -475,45 +407,45 @@ switch pop_FTF_type
         set(handles.edit_FTF_a3,                'visible','off');
         set(handles.text_FTF_a3,                'visible','off');
         set(handles.edit_FTF_a4,                'visible','on',...
-                                                'string', num2str(CI.FM.FTF.tauf.*1e3));
+                                                'string', num2str(handles.HP.FTF.tauf.*1e3));
         set(handles.text_FTF_a4,                'visible','on',...
                                                 'string','tauf [ms]');
     case 2
         set(handles.edit_FTF_a1,                'visible','on',...
-                                                'string', num2str(CI.FM.FTF.af));
+                                                'string', num2str(handles.HP.FTF.af));
         set(handles.text_FTF_a1,                'visible','on',...
                                                 'string','af [-]'); 
         set(handles.edit_FTF_a2,                'visible','on',...
-                                                'string', num2str(CI.FM.FTF.fc));
+                                                'string', num2str(handles.HP.FTF.fc));
         set(handles.text_FTF_a2,                'visible','on',...
                                                 'string','fc [Hz]'); 
         set(handles.edit_FTF_a3,                'visible','off');
         set(handles.text_FTF_a3,                'visible','off');
         set(handles.edit_FTF_a4,                'visible','on',...
-                                                'string', num2str(CI.FM.FTF.tauf.*1e3));
+                                                'string', num2str(handles.HP.FTF.tauf.*1e3));
         set(handles.text_FTF_a4,                'visible','on',...
                                                 'string','tauf [ms]'); 
     case 3
         set(handles.edit_FTF_a1,                'visible','on',...
-                                                'string', num2str(CI.FM.FTF.af));
+                                                'string', num2str(handles.HP.FTF.af));
         set(handles.text_FTF_a1,                'visible','on',...
                                                 'string','af [-]'); 
         set(handles.edit_FTF_a2,                'visible','on',...
-                                                'string', num2str(CI.FM.FTF.fc));
+                                                'string', num2str(handles.HP.FTF.fc));
         set(handles.text_FTF_a2,                'visible','on',...
                                                 'string','fc [Hz]'); 
         set(handles.edit_FTF_a3,                'visible','on',...
-                                                'string', num2str(CI.FM.FTF.xi));
+                                                'string', num2str(handles.HP.FTF.xi));
         set(handles.text_FTF_a3,                'visible','on',...
                                                 'string','xi [-]');
         set(handles.edit_FTF_a4,                'visible','on',...
-                                                'string', num2str(CI.FM.FTF.tauf.*1e3));
+                                                'string', num2str(handles.HP.FTF.tauf.*1e3));
         set(handles.text_FTF_a4,                'visible','on',...
                                                 'string','tauf [ms]');  
     case 4
         handles.indexApp = Fcn_GUI_INI_FM_helpdlg(handles.indexApp);
-        strNum = ['[' num2str(CI.FM.FTF.num) ']'];
-        strDen = ['[' num2str(CI.FM.FTF.den) ']'];
+        strNum = ['[' num2str(handles.HP.FTF.num) ']'];
+        strDen = ['[' num2str(handles.HP.FTF.den) ']'];
         set(handles.edit_FTF_a1,                'visible','on',...
                                                 'string', strNum);
         set(handles.text_FTF_a1,                'visible','on',...
@@ -525,7 +457,7 @@ switch pop_FTF_type
         set(handles.edit_FTF_a3,                'visible','off');
         set(handles.text_FTF_a3,                'visible','off');
         set(handles.edit_FTF_a4,                'visible','on',...
-                                                'string', num2str(CI.FM.FTF.tauf.*1e3));
+                                                'string', num2str(handles.HP.FTF.tauf.*1e3));
         set(handles.text_FTF_a4,                'visible','on',...
                                                 'string','tauf [ms]'); 
 end
@@ -536,7 +468,6 @@ guidata(hObject, handles);
 function Fcn_GUI_INI_FM_NL_POP_update(varargin)
 hObject         = varargin{1};
 handles         = guidata(hObject);
-global CI
 pop_NL_type    = get(handles.pop_NL_type,'Value');
 %
 switch pop_NL_type
@@ -555,21 +486,21 @@ switch pop_NL_type
         set(handles.edit_NL_a2,                 'visible','off');
         set(handles.edit_NL_a3,                 'visible','off');
         set(handles.edit_NL_a1,                'visible','on',...
-                                               'string', num2str(CI.FM.NL.Model2.alpha));
+                                               'string', num2str(handles.HP.NL.Model2.alpha));
         set(handles.text_NL_a1,                'visible','on',...
                                                'string','alpha [-]'); 
     case 3
         set(handles.pop_Plot,                  'enable','on');
         set(handles.edit_NL_a1,                'visible','on',...
-                                               'string', num2str(CI.FM.NL.Model3.alpha));
+                                               'string', num2str(handles.HP.NL.Model3.alpha));
         set(handles.text_NL_a1,                'visible','on',...
                                                'string','alpha [-]'); 
         set(handles.edit_NL_a2,                'visible','on',...
-                                               'string', num2str(CI.FM.NL.Model3.beta));
+                                               'string', num2str(handles.HP.NL.Model3.beta));
         set(handles.text_NL_a2,                'visible','on',...
                                                'string','beta [-]'); 
         set(handles.edit_NL_a3,                'visible','on',...
-                                               'string', num2str(CI.FM.NL.Model3.taufN.*1e3));
+                                               'string', num2str(handles.HP.NL.Model3.taufN.*1e3));
         set(handles.text_NL_a3,                'visible','on',...
                                                'string','taufN [ms]'); 
 end
@@ -578,67 +509,66 @@ guidata(hObject, handles);
 function Fcn_GUI_INI_FM_FTF_Value_update(varargin)
 hObject = varargin{1};
 handles = guidata(hObject);
-global CI
-CI.FM.FTF.style = get(handles.pop_FTF_type,'Value');
+% global CI
+handles.HP.FTF.style = get(handles.pop_FTF_type,'Value');
 %
-switch CI.FM.FTF.style
+switch handles.HP.FTF.style
     case 1      
-        CI.FM.FTF.af        = str2double(get(handles.edit_FTF_a1,'String'));
-        CI.FM.FTF.tauf      = str2double(get(handles.edit_FTF_a4,'String')).*1e-3;
-        CI.FM.FTF.num       = CI.FM.FTF.af;
-        CI.FM.FTF.den       = 1;
+        handles.HP.FTF.af        = str2double(get(handles.edit_FTF_a1,'String'));
+        handles.HP.FTF.tauf      = str2double(get(handles.edit_FTF_a4,'String')).*1e-3;
+        handles.HP.FTF.num       = handles.HP.FTF.af;
+        handles.HP.FTF.den       = 1;
     case 2      
-        CI.FM.FTF.af        = str2double(get(handles.edit_FTF_a1,'String'));
-        CI.FM.FTF.tauf      = str2double(get(handles.edit_FTF_a4,'String')).*1e-3;
-        CI.FM.FTF.fc        = str2double(get(handles.edit_FTF_a2,'String'));
-        CI.FM.FTF.omegac    = 2*pi*CI.FM.FTF.fc;
-        CI.FM.FTF.num       = CI.FM.FTF.af.*CI.FM.FTF.omegac;
-        CI.FM.FTF.den       = [1 CI.FM.FTF.omegac];
+        handles.HP.FTF.af        = str2double(get(handles.edit_FTF_a1,'String'));
+        handles.HP.FTF.tauf      = str2double(get(handles.edit_FTF_a4,'String')).*1e-3;
+        handles.HP.FTF.fc        = str2double(get(handles.edit_FTF_a2,'String'));
+        handles.HP.FTF.omegac    = 2*pi*handles.HP.FTF.fc;
+        handles.HP.FTF.num       = handles.HP.FTF.af.*handles.HP.FTF.omegac;
+        handles.HP.FTF.den       = [1 handles.HP.FTF.omegac];
     case 3      %
-        CI.FM.FTF.af        = str2double(get(handles.edit_FTF_a1,'String'));
-        CI.FM.FTF.tauf      = str2double(get(handles.edit_FTF_a4,'String')).*1e-3;
-        CI.FM.FTF.fc        = str2double(get(handles.edit_FTF_a2,'String'));
-        CI.FM.FTF.xi        = str2double(get(handles.edit_FTF_a3,'String'));
-        CI.FM.FTF.omegac    = 2*pi*CI.FM.FTF.fc;
-        CI.FM.FTF.num       = CI.FM.FTF.af.*CI.FM.FTF.omegac.^2;
-        CI.FM.FTF.den       = [1 2*CI.FM.FTF.xi.*CI.FM.FTF.omegac CI.FM.FTF.omegac.^2];
+        handles.HP.FTF.af        = str2double(get(handles.edit_FTF_a1,'String'));
+        handles.HP.FTF.tauf      = str2double(get(handles.edit_FTF_a4,'String')).*1e-3;
+        handles.HP.FTF.fc        = str2double(get(handles.edit_FTF_a2,'String'));
+        handles.HP.FTF.xi        = str2double(get(handles.edit_FTF_a3,'String'));
+        handles.HP.FTF.omegac    = 2*pi*handles.HP.FTF.fc;
+        handles.HP.FTF.num       = handles.HP.FTF.af.*handles.HP.FTF.omegac.^2;
+        handles.HP.FTF.den       = [1 2*handles.HP.FTF.xi.*handles.HP.FTF.omegac handles.HP.FTF.omegac.^2];
         %
      case 4   
-        CI.FM.FTF.num       = str2num(get(handles.edit_FTF_a1,'String'));
-        CI.FM.FTF.den       = str2num(get(handles.edit_FTF_a2,'String'));
-        CI.FM.FTF.tauf      = str2num(get(handles.edit_FTF_a4, 'String')).*1e-3; 
+        handles.HP.FTF.num       = str2num(get(handles.edit_FTF_a1,'String'));
+        handles.HP.FTF.den       = str2num(get(handles.edit_FTF_a2,'String'));
+        handles.HP.FTF.tauf      = str2num(get(handles.edit_FTF_a4, 'String')).*1e-3; 
 end
-assignin('base','CI',CI);                   % save the current information to the workspace
+% assignin('base','CI',CI);                   % save the current information to the workspace
 guidata(hObject, handles);
 % ------------------------------------------------------------------------
 function Fcn_GUI_INI_FM_NL_Value_update(varargin)
 hObject = varargin{1};
 handles = guidata(hObject);
-global CI
-CI.FM.NL.style = get(handles.pop_NL_type,'Value');
+% global CI
+handles.HP.NL.style = get(handles.pop_NL_type,'Value');
 %
-switch CI.FM.NL.style
+switch handles.HP.NL.style
     case 1
-
     case 2
-        CI.FM.NL.Model2.alpha       = str2double(get(handles.edit_NL_a1,'String'));
-        DqRatio                     = 1e-3;
-        qRatioMax                   = 1;
-        [CI.FM.NL.Model2.qRatioLinear,CI.FM.NL.Model2.Lf]...
-       = Fcn_GUI_INI_FM_Nonlinear_model_Dowling(CI.FM.NL.Model2.alpha,...
+        handles.HP.NL.Model2.alpha       = str2double(get(handles.edit_NL_a1,'String'));
+        DqRatio                          = 1e-3;
+        qRatioMax                        = 1;
+        [handles.HP.NL.Model2.qRatioLinear,handles.HP.NL.Model2.Lf]...
+       = Fcn_GUI_INI_FM_Nonlinear_model_Dowling(handles.HP.NL.Model2.alpha,...
                                                 DqRatio,qRatioMax);
     case 3      
-        CI.FM.NL.Model3.alpha       = str2double(get(handles.edit_NL_a1,'String'));
-        CI.FM.NL.Model3.beta        = str2double(get(handles.edit_NL_a2,'String'));
-        CI.FM.NL.Model3.taufN       = str2double(get(handles.edit_NL_a3,'String')).*1e-3;
+        handles.HP.NL.Model3.alpha       = str2double(get(handles.edit_NL_a1,'String'));
+        handles.HP.NL.Model3.beta        = str2double(get(handles.edit_NL_a2,'String'));
+        handles.HP.NL.Model3.taufN       = str2double(get(handles.edit_NL_a3,'String')).*1e-3;
         DuRatio                     = 1e-3;
         uRatioMax                   = 5;
-        [CI.FM.NL.Model3.uRatio,CI.FM.NL.Model3.Lf]...
-      = Fcn_GUI_INI_FM_Nonlinear_model_J_Li_A_Morgas(   CI.FM.NL.Model3.alpha,...
-                                                        CI.FM.NL.Model3.beta,...
-                                                        DuRatio,uRatioMax);                                            
+        [handles.HP.NL.Model3.uRatio,handles.HP.NL.Model3.Lf]...
+      = Fcn_GUI_INI_FM_Nonlinear_model_J_Li_A_Morgas(   handles.HP.NL.Model3.alpha,...
+                                                        handles.HP.NL.Model3.beta,...
+                                                        DuRatio,uRatioMax);
 end
-assignin('base','CI',CI);                   % save the current information to the workspace
+% assignin('base','CI',CI);                   % save the current information to the workspace
 guidata(hObject, handles);
 % ------------------------------------------------------------------------
 %
@@ -703,14 +633,22 @@ function pb_OK_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 Fcn_GUI_INI_FM_FTF_Value_update(hObject, eventdata, handles)
-Fcn_GUI_INI_FM_NL_Value_update(hObject, eventdata, handles)
-Fcn_GUI_INI_FM_Plot(hObject, eventdata, handles)
-Fcn_GUI_INI_FM_Update_Data(hObject, eventdata, handles)
 handles = guidata(hObject);
 guidata(hObject, handles);
+Fcn_GUI_INI_FM_NL_Value_update(hObject, eventdata, handles)
+handles = guidata(hObject);
+guidata(hObject, handles);
+Fcn_GUI_INI_FM_Plot(hObject, eventdata, handles)
+handles = guidata(hObject);
+handles.HP.IsRun = 1;    % index == 1 to show that this program has ever been run
+guidata(hObject, handles);
 global CI
-CI.IsRun.GUI_INI_FM = 1;
+CI.FM.HP{handles.HP_num}        = handles.HP;
+CI.FM.indexFM(handles.HP_num)   = handles.indexFM;
 assignin('base','CI',CI); 
+handles = guidata(hObject);
+guidata(hObject, handles);
+Fcn_GUI_INI_FM_Update_Data(hObject, eventdata, handles);  % put it before % delete
 delete(handles.figure);
 %
 % --- Executes on button press in pb_Apply.
@@ -748,26 +686,26 @@ fs          = 0:5:1000;
 s           = 2*pi*fs*1i;
 pop_PLot    = get(handles.pop_Plot,'Value');
 %------------------------------------
-FTF = polyval(CI.FM.FTF.num,s)./polyval(CI.FM.FTF.den,s).*exp(-s.*CI.FM.FTF.tauf);
+FTF = polyval(handles.HP.FTF.num,s)./polyval(handles.HP.FTF.den,s).*exp(-s.*handles.HP.FTF.tauf);
 uRatio = 0:0.1:1;
-switch CI.FM.NL.style       
+switch handles.HP.NL.style       
     case 1
 
     case 2
         for ss = 1:length(fs)
             for kk = 1 :length(uRatio)
                 qRatioLinear    = abs(FTF(ss)).*uRatio(kk);
-                LfModel2(kk,ss) = interp1(  CI.FM.NL.Model2.qRatioLinear,...
-                                            CI.FM.NL.Model2.Lf,...
+                LfModel2(kk,ss) = interp1(  handles.HP.NL.Model2.qRatioLinear,...
+                                            handles.HP.NL.Model2.Lf,...
                                             qRatioLinear,'linear','extrap');
                 FDF(kk,ss)      = LfModel2(kk,ss).*FTF(ss);
             end
         end 
     case 3      %  J.Li and A.S.Morgans JSV
-        LfModel3        = interp1(  CI.FM.NL.Model3.uRatio,...
-                                    CI.FM.NL.Model3.Lf,...
+        LfModel3        = interp1(  handles.HP.NL.Model3.uRatio,...
+                                    handles.HP.NL.Model3.Lf,...
                                     uRatio,'linear','extrap');
-        taufNSp         = CI.FM.NL.Model3.taufN.*(1-LfModel3);
+        taufNSp         = handles.HP.NL.Model3.taufN.*(1-LfModel3);
         for kk = 1 :length(uRatio) 
         FDF(kk,:)       = FTF.*LfModel3(kk).*exp(-s.*taufNSp(kk));
         end
@@ -819,19 +757,19 @@ switch pop_PLot
         set(hAxes1,'FontName','Helvetica','FontSize',fontSize1,'LineWidth',1)
         xlabel(hAxes1,'','Color','k','Interpreter','LaTex','FontSize',fontSize1);
         set(hAxes1,'xticklabel',{},'YAxisLocation','left','Color','w');
-        switch CI.FM.NL.style   
+        switch handles.HP.NL.style   
             case 1
                 errordlg('Nonlinearity is not accounted for!!!','Error');
             case 2
-            plot(hAxes1,CI.FM.NL.Model2.qRatioLinear,...
-                        CI.FM.NL.Model2.Lf.*CI.FM.NL.Model2.qRatioLinear,...
+            plot(hAxes1,handles.HP.NL.Model2.qRatioLinear,...
+                        handles.HP.NL.Model2.Lf.*handles.HP.NL.Model2.qRatioLinear,...
                         '-','color',colorPlot{1},...
                         'Linewidth',2);
             ylabel(hAxes1,'$\hat{\dot{q}}/\bar{\dot{q}}_{Nonlinear}$ [-]','Color','k',...
                 'Interpreter','LaTex','FontSize',fontSize1)
             case 3
-            plot(hAxes1,CI.FM.NL.Model3.uRatio,...
-                        CI.FM.NL.Model3.Lf.*CI.FM.NL.Model3.uRatio,...
+            plot(hAxes1,handles.HP.NL.Model3.uRatio,...
+                        handles.HP.NL.Model3.Lf.*handles.HP.NL.Model3.uRatio,...
                         '-','color',colorPlot{1},'Linewidth',2);
             ylabel(hAxes1,'$\hat{\dot{q}}/\bar{\dot{q}}(f = 0)$ [-]','Color','k',...
                 'Interpreter','LaTex','FontSize',fontSize1)
@@ -845,12 +783,12 @@ switch pop_PLot
         set(hAxes2,'YColor','k','Box','on','ygrid','on','xgrid','on');
         set(hAxes2,'FontName','Helvetica','FontSize',fontSize1,'LineWidth',1)
         set(hAxes2,'YAxisLocation','left','Color','w');
-        switch CI.FM.NL.style   
+        switch handles.HP.NL.style   
             case 1
                 errordlg('Nonlinearity is not accounted for!!!','Error');
             case 2
-                plot(hAxes2,CI.FM.NL.Model2.qRatioLinear,...
-                            CI.FM.NL.Model2.Lf,...
+                plot(hAxes2,handles.HP.NL.Model2.qRatioLinear,...
+                            handles.HP.NL.Model2.Lf,...
                         '-','color',colorPlot{1},...
                         'Linewidth',2);
                 xlabel(hAxes2,'$\hat{\dot{q}}/\bar{\dot{q}}_{Linear}$ [-]','Color','k','Interpreter',...
@@ -858,8 +796,8 @@ switch pop_PLot
                 ylabel(hAxes2,'$L_f$ [-]','Color','k','Interpreter','LaTex',...
                 'FontSize',fontSize1)
             case 3
-                plot(hAxes2,CI.FM.NL.Model3.uRatio,...
-                            CI.FM.NL.Model3.Lf,...
+                plot(hAxes2,handles.HP.NL.Model3.uRatio,...
+                            handles.HP.NL.Model3.Lf,...
                             '-','color',colorPlot{1},'Linewidth',2);
                 xlabel(hAxes2,'$\hat{u}_u/\bar{u}_u$ [-]','Color','k','Interpreter',...
                 'LaTex','FontSize',fontSize1);
@@ -883,7 +821,7 @@ switch pop_PLot
         color_type      = Fcn_color_set(length(uRatio)+2);    % color set
         cla(hAxes1,'reset')
         axes(hAxes1)
-        switch CI.FM.NL.style   
+        switch handles.HP.NL.style   
             case 1
                 errordlg('Nonlinearity is not accounted for!!!','Error');
             otherwise
@@ -905,7 +843,7 @@ switch pop_PLot
         cla(hAxes2,'reset')
         axes(hAxes2)
         hold on
-        switch CI.FM.NL.style   
+        switch handles.HP.NL.style   
             case 1
                 errordlg('Nonlinearity is not accounted for!!!','Error');
             otherwise
@@ -960,44 +898,30 @@ assignin('base','CI',CI);                   % save the current information to th
 function Fcn_GUI_INI_FM_Update_Data(hObject, eventdata, handles)
 handles = guidata(hObject);
 global CI
-switch handles.indexEdit 
-    case 0
-    main = handles.MainGUI;
-    % Obtain handles using GUIDATA with the caller's handle 
-    if(ishandle(main))
-        mainHandles = guidata(main);
-        changeMain = mainHandles.INI_BC;
-        set(changeMain, 'Enable', 'on');
-        String_Listbox=get(mainHandles.listbox_Info,'string');
-        ind=find(ismember(String_Listbox,'<HTML><FONT color="blue">Information 3:'));
-        nLength=size(String_Listbox);
-        if isempty(ind)
-            indStart=nLength(1);
-        else
-            indStart=ind-1;
-            for i=nLength(1):-1:indStart+1 
-                String_Listbox(i)=[];
-            end
-        end
-        String_Listbox{indStart+1}=['<HTML><FONT color="blue">Information 3:'];
-        String_Listbox{indStart+2}=['<HTML><FONT color="blue">Flame describing functions are from models:'];
-        String_Listbox{indStart+3}=['FTF model type:' num2str(CI.FM.FTF.style) ];
-        String_Listbox{indStart+4}=['The numerator(s) is (are):'];
-        String_Listbox{indStart+5}=[num2str(CI.FM.FTF.num)];
-        String_Listbox{indStart+6}=['The denominator(s) is (are):'];
-        String_Listbox{indStart+7}=[num2str(CI.FM.FTF.den)];
-        String_Listbox{indStart+8}=['Nonlinear model type:' num2str(CI.FM.NL.style) ];
-        set(mainHandles.listbox_Info,'string',String_Listbox);
+main = handles.MainGUI;
+if(ishandle(main))
+    mainHandles = guidata(main);
+    changeMain = mainHandles.uitable1;
+    table_cell = get(changeMain, 'data');
+    table_cell{handles.HP_num,1}= CI.FM.ModelType{handles.indexFM};
+    table_cell{handles.HP_num,2}= 'Y';
+    set(changeMain,'data',table_cell);  % change the table 
+    % -----------
+    N = length(CI.FM.indexFM);
+    for ss = 1:N
+        HP = CI.FM.HP{ss};
+        isRunSp(ss) = HP.IsRun;
     end
-    otherwise
+    if isRunSp == 1
+        changeMain2 = mainHandles.pb_OK;
+        set(changeMain2, 'enable','on');
+    end            
 end
 guidata(hObject, handles);
-% guidata(hObject, handles);
-assignin('base','CI',CI);                   % save the current information to the workspace
 %
 % --- Executes on button press in pb_SaveFig.
 function pb_SaveFig_Callback(varargin)
-global CI
+% global CI
 hObject = varargin{1};
 handles = guidata(hObject);
 pop_PLot            = get(handles.pop_Plot,'Value');
@@ -1255,26 +1179,3 @@ for ss=1:length(n_sample)
     color_type(ss,1:3)=cmap(n_sample(ss),1:3);
 end
 %---------------------------end-------------------------------------------
-
-
-
-function edit21_Callback(hObject, eventdata, handles)
-% hObject    handle to edit21 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: get(hObject,'String') returns contents of edit21 as text
-%        str2double(get(hObject,'String')) returns contents of edit21 as a double
-
-
-% --- Executes during object creation, after setting all properties.
-function edit21_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to edit21 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: edit controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
