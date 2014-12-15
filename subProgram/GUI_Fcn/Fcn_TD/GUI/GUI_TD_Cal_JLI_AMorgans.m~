@@ -275,15 +275,7 @@ function Fcn_main_calculation_JLI_AMorgans(varargin)
 hObject     = varargin{1};
 handles     = guidata(hObject);
 global CI
-indexFM2 = find(CI.FM.indexFM == 2);
-for ss = 1:length(indexFM2)
-   if CI.FM.HP{1,indexFM2(ss)}.NL.style == 3
-       CI.TD.indexFMJLI = indexFM2(ss);   % the maximum number of this kind of interface is 1
-   end
-end
-% 
-%
-assignin('base','CI',CI);
+indexFMJLI = find(CI.FM.indexFM == 2)
 Fcn_TD_INI_Period_Seperation(CI.TD.nPeriod,CI.TD.RatioGapPadding)
 Fcn_set_ui_enable(hObject,handles,0);
 for mm = 1:CI.TD.nPeriod
@@ -310,12 +302,12 @@ for mm = 1:CI.TD.nPeriod
         % --------------------------
         Fcn_TD_calculation_one_period(mm)
         % --------------------------
-        uRatioEnv1 = Fcn_calculation_envelope(CI.TD.uRatio(CI.TD.indexFMJLI,VarPad(1):VarPad(2)),N);       % calculate uRatio
+        uRatioEnv1 = Fcn_calculation_envelope(CI.TD.uRatio(VarPad(1):VarPad(2)),N);       % calculate uRatio
         uRatioEnv1 = 0.5*(uRatioEnv1 + uRatioEnv2);
         [   CI.TD.Lf(Var(1):VarPad(2)),...
             CI.TD.tauf(Var(1):VarPad(2))]...
-            = Fcn_flame_model_NL_JLi_AMorgans(uRatioEnv1(Var(1)-CI.TD.nPadding:end),CI.TD.indexFMJLI);       % only update the nonlinear value from Var(1) to VarPad(2)
-            CI.TD.taufRem(CI.TD.indexFMJLI,Var(1):VarPad(2))  = CI.TD.tauf(CI.TD.indexFMJLI,Var(1):VarPad(2)) - CI.TD.taufMin(CI.TD.indexFMJLI);
+            = Fcn_flame_model_NL_JLi_AMorgans(uRatioEnv1(Var(1)-CI.TD.nPadding:end));       % only update the nonlinear value from Var(1) to VarPad(2)
+            CI.TD.taufRem(Var(1):VarPad(2))  = CI.TD.tauf(Var(1):VarPad(2)) - CI.TD.taufMin;
         index = [Var(1), Var(1)+N1-1] - CI.TD.nPadding;
         error = abs(std(uRatioEnv1(index(1) : index(2)) - uRatioEnv2(index(1) : index(2)))); 
         % ---------------------
@@ -328,7 +320,6 @@ for mm = 1:CI.TD.nPeriod
         uRatioEnv2 = uRatioEnv1;
         %----------------
     end
-    % We only calculate this envelope, no others!!!
     CI.TD.uRatioEnv(Var(1):Var(2)) = uRatioEnv2((Var(1):Var(2))-CI.TD.nPadding);
 end
 assignin('base','CI',CI);
@@ -349,7 +340,7 @@ axes(hAxes1)
 hold on
 switch popVal 
     case 1
-        plot(hAxes1,CI.TD.tSpTotal,CI.TD.uRatio(CI.TD.indexFMJLI,:),'-k','linewidth',0.5);
+        plot(hAxes1,CI.TD.tSpTotal,CI.TD.uRatio,'-k','linewidth',0.5);
 end
 set(hAxes1,'YColor','k','Box','on','ygrid','on','xgrid','on');
 set(hAxes1,'FontName','Helvetica','FontSize',fontSize1,'LineWidth',1)

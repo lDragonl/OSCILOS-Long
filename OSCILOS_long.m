@@ -296,12 +296,15 @@ function TD_SIM_Callback(hObject, eventdata, handles)
 global CI
 % --------------------------
 F = findall(0,'type','figure','tag','TMWWaitbar');
-delete(F);
+delete(F);  % kill the useless waitbar
 % ---------------------------
 indexLoadProg = 1;
 if ~isempty(CI.CD.indexHP)    % if there are heat perturbations
-    if ~isempty(find(CI.FM.indexFM == 3))
-        indexLoadProg = 2;
+    numFM2 = find(CI.FM.indexFM == 2);
+    if ~isempty(numFM2)
+        if CI.FM.HP{1,numFM2}.NL.style == 3
+            indexLoadProg = 2;
+        end
     end
 end
 switch indexLoadProg                                                          
