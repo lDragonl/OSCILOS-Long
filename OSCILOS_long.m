@@ -294,6 +294,10 @@ function TD_SIM_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 global CI
+% --------------------------
+F = findall(0,'type','figure','tag','TMWWaitbar');
+delete(F);
+% ---------------------------
 indexLoadProg = 1;
 if ~isempty(CI.CD.indexHP)    % if there are heat perturbations
     if ~isempty(find(CI.FM.indexFM == 3))

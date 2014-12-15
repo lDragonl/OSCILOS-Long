@@ -42,7 +42,7 @@ CI.TD.nRound            = ceil(CI.TD.NRaw./CI.TD.nGap);                     % Th
 CI.TD.nCal              = CI.TD.nRound*CI.TD.nGap;                          % This is the final sampling number after time zero
 CI.TD.tSp               = (1:CI.TD.nRound*CI.TD.nGap).*CI.TD.dt;            % This is final time samples afte time zero
 % ------------------
-CI.TD.tauPadding        = Fcn_TD_Padding_time_delay;                        % accounting for the time delay, zero padding before the time zero is necessary
+CI.TD.tauPadding        = 1.5*Fcn_TD_Padding_time_delay;                    % accounting for the time delay, zero padding before the time zero is necessary, use 1.5 to increase its original length
 CI.TD.nPadding          = round(CI.TD.tauPadding.*CI.TD.fs);                % number of padding signal
 CI.TD.tSpPadding        = (-CI.TD.nPadding+1:0).*CI.TD.dt;                  % padding time samples
 % ------------------

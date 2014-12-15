@@ -1,4 +1,4 @@
-function qRatio = Fcn_TD_calculation_qRatio_s(uRatio,FTFSys,tFTFSys,Var,tdRem,dt,Lf, indexHP)
+function qRatio = Fcn_TD_calculation_qRatio_s(uRatio,FTFSys,tFTFSys,Var,tdRem,dt,Lf)
 % The flame transfer function is the function of s. 
 % This function is used to calculate qRatio of flame
 % uRatio is the velocity ratio before the flame
@@ -12,15 +12,15 @@ function qRatio = Fcn_TD_calculation_qRatio_s(uRatio,FTFSys,tFTFSys,Var,tdRem,dt
 %
 % author: Jingxuan LI (jingxuan.li@imperial.ac.uk)
 % first created:    2014-11-11
-% last edited:      2014-12-15
+% last edited:      2014-11-19
 %
 global CI
 
 qRatio = Fcn_lsim_varied_td(uRatio,FTFSys,tFTFSys,Var,tdRem,dt);
 
-switch CI.FM.HP{1,indexHP}.NL.style
+switch CI.FM.NL.style
     case 2
-        qRatio = Fcn_saturation(qRatio,CI.FM.HP{1,indexHP}.NL.Model2.alpha);
+        qRatio = Fcn_saturation(qRatio,CI.FM.NL.Model2.alpha);
     otherwise
         qRatio = qRatio.*Lf((Var(1):Var(2)));
 end

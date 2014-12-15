@@ -16,6 +16,7 @@ if ~isempty(CI.CD.indexHP)    % if there are heat perturbations
     numHP                   = length(CI.CD.indexHP);                        % number of heat perturbations
     CI.TD.tauf      = zeros(numHP,CI.TD.nTotal);                             % Nonlinear time delay, which varies with velocity perturbations
     CI.TD.Lf        = zeros(numHP,CI.TD.nTotal);                               % Nonlinear model, which describes the saturation of heat release rate with velocity perturbations
+    CI.TD.taufRem   = zeros(numHP,CI.TD.nTotal); 
     for ss = 1 : numHP
         HP = CI.FM.HP{ss};
         switch CI.FM.indexFM(ss)

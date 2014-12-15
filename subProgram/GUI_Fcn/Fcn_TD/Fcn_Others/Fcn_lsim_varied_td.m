@@ -37,9 +37,9 @@ if index1 == index2 % This occurs if we have one operation per time step, as in 
     index1 = index1 - 1;
 end
 
-if index2 >= min(Var(1):Var(2))
-    error('You are trying to use data which has not yet been calculated in an interpolation. Try reducing your time step')
-end
+% if index2 >= min(Var(1):Var(2)) % not correct
+%     error('You are trying to use data which has not yet been calculated in an interpolation. Try reducing your time step')
+% end
 
 t0          = (0:index2-index1).*dt;                % corresponding time samples
 

@@ -15,6 +15,7 @@ tauPadding = max(tauPadding, CI.TP.tau_minus(1) + CI.BC.tau_d1);
 % Outlet boundary:
 tauPadding = max(tauPadding, CI.TP.tau_plus(1)  + CI.BC.tau_d2);
 %
+% flames
 % --------------------------------
 if ~isempty(CI.CD.indexHP)    % if there are heat perturbations                   
     numHP                   = length(CI.CD.indexHP);                                % number of heat perturbations
@@ -53,7 +54,8 @@ if ~isempty(CI.CD.indexHP)    % if there are heat perturbations
         tauPadding = max(tauPadding, max(taufLimit));
     end
 end
-
+% Green's function
+tauPadding = max(tauPadding, max(CI.TD.Green.tauConv2));
 
 %
 % ------------------------ end --------------------------------------------
