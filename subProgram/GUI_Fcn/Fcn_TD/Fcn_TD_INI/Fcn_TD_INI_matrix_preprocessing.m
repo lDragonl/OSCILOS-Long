@@ -4,22 +4,41 @@ function Fcn_TD_INI_matrix_preprocessing
 % outputs are the values to be calculated. The matrix in the technical
 % report should be reorganized.
 % 
-% last edit: 2014-11-13
+% last edit: 2014-12-12
 %
+% IF means interface
 global CI
+indexHA = 0;  % index of heat addition is set to zero at the beginning and
+% is increased by 1 in case the interface is a heat addition interface
+indexHP = 0; % index of heat perturbation. It is added by 1 in case the 
+% interface is an unsteady heat source
 for ss = 1:CI.TP.numSection-1 
     switch CI.CD.SectionIndex(ss+1)
-        case {0,10} % case of no heat release, or mean heat release only
+        case 0 % case of no heat release
             CI.TD.IF.Z{ss} = Fcn_TD_matrix_reorganization_no_flame(CI.TPM.BC{ss}); 
-        case {11} % case of heat release perturbations
+        case 10
+            indexHA = indexHA + 1;
             % heat addition coefficient
-            K       = CI.TP.DeltaHr./CI.TP.c_mean(2,ss+1)./CI.TP.c_mean(1,ss)./CI.TP.Theta(ss);
+            K       = 0;
             % right side, first term
             B1a     = CI.TPM.B1{2,ss}*(CI.TPM.B2{1,ss}\CI.TPM.B1{1,ss});
             BC1a    = B1a*CI.TPM.C1;
             % left side
             BC2     = CI.TPM.B2{2,ss}*CI.TPM.C2;
-            [CI.TD.IF.Z{ss},CI.TD.IF.Ar]...
+            [CI.TD.IF.Z{ss},CI.TD.IF.Ar(indexHA)]...
+                = Fcn_TD_matrix_reorganization_with_flame(BC1a,BC2,K);
+            % 
+        case {11} % case of heat release perturbations
+            indexHA = indexHA + 1;
+            indexHP = indexHP + 1;
+            % heat addition coefficient
+            K       = CI.TP.DeltaHr(indexHA)./CI.TP.c_mean(2,ss+1)./CI.TP.c_mean(1,ss)./CI.TP.Theta(ss);
+            % right side, first term
+            B1a     = CI.TPM.B1{2,ss}*(CI.TPM.B2{1,ss}\CI.TPM.B1{1,ss});
+            BC1a    = B1a*CI.TPM.C1;
+            % left side
+            BC2     = CI.TPM.B2{2,ss}*CI.TPM.C2;
+            [CI.TD.IF.Z{ss},CI.TD.IF.Ar(indexHP)]...
                 = Fcn_TD_matrix_reorganization_with_flame(BC1a,BC2,K);
     end
 end

@@ -15,7 +15,8 @@ tau_minus   = CI.TP.tau_minus;
 tau_c       = CI.TP.tau_c;
 %--------------------------------
 G = eye(3);
-indexHP = 0;    % index of unsteady heat sources
+indexHA = 0;            % index of heat addition
+indexHP = 0;            % index of heat perturbation
 for ss = 1:CI.TP.numSection-1 
     D1 = diag([ exp(-s*tau_plus(ss)),...
                 exp( s*tau_minus(ss)),...
@@ -24,6 +25,7 @@ for ss = 1:CI.TP.numSection-1
         case 0
             Z       = CI.TPM.BC{ss}*D1;
         case 10
+            indexHA = indexHA + 1;
             B2b     = zeros(3);
             B2b(3,2)= 0;
             Bsum    = CI.TPM.B1{2,ss}*(CI.TPM.B2{1,ss}\CI.TPM.B1{1,ss}) + B2b;
@@ -32,14 +34,15 @@ for ss = 1:CI.TP.numSection-1
             Z       = (BC2\BC1)*D1;
         case 11
             % Flame model
-            indexHP = indexHP  + 1;
+            indexHA = indexHA + 1;
+            indexHP = indexHP + 1;
             if indexHP == CI.FM.indexMainHPinHp
                 FTF = Fcn_nonlinear_flame_model(s);
             else
                 FTF = Fcn_linear_flame_model(s,indexHP);
             end
             B2b     = zeros(3);
-            B2b(3,2)= CI.TP.DeltaHr(CI.FM.indexHPinHA(indexHP))./CI.TP.c_mean(2,ss+1)./CI.TP.c_mean(1,ss)./CI.TP.Theta(ss).*FTF;
+            B2b(3,2)= CI.TP.DeltaHr(CI.CD.indexHPinHA(indexHP))./CI.TP.c_mean(2,ss+1)./CI.TP.c_mean(1,ss)./CI.TP.Theta(ss).*FTF;
             Bsum    = CI.TPM.B1{2,ss}*(CI.TPM.B2{1,ss}\CI.TPM.B1{1,ss}) + B2b;
             BC1     = Bsum*CI.TPM.C1;
             BC2     = CI.TPM.B2{2,ss}*CI.TPM.C2;
@@ -105,17 +108,18 @@ F       = polyval(num,s)./polyval(den,s).*exp(-s.*tauf);
 function F = Fcn_nonlinear_flame_model(s)
 global FDF
 global CI
+global HP
 F = polyval(FDF.num,s)./polyval(FDF.den,s).*exp(-s.*FDF.tauf);
 if  CI.EIG.APP_style == 21    % from model
-    switch CI.FM.NL.style
+    switch HP.NL.style
         case 2
             uRatio = FDF.uRatio;
             if FDF.uRatio == 0
                 uRatio = eps;
             end
         qRatioLinear = abs(F).*uRatio; 
-        Lf = interp1(  CI.FM.NL.Model2.qRatioLinear,...
-                       CI.FM.NL.Model2.Lf,...
+        Lf = interp1(  HP.NL.Model2.qRatioLinear,...
+                       HP.NL.Model2.Lf,...
                        qRatioLinear,'linear','extrap');                                    
         F = F.*Lf; 
     %     otherwise

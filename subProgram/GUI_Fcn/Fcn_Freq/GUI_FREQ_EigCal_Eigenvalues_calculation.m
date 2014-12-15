@@ -74,6 +74,7 @@ hObject = varargin{1};
 handles = guidata(hObject);
 global CI
 global FDF
+global HP
 % -----------------------get flame describing function --------------------
 %
 if  CI.EIG.APP_style == 21     % From flame model, CI.FM.indexFM == 2
@@ -101,7 +102,7 @@ if  CI.EIG.APP_style == 21     % From flame model, CI.FM.indexFM == 2
     case 3      
         CI.EIG.FDF.Lf       = interp1(  HP.NL.Model3.uRatio,...
                                         HP.NL.Model3.Lf,...
-                                        HP.FDF.uRatioSp,'linear','extrap');         % Nonlinear ratio
+                                        CI.EIG.FDF.uRatioSp,'linear','extrap');         % Nonlinear ratio
         CI.EIG.FDF.taufNSp  = HP.NL.Model3.taufN.*(1-CI.EIG.FDF.Lf);                % Nonlinear time delay
         for ss = 1:uRatioNum
             CI.EIG.FDF.num{ss}   = CI.EIG.FDF.Lf(ss).*HP.FTF.num;
@@ -123,6 +124,7 @@ elseif CI.EIG.APP_style == 22  % From experimental FDF
 end
 CI.EIG.FDF.uRatioNum = uRatioNum;
 assignin('base','CI',CI);
+assignin('base','HP',HP);
 %
 % ---------------calculate the eigenvalues---------------
 %

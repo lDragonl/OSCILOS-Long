@@ -18,7 +18,8 @@ E(1)        = 0;
 A_plus(1)   = R1.*A_minus(1);
 Array(:,1)  = [A_plus(1),A_minus(1),E(1)]';
 %
-indexHP = 0;    % index of unsteady heat sources
+indexHA = 0;            % index of heat addition
+indexHP = 0;            % index of heat perturbation
 % -------------------------------------------------------------------------
 for ss = 1:CI.TP.numSection-1 
     D1 = diag([ exp(-s_star*tau_plus(ss)),...
@@ -28,6 +29,7 @@ for ss = 1:CI.TP.numSection-1
         case 0
             CI.TPM.Z{ss}       = CI.TPM.BC{ss}*D1;
         case 10
+            indexHA = indexHA + 1;
             B2b     = zeros(3);
             B2b(3,2)= 0;
             Bsum    = CI.TPM.B1{2,ss}*(CI.TPM.B2{1,ss}\CI.TPM.B1{1,ss}) + B2b;
@@ -36,12 +38,13 @@ for ss = 1:CI.TP.numSection-1
             CI.TPM.Z{ss}       = (BC2\BC1)*D1;
         case 11
             % linear flame transfer function
+            indexHA = indexHA + 1;
             indexHP = indexHP + 1;
             FTF     = Fcn_flame_model(s_star,indexHP);
             B2b     = zeros(3);
             temp    = D1*Array(:,ss);
             uf      = abs((temp(1) - temp(2))./(CI.TP.c_mean(1,ss).*CI.TP.rho_mean(1,ss)));         % velocity before the flame
-            B2b(3,2)= CI.TP.DeltaHr(CI.FM.indexHPinHA(indexHP))./CI.TP.c_mean(2,ss+1)./CI.TP.c_mean(1,ss)./CI.TP.Theta(ss).*FTF;
+            B2b(3,2)= CI.TP.DeltaHr(indexHA)./CI.TP.c_mean(2,ss+1)./CI.TP.c_mean(1,ss)./CI.TP.Theta(ss).*FTF;
             Bsum    = CI.TPM.B1{2,ss}*(CI.TPM.B2{1,ss}\CI.TPM.B1{1,ss}) + B2b;
             BC1     = Bsum*CI.TPM.C1;
             BC2     = CI.TPM.B2{2,ss}*CI.TPM.C2;

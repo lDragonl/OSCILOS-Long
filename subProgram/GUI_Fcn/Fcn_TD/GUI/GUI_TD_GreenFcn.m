@@ -277,11 +277,42 @@ Fcn_Update_Plots(hObject);
 handles = guidata(hObject);
 guidata(hObject, handles); 
 %
+
+function Fcn_check_transfer_function
+global CI
+% This function is used to check the transfer function
+% 1. check the  inlet boundary condition
+if length(CI.BC.num1) <= 1 && length(CI.BC.num2) <=1
+    Msg{1} = {'The inlet boundary condition is a constant value and examination of the Green''s function is not necessary!'};
+else 
+    Msg{1} = {'The inlet boundary condition is a polynomial transfer function and examination of its Green''s function is necessary!'};
+end
+% 2. check the outlet boundary condition
+if length(CI.BC.num2) <= 1 && length(CI.BC.num2) <=1
+    Msg{2} = {'The outlet boundary condition is a constant value and examination of the Green''s function is not necessary!'};
+else 
+    Msg{2} = {'The outlet boundary condition is a polynomial transfer function and examination of its Green''s function is necessary!'};
+end
+% 3. check the flame transfer function
+if isempty(CI.CD.indexHP)
+    numHP = length(CI.CD.indexHP);     % number of heat perturbations
+    numHP_TF = find(CI.FM.indexFM); 
+end
+    
+    
+
+
+
+    
 % -------------------------------------------------------------------------
 %
 function Fcn_Pre_calculation(varargin)
 hObject = varargin{1};
 handles = guidata(hObject);
+% In the code, the inlet and outlet boundaries are firstly accounted for
+% and take the first and second indexes
+% Then the flame transfer functions
+% Then .....
 global CI
 global Green
 switch CI.IsRun.GUI_TD_Convg
@@ -290,6 +321,13 @@ switch CI.IsRun.GUI_TD_Convg
         Green.den{1} = CI.BC.den1;
         Green.num{2} = CI.BC.num2;
         Green.den{2} = CI.BC.den2;
+        % check the flame model
+        % flame model type: 1, 2 need to be checked
+%         if ~isempty(CI.CD.indexHP)
+%             numHP = length(CI.CD.indexHP);
+%             if ~isempty(find(CI.FM.indexHP < 3 ))
+%                 indexFTFinHP = find(CI.FM.indexHP < 3)
+%         end
         Green.num{3} = CI.FM.FTF.num;
         Green.den{3} = CI.FM.FTF.den;
         for ss = 1:3

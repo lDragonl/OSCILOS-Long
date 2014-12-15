@@ -392,7 +392,6 @@ set(handles.pb_Cancel,...
                         'string','Cancel',...
                         'backgroundcolor',handles.bgcolor{3}); 
 guidata(hObject, handles);
-
 switch CI.IsRun.GUI_INI_CD
     case 1
         switch CI.CD.pop_CD_type
@@ -403,6 +402,18 @@ switch CI.IsRun.GUI_INI_CD
                 set(handles.ed_DS,              'string', num2str((CI.CD.x_sample(3)-CI.CD.x_sample(2)).*1000));
                 set(handles.ed_Diameter,        'string', num2str(1000*CI.CD.r_sample(1)));
                 set(handles.pop_CB_type,        'value',1);
+                if isempty(CI.CD.indexHP) == 0
+                    set(handles.checkbox1,'value', 1);
+                    set(handles.checkbox2,'value', 1);
+                end
+                if isempty(CI.CD.indexHP) == 1 && isempty(CI.CD.indexHA) == 0
+                    set(handles.checkbox1,'value', 1);
+                    set(handles.checkbox2,'value', 0);
+                end
+                 if isempty(CI.CD.indexHP) == 1 && isempty(CI.CD.indexHA) == 1
+                    set(handles.checkbox1,'value', 0);
+                    set(handles.checkbox2,'value', 0);
+                 end         
             case 2
                 set(handles.uipanel_Rijke_DM,   'visible','off'); 
                 set(handles.uipanel_Load,       'visible','on'); 
