@@ -22,7 +22,7 @@ function varargout = GUI_TD_GreenFcn(varargin)
 
 % Edit the above text to modify the response to help GUI_TD_GreenFcn
 
-% Last Modified by GUIDE v2.5 24-Oct-2014 09:17:15
+% Last Modified by GUIDE v2.5 15-Dec-2014 13:14:32
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -140,17 +140,42 @@ screenSize  = get(0, 'ScreenSize');                             % get the screen
 sW          = handles.sW;                                       % screen width
 sH          = handles.sH;                                       % screen height
 FigW        = sW.*1/2;                                          % window width
-FigH        = sH.*3/5;                                          % window height
+FigH        = sH.*4/5;                                          % window height
 set(handles.figure,     'units', 'points',...
                         'position',[(screenSize(3)-FigW)./2 (screenSize(4)-FigH)./2 FigW FigH],...
                         'name','Green''function examination',...
                         'color',handles.bgcolor{3});
 %----------------------------------------
+set(handles.uipanel_Msg,...
+                        'units', 'points',...
+                        'Fontunits','points',...
+                        'position',[FigW*0.5/20 FigH*16.5/20 FigW*19/20 FigH*3.25/20],...
+                        'Title','',...
+                        'visible','on',...
+                        'highlightcolor',handles.bgcolor{3},...
+                        'borderwidth',1,...
+                        'fontsize',handles.FontSize(2),...
+                        'backgroundcolor',handles.bgcolor{3});
+pannelsize=get(handles.uipanel_Msg,'position');
+pW=pannelsize(3);
+pH=pannelsize(4); 
+msg={   '<HTML><FONT color="blue">This GUI is used examine the convergence of the Green''s function of each tranfer function;';...
+        '<HTML><FONT color="blue">The inlet and outlet boundaries are needed to be checked:';...
+        '<HTML><FONT color="blue">The flame transfer functions are needed to be checked;'};
+set(handles.listbox1,...
+                        'units', 'points',...
+                        'fontunits','points',...
+                        'position',[pW*0/20 pH*0/20 pW*20/20 pH*20/20],...
+                        'fontsize',handles.FontSize(1),...
+                        'string',msg,...
+                        'backgroundcolor',handles.bgcolor{4},...
+                        'value',1);  
+%----------------------------------------
 % pannel axes
 set(handles.uipanel_axes,...
                         'units', 'points',...
                         'Fontunits','points',...
-                        'position',[FigW*0.5/20 FigH*8/20 FigW*19/20 FigH*11.5/20],...
+                        'position',[FigW*0.5/20 FigH*6.5/20 FigW*19/20 FigH*9.75/20],...
                         'Title','',...
                         'visible','on',...
                         'highlightcolor',handles.bgcolor{3},...
@@ -184,7 +209,7 @@ set(handles.pop_type,...
 set(handles.uipanel_Input,...
                         'units', 'points',...
                         'Fontunits','points',...
-                        'position',[FigW*0.5/20 FigH*2.5/20 FigW*19/20 FigH*5/20],...
+                        'position',[FigW*0.5/20 FigH*1.75/20 FigW*19/20 FigH*4.5/20],...
                         'Title','',...
                         'visible','on',...
                         'highlightcolor',handles.bgcolor{3},...
@@ -237,7 +262,7 @@ set(handles.edit_a2,...
 set(handles.uipanel_AOC,...
                         'units', 'points',...
                         'Fontunits','points',...
-                        'position',[FigW*0.5/20 FigH*0/20 FigW*19/20 FigH*2/20],...
+                        'position',[FigW*0.5/20 FigH*0/20 FigW*19/20 FigH*1.5/20],...
                         'Title','',...
                         'visible','on',...
                         'highlightcolor',handles.bgcolor{3},...
@@ -278,32 +303,6 @@ handles = guidata(hObject);
 guidata(hObject, handles); 
 %
 
-function Fcn_check_transfer_function
-global CI
-% This function is used to check the transfer function
-% 1. check the  inlet boundary condition
-if length(CI.BC.num1) <= 1 && length(CI.BC.num2) <=1
-    Msg{1} = {'The inlet boundary condition is a constant value and examination of the Green''s function is not necessary!'};
-else 
-    Msg{1} = {'The inlet boundary condition is a polynomial transfer function and examination of its Green''s function is necessary!'};
-end
-% 2. check the outlet boundary condition
-if length(CI.BC.num2) <= 1 && length(CI.BC.num2) <=1
-    Msg{2} = {'The outlet boundary condition is a constant value and examination of the Green''s function is not necessary!'};
-else 
-    Msg{2} = {'The outlet boundary condition is a polynomial transfer function and examination of its Green''s function is necessary!'};
-end
-% 3. check the flame transfer function
-if isempty(CI.CD.indexHP)
-    numHP = length(CI.CD.indexHP);     % number of heat perturbations
-    numHP_TF = find(CI.FM.indexFM); 
-end
-    
-    
-
-
-
-    
 % -------------------------------------------------------------------------
 %
 function Fcn_Pre_calculation(varargin)
@@ -317,49 +316,62 @@ global CI
 global Green
 switch CI.IsRun.GUI_TD_Convg
     case 0
+        Green.numGreen = 2;                                 % the default number
         Green.num{1} = CI.BC.num1;
         Green.den{1} = CI.BC.den1;
         Green.num{2} = CI.BC.num2;
         Green.den{2} = CI.BC.den2;
         % check the flame model
         % flame model type: 1, 2 need to be checked
-%         if ~isempty(CI.CD.indexHP)
-%             numHP = length(CI.CD.indexHP);
-%             if ~isempty(find(CI.FM.indexHP < 3 ))
-%                 indexFTFinHP = find(CI.FM.indexHP < 3)
-%         end
-        Green.num{3} = CI.FM.FTF.num;
-        Green.den{3} = CI.FM.FTF.den;
-        for ss = 1:3
+        if ~isempty(CI.CD.indexHP)
+            Green.numHP       = length(CI.CD.indexHP);            % number of heat perturbations
+            Green.indexHP_TF  = find(CI.FM.indexFM <= 2);         % find the index of flame type 1 and 2
+            Green.numHP_TF    = length(Green.indexHP_TF);               % number of flame type 1 and 2
+            if Green.numHP_TF > 0
+                for ss = 1:Green.numHP_TF
+                    Green.numGreen = Green.numGreen + 1;
+                    HP = CI.FM.HP{Green.indexHP_TF(ss)};
+                        Green.num{Green.numGreen} = HP.FTF.num;
+                        Green.den{Green.numGreen} = HP.FTF.den;
+                end
+            end
+        end
+        for ss = 1:Green.numGreen
             num     = Green.num{ss};
             den     = Green.den{ss};
             Nnum    = length(num);
             Nden    = length(den);
             if Nnum <=1 && Nden<=1
-                Green.indexConst(ss)   = 1;
-                Green.sys{ss}          = tf(num,den);
-                Green.y1{ss}           = num./den;
-                Green.t1{ss}           = 0;
-                Green.tauConv1(ss)     = 0;
-                Green.y2{ss}           = num./den;
-                Green.t2{ss}           = 0;
-                Green.tauConv2(ss)     = 0;
+                Green.indexConst(ss)   = 1;                     % if this index ==1, it means that the dynamic system is a static gain 
+                Green.sys{ss}          = tf(num,den);           % dynamic system
+                Green.y1{ss}           = num./den;              % response samples, used as reference 
+                Green.t1{ss}           = 0;                     % time samples, used as reference
+                Green.tauConv1(ss)     = 0;                     % cut-off time, used as reference
+                Green.y2{ss}           = num./den;              % response samples, used in the TD calculation 
+                Green.t2{ss}           = 0;                     % time samples, used in the TD calculation 
+                Green.tauConv2(ss)     = 0;                     % cut-off time, used in the TD calculation 
             else
-                Green.indexConst(ss)   = 0;
-                Green.sys{ss}          = tf(num,den);
-                [Green.y1{ss},Green.t1{ss}]   = impulse(Green.sys{ss});
-                t1                          = Green.t1{ss};
-                Green.tauConv1(ss)     = t1(end);
-                [Green.y2{ss},Green.t2{ss}]   = impulse(Green.sys{ss});
-                t2                          = Green.t2{ss};
-                Green.tauConv2(ss)     = t2(end);
+                Green.indexConst(ss)            = 0;                     % 
+                Green.sys{ss}                   = tf(num,den);
+                [y,t]                           = impulse(Green.sys{ss});
+                Green.tauConv1(ss)              = t(end);
+                Green.tauConv2(ss)              = t(end);
+                [Green.y1{ss},Green.t1{ss}]     = impulse(Green.sys{ss},Green.tauConv1(ss));
+                [Green.y2{ss},Green.t2{ss}]     = impulse(Green.sys{ss},Green.tauConv2(ss));
             end
         end
-        CI.TD.Green    = Green;
+%         CI.TD.Green    = Green;
     case 1
         Green  = CI.TD.Green;
 end
-set(handles.pop_type, 'value',1)
+str = {'Inlet boundary condition';'Outlet boundary condition'};
+if Green.numGreen > 2
+for ss = 1:Green.numGreen-2
+    strtemp = ['Flame transfer function of HP ' num2str(Green.indexHP_TF(ss))];
+    str{ss+2} = strtemp;
+end
+end
+set(handles.pop_type,'string',str,'value',1);  
 set(handles.edit_a1, 'string', num2str(Green.tauConv1(1).*1e3));
 set(handles.edit_a2, 'string', num2str(Green.tauConv2(1).*1e3));
 assignin('base','CI',CI);
@@ -372,7 +384,7 @@ function Fcn_Update_Plots(varargin)
 hObject = varargin{1};
 handles = guidata(hObject);
 global Green
-global CI
+% global CI
 ss = get(handles.pop_type,'Value');
 switch Green.indexConst(ss)
     case 0
@@ -380,20 +392,20 @@ switch Green.indexConst(ss)
         Green.tauConv2(ss) = str2double(get(handles.edit_a2, 'string'))./1e3;
         [Green.y2{ss},Green.t2{ss}]   = impulse(Green.sys{ss},Green.tauConv2(ss));
     case 1
-        if ss == 3 && CI.FM.NL.style == 4 % Flame transfer function selected with the G-Equation
-            set(handles.edit_a2,    'enable','off');
-            string={...
-                'You have selected a G-Equation flame model,';...
-                'Its transfer function is not available.';...
-                'Examination of the Green''s function is not necessary!'};
+%         if ss == 3 && CI.FM.NL.style == 4 % Flame transfer function selected with the G-Equation
+%             set(handles.edit_a2,    'enable','off');
+%             string={...
+%                 'You have selected a G-Equation flame model,';...
+%                 'Its transfer function is not available.';...
+%                 'Examination of the Green''s function is not necessary!'};
+%             helpdlg(string,'')
+%         else
+        set(handles.edit_a2,    'enable','off');
+        string={...
+            'The transfer function is a constant value!';...
+            'Examination of the Green''s function is not necessary!'};
             helpdlg(string,'')
-        else
-            set(handles.edit_a2,    'enable','off');
-            string={...
-                'The transfer function is a constant value!';...
-                'Examination of the Green''s function is not necessary!'};
-            helpdlg(string,'')
-        end
+%         end
 end
 assignin('base','Green',Green);
 guidata(hObject, handles)
@@ -455,9 +467,15 @@ function pb_OK_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 global CI
 global Green
-CI.TD.Green                = Green;
-CI.IsRun.GUI_TD_Convg   = 1;
+CI.TD.Green                 = Green;
+CI.IsRun.GUI_TD_Convg       = 1;
 assignin('base','CI',CI);
+main = handles.MainGUI;                     % get the handle of OSCILOS_long
+if(ishandle(main))
+    mainHandles = guidata(main);            %
+   set(mainHandles.TD_Para_Config, 'enable' , 'on') 
+end
+guidata(hObject, handles);
 uiresume(handles.figure);
 %
 % -------------------------------------------------------------------------
@@ -558,3 +576,29 @@ function figure_CloseRequestFcn(hObject, eventdata, handles)
 uiresume(hObject);
 %
 % --------------------------  end  ---------------------------------------
+
+
+% --- Executes on selection change in listbox1.
+function listbox1_Callback(hObject, eventdata, handles)
+% hObject    handle to listbox1 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: contents = cellstr(get(hObject,'String')) returns listbox1 contents as cell array
+%        contents{get(hObject,'Value')} returns selected item from listbox1
+
+
+% --- Executes during object creation, after setting all properties.
+function listbox1_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to listbox1 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: listbox controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+

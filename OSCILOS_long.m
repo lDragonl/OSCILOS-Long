@@ -294,10 +294,16 @@ function TD_SIM_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 global CI
-switch CI.FM.NL.style                                                           
-    case 3
+indexLoadProg = 1;
+if ~isempty(CI.CD.indexHP)    % if there are heat perturbations
+    if ~isempty(find(CI.FM.indexFM == 3))
+        indexLoadProg = 2;
+    end
+end
+switch indexLoadProg                                                          
+    case 2
         GUI_TD_Cal_JLI_AMorgans('OSCILOS_long', handles.figure);                            
-    otherwise
+    case 1
         Fcn_TD_main_calculation_without_identification_uRatio;
 end
 % Fcn_TD_main_calculation(1)

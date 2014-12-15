@@ -30,10 +30,10 @@ nMin        = min(nfloor);                          % minimum discreted samples 
 nSys        = ceil(1.2*tSys./dt);                   % increase the length of Green's function to have a better precesion
 %
 index1      = Var(1) - (nMax + 1) - (nSys - 1);     % start index of padded input
-index2      = Var(2) - nMin;                        % end index of padded input7
+index2      = Var(2) - nMin;                        % end index of padded input
 
 if index1 == index2 % This occurs if we have one operation per time step, as in the G-equation
-    index2 = index2 +1 ; % in this case simulate two time steps. The interpolation will take care of getting the correct value
+    index2 = index2 + 1 ; % in this case simulate two time steps. The interpolation will take care of getting the correct value
     index1 = index1 - 1;
 end
 

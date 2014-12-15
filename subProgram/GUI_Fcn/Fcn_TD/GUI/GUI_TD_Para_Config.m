@@ -389,13 +389,25 @@ set(handles.pb_Cancel,...
  
 % --------------------------------
 %specific configuration for G-Equation
-if CI.FM.NL.style == 4;
- %set(handles.uipanel_Speed,'visible','off');
- set(handles.uipanel_Limit,'visible','off');
+% if CI.FM.NL.style == 4;
+%  %set(handles.uipanel_Speed,'visible','off');
+%  set(handles.uipanel_Limit,'visible','off');
+%   
+% set(handles.edit_d2,...
+%                         'string',1,...
+%                         'Enable','off');        
+% end
+if ~isempty(CI.CD.indexHP)    % if there are heat perturbations    
+   if ~isempty(find(CI.FM.indexFM == 4))  % G-equation
+    % ************* need further change **************
+    %set(handles.uipanel_Speed,'visible','off');
+    set(handles.uipanel_Limit,'visible','off');
   
-set(handles.edit_d2,...
+    set(handles.edit_d2,...
                         'string',1,...
-                        'Enable','off');        
+                        'Enable','off');  
+    % ************* need further change **************
+   end
 end
 % --------------------------------
 guidata(hObject, handles);
@@ -454,6 +466,14 @@ NoiseInfo.level     = str2double(get(handles.edit_c3,'String'));
 Fcn_TD_INI(dt,tEndRaw,uRatioMax,nGapRatio,NoiseInfo)
 CI.IsRun.GUI_TD_Para_Config = 1;
 assignin('base','CI',CI)
+%
+%
+main = handles.MainGUI;                     % get the handle of OSCILOS_long
+if(ishandle(main))
+    mainHandles = guidata(main);            %
+   set(mainHandles.TD_SIM, 'enable' , 'on') 
+end
+guidata(hObject, handles);
 delete(handles.figure);
 
 % --- Executes on button press in pb_Help.
