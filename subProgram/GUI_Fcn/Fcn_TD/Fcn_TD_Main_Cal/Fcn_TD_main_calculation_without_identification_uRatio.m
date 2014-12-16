@@ -17,6 +17,6 @@ for nn = 1:CI.TD.nRound
 end
 close(hWaitBar)
 assignin('base','CI',CI);
-Fcn_TD_results_plot                                     % Plot the result
+% Fcn_TD_results_plot                                     % Plot the result
 %
 % ----------------------------end------------------------------------------

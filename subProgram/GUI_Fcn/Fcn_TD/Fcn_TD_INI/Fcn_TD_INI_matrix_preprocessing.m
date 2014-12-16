@@ -25,7 +25,7 @@ for ss = 1:CI.TP.numSection-1
             BC1a    = B1a*CI.TPM.C1;
             % left side
             BC2     = CI.TPM.B2{2,ss}*CI.TPM.C2;
-            [CI.TD.IF.Z{ss},CI.TD.IF.Ar(indexHA)]...
+            [CI.TD.IF.Z{ss},CI.TD.IF.Ar{indexHA}]...
                 = Fcn_TD_matrix_reorganization_with_flame(BC1a,BC2,K);
             % 
         case {11} % case of heat release perturbations

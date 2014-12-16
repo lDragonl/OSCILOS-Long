@@ -146,20 +146,24 @@ switch selection
         if CI.IsRun.GUI_INI_FM == 1 || CI.IsRun.GUI_INI_FMEXP == 1 || CI.IsRun.GUI_INI_GEQU == 1
             set(handles.INI_BC,         'enable','on')
         end
-        if CI.IsRun.GUI_INI_BC == 1;
-            if CI.FM.NL.style == 4 % G-Equation can't be computed in Freq. domain
-                set(handles.FREQ,           'enable','off')
-                set(handles.FREQ_EigCal,    'enable','off')
-            else
-                set(handles.FREQ,           'enable','on')
-                set(handles.FREQ_EigCal,    'enable','on')
+        if CI.IsRun.GUI_INI_BC == 1; 
+            if ~isempty(CI.CD.indexHP)            % with heat perturbations
+                if ~isempty(find(CI.FM.indexFM == 4))   % Frequency calculation can only be run if the G-EQuation is not being used
+                    set(handles.FREQ,           'enable','off')
+                    set(handles.FREQ_EigCal,    'enable','off')
+                    set(handles.TD,             'enable','on')
+                end
+                if ~isempty(find(CI.FM.indexFM == 3))   % with loaded experimental/CFD FDF, time domain code is not avaliable
+                    set(handles.FREQ,           'enable','on')
+                    set(handles.FREQ_EigCal,    'enable','on')
+                    set(handles.TD,             'enable','off')
+                end
             end
-            set(handles.TD,             'enable','on')
         end
     catch
     end
-  case 'No'
-  return 
+    case 'No'
+    return 
 end
 guidata(hObject, handles); 
 

@@ -137,7 +137,7 @@ pW=pannelsize(3);
 pH=pannelsize(4);                
 set(handles.axes1,      'units', 'points',...
                         'Fontunits','points',...
-                        'position',[pW*2/10 pH*2.0/10 pW*7.5/10 pH*7/10],...
+                        'position',[pW*1.5/10 pH*2.0/10 pW*7.5/10 pH*7/10],...
                         'fontsize',handles.FontSize(1),...
                         'color',handles.bgcolor{1},...
                         'box','on');                     
@@ -247,7 +247,7 @@ set(handles.pop2,...
                         'position',[pW*3.5/10 pH*1/10 pW*6/10 pH*1.75/10],...
                         'fontsize',handles.FontSize(2),...
                         'string',{  'Time evolution';...
-                                    'Power spectrum density'},...
+                                    'Power spectrum'},...
                         'backgroundcolor',handles.bgcolor{1},...
                         'horizontalalignment','left',...
                         'enable','on',...
@@ -300,25 +300,15 @@ axes(hAxes1)
 hold on
 switch popData
     case 1
-        ylabelStr = ['$p^\prime$~[Pa]'];
-        yData = pPrime;
     case 2
-        ylabelStr = ['$u^\prime$~[m/s]'];
-        yData = uPrime;
-    case {3,5,7,9}
-        ylabelStr = ['$\hat{u}/\bar{u}$~[-]'];
-        yData = CI.TD.uRatio(1,CI.TD.nPadding+1:CI.TD.nTotal);
-    case {4,6,8,10}
-        ylabelStr = ['$\hat{\dot{q}}/\bar{\dot{q}}$~[-]'];
-        yData = CI.TD.qRatio(1,CI.TD.nPadding+1:CI.TD.nTotal);
-end
+        
 switch popPlot
     case 1  % time evolution
-        plot(hAxes1,1*CI.TD.tSp,yData,'-k','linewidth',0.5);
+        plot(hAxes1,1*CI.TD.tSpTotal,CI.TD.uRatio(CI.TD.indexFMJLI,:),'-k','linewidth',0.5);
         xlabel(hAxes1,'Time [s]','Color','k','Interpreter','LaTex','FontSize',fontSize1);
-        ylabel(hAxes1,ylabelStr,'Color','k','Interpreter','LaTex','FontSize',fontSize1)
+        ylabel(hAxes1,'uRatio [-]','Color','k','Interpreter','LaTex','FontSize',fontSize1)
     case 2  % psd
-        PSD_plot = calculate_psd(yData,CI.TD.fs);
+        PSD_plot = calculate_psd(yData,Fs);
         plot(hAxes1, PSD_plot(1,:),PSD_plot(2,:),'-','color',0*[1 1 1],'Linewidth',0.5);
         xlabel(hAxes1,'$\rm Frequency~[Hz]$','Color','k','Interpreter','LaTex','FontSize',fontSize1);
         ylabel(hAxes1,'$\rm Power/Frequency ~ [dB/Hz]$','Color','k','Interpreter','LaTex','FontSize',fontSize1);
@@ -338,9 +328,9 @@ if x == CI.CD.x_sample(1)
 end
 tauPlus     = (x-CI.CD.x_sample(indexSection))./(CI.TP.c_mean(1,indexSection) + CI.TP.u_mean(1,indexSection));
 tauMinus    = (CI.CD.x_sample(indexSection+1) - x)./(CI.TP.c_mean(1,indexSection) - CI.TP.u_mean(1,indexSection));
-Var         = [CI.TD.nPadding+1,CI.TD.nTotal];
-APlus       = Fcn_interp1_varied_td(CI.TD.AP(indexSection,:),Var,tauPlus,CI.TD.dt);
-AMinus      = Fcn_interp1_varied_td(CI.TD.AM(indexSection,:),Var,tauMinus,CI.TD.dt);
+Var         = [1,nTotal];
+APlus       = Fcn_interp1_varied_td(CI.TD.AP(indexSection),Var,tauPlus,CI.TD.dt);
+AMinus      = Fcn_interp1_varied_td(CI.TD.AM(indexSection),Var,tauMinus,CI.TD.dt);
 pPrime      = APlus + AMinus;
 uPrime      = (APlus - AMinus)./(CI.TP.c_mean(1,indexSection).*CI.TP.rho_mean(1,indexSection));
 
@@ -364,10 +354,7 @@ function pop1_Callback(hObject, eventdata, handles)
 pop1Val = get(handles.pop1, 'value');
 if pop1Val > 2
     set(handles.edit1,'enable','off','visible','off');
-else
-    set(handles.edit1,'enable','on','visible','on');
 end
-    
 
 % -------------------------------------------------------------------------
 %
@@ -436,9 +423,9 @@ function edit1_Callback(hObject, eventdata, handles)
 global CI
 datEdit = str2double(get(hObject, 'String'));
 ValDefault = CI.CD.x_sample(1); 
-if isnan(datEdit) || ~isreal(datEdit) 
+if isnan(datEdit) || ~isreal(datEdit) ||datEdit <= 0
     set(hObject, 'String', ValDefault);
-    errordlg('Input must be a real number','Error');
+    errordlg('Input must be a positive real number','Error');
     % when the input is not a number, it is set to the default value
 end
 if datEdit < CI.CD.x_sample(1) || datEdit > CI.CD.x_sample(end)
@@ -517,7 +504,7 @@ function pb_Plot_Callback(hObject, eventdata, handles)
 % hObject    handle to pb_Plot (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-Fcn_Plots(hObject)
+
 
 % --- Executes on selection change in pop2.
 function pop2_Callback(hObject, eventdata, handles)
