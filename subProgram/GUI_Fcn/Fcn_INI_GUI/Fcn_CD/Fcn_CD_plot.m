@@ -5,6 +5,7 @@ function Fcn_CD_plot(hAxes,handles,indexLegend)
 %
 global CI
 hFontsize1  = handles.FontSize(1);
+hFontsize2  = handles.FontSize(2);
 poshAxes    = get(handles.axes1,'position');
 WallLineWidth = 2;
 % -------------------------------------------------------------------------
@@ -110,7 +111,7 @@ switch indexLegend
                             'inlet','outlet',...
                             legend1,...
                             legend2);
-    set(hlegend,'fontsize',hFontsize1,'location','northeastoutside');
+    set(hlegend,'fontsize',hFontsize2,'location','northeastoutside');
     otherwise
 end
 set(handles.axes1,      'units', 'points',...

@@ -15,6 +15,7 @@ switch CI.IsRun.GUI_INI_TP    % This value is defined in the OSCILOS_Long.m
         set(handles.pb_Plot,            'enable','on');
         set(handles.pb_saveFig,         'enable','on');
         set(handles.pb_OK,              'enable','on');
+        set(handles.pop_plot,           'enable','on')
         %
         % --------------------inlet mean properties -----------------------
         %

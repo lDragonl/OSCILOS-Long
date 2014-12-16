@@ -30,12 +30,12 @@ switch pop_plot
                     y_plots(1:2,ss) = NaN;
             end   
         end
-        ylabel(hAxes,'$\bar{u}$ [m/s]','Color','k','Interpreter','LaTex','FontSize',handles.FontSize(1));
+        ylabel(hAxes,'$\overline{u}$ [m/s]','Color','k','Interpreter','LaTex','FontSize',handles.FontSize(1));
     case 2 % mean temperature
         for ss = 1:N-1
             y_plots(1:2,ss) = CI.TP.T_mean(1,ss);
         end
-        ylabel(hAxes,'$\bar{T}$ [K]','Color','k','Interpreter','LaTex','FontSize',handles.FontSize(1));
+        ylabel(hAxes,'$\overline{T}$ [K]','Color','k','Interpreter','LaTex','FontSize',handles.FontSize(1));
 end
 %
 for ss = 1:N-1

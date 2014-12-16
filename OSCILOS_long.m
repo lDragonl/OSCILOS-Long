@@ -313,7 +313,7 @@ switch indexLoadProg
     case 1
         Fcn_TD_main_calculation_without_identification_uRatio;
 end
-% Fcn_TD_main_calculation(1)
+set(handles.TD_Plots, 'enable','on')
 % --------------------------------------------------------------------
 function TD_Sensors_Actuators_Callback(hObject, eventdata, handles)
 % hObject    handle to TD_Sensors_Actuators (see GCBO)
@@ -335,6 +335,9 @@ function TD_Plots_Callback(hObject, eventdata, handles)
 % hObject    handle to TD_Plots (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+guidata(hObject,handles);
+handles=guidata(hObject);
+GUI_TD_Plot_Results('OSCILOS_long', handles.figure)
 
 function HP_Callback(hObject, eventdata, handles)
 % hObject    handle to HP (see GCBO)
@@ -612,7 +615,7 @@ set(handles.TD_Plots,...
                         'ForegroundColor',      handles.bgcolor{2},...
                         'Label',                'Results Output and plot ...',...
                         'Position',             5,...
-                        'visible',              'off',...
+                        'visible',              'on',...
                         'Accelerator',          '' )
 set(handles.HP,...
                         'Enable',   'on',...
