@@ -382,7 +382,7 @@ switch CI.IsRun.GUI_INI_FM_Sel
             set(handles.pop1,...
                                         'string',StringPop1,...
                                         'value',1);
-            set(handles.pop1,           'value',CI.FM.indexFM(1));
+            set(handles.pop2,           'value',CI.FM.indexFM(1))
             set(handles.pb_OK,          'enable','on');
         end
 end

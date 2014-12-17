@@ -107,6 +107,9 @@ switch CI.EIG.pop_PlotType
     case {11,12}  
         [x_resample,p,u] = Fcn_calculation_eigenmode_Linear(s_star);
     case {21,22}                             % nonlinear flame model
+        global HP
+        HP = CI.FM.HP{CI.FM.indexMainHPinHp};
+        assignin('base','HP',HP);
         FDF.num     = CI.EIG.FDF.num{indexShow};
         FDF.den     = CI.EIG.FDF.den{indexShow};
         FDF.tauf    = CI.EIG.FDF.tauf(indexShow);
