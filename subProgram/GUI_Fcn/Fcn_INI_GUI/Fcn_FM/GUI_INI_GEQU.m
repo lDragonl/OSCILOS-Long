@@ -51,102 +51,58 @@ function GUI_INI_GEQU_OpeningFcn(hObject, eventdata, handles, varargin)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 % varargin   command line arguments to GUI_INI_GEQU (see VARARGIN)
-handles.indexEdit = 0;
-switch handles.indexEdit 
-    case 0
-        %--------------------------------------------------------------------------
-        dontOpen = false;
-        mainGuiInput = find(strcmp(varargin, 'OSCILOS_long'));
-        if (isempty(mainGuiInput)) ...
-            || (length(varargin) <= mainGuiInput) ...
-            || (~ishandle(varargin{mainGuiInput+1}))
-            dontOpen = true;
-        else % load from the main GUI
-            % handles of main GUI
-            handles.MainGUI = varargin{mainGuiInput+1};
-            try
-                handles.ExampleGUI = varargin{mainGuiInput+2};
-            catch
-            end
-            % Obtain handles using GUIDATA with the caller's handle 
-            mainHandles = guidata(handles.MainGUI);
-            % background colors
-            handles.bgcolor=mainHandles.bgcolor;
-            % fontsize
-            handles.FontSize=mainHandles.FontSize;
-            %
-            handles.sW = mainHandles.sW;
-            handles.sH = mainHandles.sH;
-            handles.indexApp = 0;
-            GUI_INI_GEQU_global_value_Initialization
-            % Update handles structure
-            guidata(hObject, handles);
-            % Initialization
-            GUI_INI_GEQU_Initialization(hObject, eventdata, handles)
-        end
-        guidata(hObject, handles);
-        handles.output = hObject;
-        guidata(hObject, handles);
-        if dontOpen
-           disp('-----------------------------------------------------');
-           disp('This is a subprogram. It cannot be run independently.') 
-           disp('Please load the program "OSCILOS_long'' from the ')
-           disp('parent directory!')
-           disp('-----------------------------------------------------');
-        else
-%            uiwait(hObject);
-        end
-    case 1
-        global CI
-        handles.bgcolor{1} = [0.95, 0.95, 0.95];
-        handles.bgcolor{2} = [0, 0, 0];
-        handles.bgcolor{3} = [.75, .75, .75];
-        handles.bgcolor{4} = [0.90,0.90,1];
-        %
-        handles.sW  = 800;
-        handles.sH  = 600;
-        %
-        if ispc
-            handles.FontSize(1)=11;                 % set the default fontsize
-            handles.FontSize(2)=9;
-        else
-            handles.FontSize(1)=12;                 % set the default fontsize
-            handles.FontSize(2)=10;   
-        end
-        handles.indexApp = 0;
-        CI.IsRun.GUI_INI_GEQU = 0;
-        assignin('base','CI',CI);                   % save the current information to the works
-        GUI_INI_GEQU_global_value_Initialization
-        handles.indexApp = 0;
-        guidata(hObject, handles);  
-        GUI_INI_GEQU_Initialization(hObject, eventdata, handles)
-        % Choose default command line output for GUI_INI_GEQU
-        handles.output = hObject;
-        
-        % Update handles structure
-        guidata(hObject, handles);
-end
-
-
-function GUI_INI_GEQU_global_value_Initialization
 global CI
+mainGuiInput = 0;
+% handles of main GUI
+handles.MainGUI = varargin{mainGuiInput+1};
+% Obtain handles using GUIDATA with the caller's handle 
+mainHandles = guidata(handles.MainGUI);
+% background colors
+handles.bgcolor=mainHandles.bgcolor;
+% fontsize
+handles.FontSize=mainHandles.FontSize;
 %
-switch CI.IsRun.GUI_INI_GEQU
-    case 0
-        CI.FM.NL.style      = 4; % G-EQuation (Williams 1985)
-        CI.FM.NL.Model4.nb_points = 35; % Number of points used for discretisation along r
-        CI.FM.NL.Model4.rb = CI.CD.r_sample(CI.CD.index_flame); % If there are multiple heat zones in the duct, this is a vector
-        CI.FM.NL.Model4.ra   = CI.FM.NL.Model4.rb/2; % in m, also a vector
-        CI.FM.NL.Model4.U1 = CI.TP.u_mean(1,max(CI.CD.index_flame - 1,1)); % This is a vector if there are multple flame. The max function is required is the flame is at the begining of the duct.
-        CI.FM.NL.Model4.rho1 = CI.TP.u_mean(1,max(CI.CD.index_flame - 1,1));% This is a vector if there are multple flame. The max function is required is the flame is at the end of the duct.
-        CI.FM.NL.Model4.SU   = CI.FM.NL.Model4.U1 * 0.088; % in m/s, this is a vector if there are multple flame.
-        CI.FM.NL.Model4.time_integration = 1; % Set to adam bashforth
+handles.sW = mainHandles.sW;
+handles.sH = mainHandles.sH;
+handles.indexApp = 0;
+% --------------------------
+%
+handles.HP_num  = varargin{2};              % the index of unsteady heat source
+handles.indexFM = varargin{3};              % the index of flame model
+handles.HP = CI.FM.HP{handles.HP_num};
+guidata(hObject, handles);
+% --------------------------
+% Global initialisation : for variables if the GUI has never been called
+% yet
+if handles.HP.IsRun == 0
+    Fcn_GUI_INI_FM_GEQU_Var_initilisation(hObject, eventdata, handles)
+    handles = guidata(hObject);
+    guidata(hObject, handles);
 end
-assignin('base','CI',CI);                   % save the current information to the workspace
+
+% Initialization
+GUI_INI_GEQU_Initialization(hObject, eventdata, handles);
+%         end
+guidata(hObject, handles);
+handles.output = hObject;
+guidata(hObject, handles);
         
 % UIWAIT makes GUI_INI_GEQU wait for user response (see UIRESUME)
 % uiwait(handles.figure1);
-
+function Fcn_GUI_INI_FM_GEQU_Var_initilisation(varargin)
+hObject = varargin{1};
+handles = guidata(hObject);
+global CI
+handles.HP.NL.style      = 4; % G-EQuation (Williams 1985)
+handles.HP.GEQU.nb_points = 35; % Number of points used for discretisation along r
+handles.HP.GEQU.rb = CI.CD.r_sample(CI.CD.indexHP(handles.HP_num)); % If there are multiple heat zones in the duct, this is a vector
+handles.HP.GEQU.ra   = handles.HP.GEQU.rb/2; % in m, also a vector
+handles.HP.GEQU.U1 = CI.TP.u_mean(1,max(CI.CD.indexHP(handles.HP_num) - 1,1)); % This is a vector if there are multple flame. The max function is required is the flame is at the begining of the duct.
+handles.HP.GEQU.rho1 = CI.TP.u_mean(1,max(CI.CD.indexHP(handles.HP_num) - 1,1));% This is a vector if there are multple flame. The max function is required is the flame is at the end of the duct.
+handles.HP.GEQU.SU   = handles.HP.GEQU.U1 * 0.088; % in m/s, this is a vector if there are multple flame.
+handles.HP.GEQU.time_integration = 1; % Set to adam bashforth
+handles.HP.GEQU.dowst_of_heat_lengths = CI.CD.x_sample(min(CI.CD.indexHP(handles.HP_num) + 1,end)) - CI.CD.x_sample(CI.CD.indexHP(handles.HP_num));
+guidata(hObject, handles);
 %
 %-------------------------------------------------
 %
@@ -214,7 +170,7 @@ set(handles.edit_GEQU_a1,...
                         'Fontunits','points',...
                         'position',[pW*3.25/10 pH*5.25/10 pW*1.5/10 pH*2/10],...
                         'fontsize',handles.FontSize(2),...
-                        'string',0.1,...
+                        'string',1,...
                         'backgroundcolor',handles.bgcolor{1},...
                         'horizontalalignment','right',...
                         'Enable','on');
@@ -324,10 +280,10 @@ set(handles.obj_text_GEQU,          'visible','on')
 %
 %---------------------------------------
 guidata(hObject, handles);
-Fcn_GUI_INI_FM_GEQU_Value_update(hObject);
+%Fcn_GUI_INI_FM_GEQU_Value_update(hObject);
 handles = guidata(hObject);
 guidata(hObject, handles);
-Fcn_GUI_INI_FM_Plot_GEQU_Shape(hObject);
+%Fcn_GUI_INI_FM_Plot_GEQU_Shape(hObject);
 handles = guidata(hObject);
 guidata(hObject, handles);
 %
@@ -336,33 +292,33 @@ guidata(hObject, handles);
 function Fcn_GUI_INI_FM_GEQU_Value_update(varargin)
 hObject = varargin{1};
 handles = guidata(hObject);
-global CI
-% Get data from GUI cells
-CI.FM.NL.Model4.SU = str2num(get(handles.edit_GEQU_a1,'String')); % vector if multiple flames. str2num required here to be able to deal with vector inputs
-CI.FM.NL.Model4.tau_f_factor = str2num(get(handles.edit_GEQU_a2,'String'));
-CI.FM.NL.Model4.nb_points = str2num(get(handles.edit_GEQU_a3,'String')); % str2num required here to be able to deal with vector inputs
-CI.FM.NL.Model4.ra = str2num(get(handles.edit_GEQU_a4,'String'));
-% Compute important values
-CI.FM.NL.Model4.area_ratio = 1.0 -(CI.FM.NL.Model4.ra./CI.FM.NL.Model4.rb).^2; % vector if there are multiple flames
-CI.FM.NL.Model4.Ugs = Fcn_TD_Gequ_calc_ugutter( CI.FM.NL.Model4.U1,CI.FM.NL.Model4.area_ratio,0,0 ); % vector if there are multiple flames
-CI.FM.NL.Model4.tau_f = CI.FM.NL.Model4.tau_f_factor .* CI.CD.dowst_of_heat_lengths./CI.FM.NL.Model4.Ugs; % vector of time delays for everyflame in the duct
+%global CI
 
-for runner = 1:length(CI.FM.NL.Model4.ra)
-    CI.FM.NL.Model4.y_vec(runner,:) = linspace(CI.FM.NL.Model4.ra(runner),CI.FM.NL.Model4.rb(runner),CI.FM.NL.Model4.nb_points(runner)); % currently the nb of points for all flames nees to be the same
+% Get data from GUI cells
+handles.HP.GEQU.SU = str2num(get(handles.edit_GEQU_a1,'String')); % vector if multiple flames. str2num required here to be able to deal with vector inputs
+handles.HP.GEQU.tau_f_factor = str2num(get(handles.edit_GEQU_a2,'String'));
+handles.HP.GEQU.nb_points = str2num(get(handles.edit_GEQU_a3,'String')); % str2num required here to be able to deal with vector inputs
+handles.HP.GEQU.ra = str2num(get(handles.edit_GEQU_a4,'String'));
+% Compute important values
+handles.HP.GEQU.area_ratio = 1.0 -(handles.HP.GEQU.ra./handles.HP.GEQU.rb).^2; % vector if there are multiple flames
+handles.HP.GEQU.Ugs = Fcn_TD_Gequ_calc_ugutter( handles.HP.GEQU.U1,handles.HP.GEQU.area_ratio,0,0 ); % vector if there are multiple flames
+handles.HP.GEQU.tau_f = handles.HP.GEQU.tau_f_factor .* handles.HP.GEQU.dowst_of_heat_lengths./handles.HP.GEQU.Ugs; % vector of time delays for everyflame in the duct
+
+for runner = 1:length(handles.HP.GEQU.ra)
+    handles.HP.GEQU.y_vec(runner,:) = linspace(handles.HP.GEQU.ra(runner),handles.HP.GEQU.rb(runner),handles.HP.GEQU.nb_points(runner)); % currently the nb of points for all flames nees to be the same
 end
-CI.FM.NL.Model4.area_ratio = 1.0 -(CI.FM.NL.Model4.ra./CI.FM.NL.Model4.rb).^2; % vector if there are multiple flames
-CI.FM.NL.Model4.Ugs = Fcn_TD_Gequ_calc_ugutter( CI.FM.NL.Model4.U1,CI.FM.NL.Model4.area_ratio,0,0 ); % vector if there are multiple flames
-CI.FM.NL.Model4.xi_steady       = ...
-    Fcn_TD_Gequ_steady_flame( CI.FM.NL.Model4.Ugs,CI.FM.NL.Model4.SU,CI.FM.NL.Model4.y_vec ); % If there are multiple flame, this is a matrix (lines are flames in different sections, columns come along r)
-CI.FM.NL.Model4.xi = CI.FM.NL.Model4.xi_steady; % initialise xi value
-CI.FM.NL.Model4.bashforth_data = zeros(length(CI.FM.NL.Model4.rb),max(CI.FM.NL.Model4.nb_points),3); % Three dimentional matrix for three step adam bashforth
+handles.HP.GEQU.area_ratio = 1.0 -(handles.HP.GEQU.ra./handles.HP.GEQU.rb).^2; % vector if there are multiple flames
+handles.HP.GEQU.Ugs = Fcn_TD_Gequ_calc_ugutter( handles.HP.GEQU.U1,handles.HP.GEQU.area_ratio,0,0 ); % vector if there are multiple flames
+handles.HP.GEQU.xi_steady       = ...
+    Fcn_TD_Gequ_steady_flame( handles.HP.GEQU.Ugs,handles.HP.GEQU.SU,handles.HP.GEQU.y_vec ); % If there are multiple flame, this is a matrix (lines are flames in different sections, columns come along r)
+handles.HP.GEQU.xi = handles.HP.GEQU.xi_steady; % initialise xi value
+handles.HP.GEQU.bashforth_data = zeros(length(handles.HP.GEQU.rb),max(handles.HP.GEQU.nb_points),3); % Three dimentional matrix for three step adam bashforth
 
 % Set the flame transfer function numerator and denominator to
 % 1, as they are used for the Green's function initilisation,
-CI.FM.FTF.num = 1;
-CI.FM.FTF.den = 1;
+handles.HP.FTF.num = 1;
+handles.HP.FTF.den = 1;
         
-assignin('base','CI',CI);                   % save the current information to the workspace
 guidata(hObject, handles);
 %
 % ------------------------------------------------------------------------
@@ -373,13 +329,19 @@ function pb_OK_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 Fcn_GUI_INI_FM_GEQU_Value_update(hObject, eventdata, handles)
-Fcn_GUI_INI_FM_Plot_GEQU_Shape(hObject, eventdata, handles)
-Fcn_GUI_INI_FM_GEQU_Update_Data(hObject, eventdata, handles)
 handles = guidata(hObject);
 guidata(hObject, handles);
+Fcn_GUI_INI_FM_Plot_GEQU_Shape(hObject, eventdata, handles)
+handles = guidata(hObject);
+handles.HP.IsRun = 1;    % index == 1 to show that this program has been run
+guidata(hObject, handles);
 global CI
-CI.IsRun.GUI_INI_GEQU = 1;
+CI.FM.HP{handles.HP_num}        = handles.HP;
+CI.FM.indexFM(handles.HP_num)   = handles.indexFM;
 assignin('base','CI',CI); 
+handles = guidata(hObject);
+guidata(hObject, handles);
+Fcn_GUI_INI_FM_GEQU_Update_Data(hObject, eventdata, handles)
 delete(handles.figure);
 %
 % ------------------------------------------------------------------------
@@ -401,40 +363,26 @@ guidata(hObject, handles);
 function Fcn_GUI_INI_FM_GEQU_Update_Data(hObject, eventdata, handles)
 handles = guidata(hObject);
 global CI
-switch handles.indexEdit 
-    case 0
-    main = handles.MainGUI;
-    % Obtain handles using GUIDATA with the caller's handle 
-    if(ishandle(main))
-        mainHandles = guidata(main);
-        changeMain = mainHandles.INI_BC;
-        set(changeMain, 'Enable', 'on');
-        String_Listbox=get(mainHandles.listbox_Info,'string');
-        ind=find(ismember(String_Listbox,'<HTML><FONT color="blue">Information 3:'));
-        nLength=size(String_Listbox);
-        if isempty(ind)
-            indStart=nLength(1);
-        else
-            indStart=ind-1;
-            for i=nLength(1):-1:indStart+1 
-                String_Listbox(i)=[];
-            end
-        end
-        String_Listbox{indStart+1}=['<HTML><FONT color="blue">Information 3:'];
-        String_Listbox{indStart+2}=['<HTML><FONT color="blue">G-Equation Flame Model has been selected.'];
-        String_Listbox{indStart+3}=['The laminar burning velocity(s) are:'];
-        String_Listbox{indStart+4}=[num2str(CI.FM.NL.Model4.SU)];
-        String_Listbox{indStart+5}=['The flame holder radius(s) are:'];
-        String_Listbox{indStart+6}=[num2str(CI.FM.NL.Model4.ra)];
-        String_Listbox{indStart+7}=['The time delay factor(s) are:'];
-        String_Listbox{indStart+8}=[num2str(CI.FM.NL.Model4.tau_f_factor)];
-        set(mainHandles.listbox_Info,'string',String_Listbox);
+main = handles.MainGUI;
+if(ishandle(main))
+    mainHandles = guidata(main);
+    changeMain = mainHandles.uitable1;
+    table_cell = get(changeMain, 'data');
+    table_cell{handles.HP_num,1}= CI.FM.ModelType{handles.indexFM};
+    table_cell{handles.HP_num,2}= 'Y';
+    set(changeMain,'data',table_cell);  % change the table 
+    % -----------
+    N = length(CI.FM.indexFM);
+    for ss = 1:N
+        HP = CI.FM.HP{ss};
+        isRunSp(ss) = HP.IsRun;
     end
-    otherwise
+    if isRunSp == 1
+        changeMain2 = mainHandles.pb_OK;
+        set(changeMain2, 'enable','on');
+    end
 end
 guidata(hObject, handles);
-% guidata(hObject, handles);
-assignin('base','CI',CI);                   % save the current information to the workspace
 %
 % ------------------------------------------------------------------------
 % 
@@ -447,7 +395,6 @@ global CI
 try
 x_sample    = CI.CD.x_sample;                
 r_sample    = CI.CD.r_sample;
-index_flame = CI.CD.index_flame;
 %-------------------------------------
 W           = abs(x_sample(end) - x_sample(1));             % Length of the combustor
 H           = 2*max(r_sample);                              % Diameter of the combustor
@@ -473,17 +420,21 @@ end
 %--------------------------------------
 % Plot the flame holder
 flame_holder_length = 0.01; % in m
-for s = 1:length(index_flame)
-rectangle(  'Position',1000*[x_sample(index_flame(s)) - flame_holder_length,-CI.FM.NL.Model4.ra(s),...
+ % This loop isn't erally required, as each time we are only plotting one flame. 
+ % Still its good to keep the code general
+for s = 1:length(CI.CD.indexHP(handles.HP_num))
+rectangle(  'Position',1000*[x_sample(CI.CD.indexHP(handles.HP_num(s))) - flame_holder_length,-handles.HP.GEQU.ra(s),...
                 flame_holder_length,...
-                2*CI.FM.NL.Model4.ra(s)],...
+                2*handles.HP.GEQU.ra(s)],...
                 'Curvature',[0,0],'LineWidth',1,'LineStyle','-','facecolor','b');
 end
 
+ % This loop isn't erally required, as each time we are only plotting one flame. 
+ % Still its good to keep the code general
 %plot the flame sheet
-for s = 1:length(index_flame)
-plot(1000 * CI.FM.NL.Model4.xi(s,:) + 1000 *x_sample(index_flame(s)), 1000* CI.FM.NL.Model4.y_vec(s,:),'-r',...
-    1000 * CI.FM.NL.Model4.xi(s,:) + 1000 *x_sample(index_flame(s)), -1000 * CI.FM.NL.Model4.y_vec(s,:),'-r')
+for s = 1:length(CI.CD.indexHP(handles.HP_num))
+plot(1000 * handles.HP.GEQU.xi(s,:) + 1000 *x_sample(CI.CD.indexHP(handles.HP_num(s))), 1000* handles.HP.GEQU.y_vec(s,:),'-r',...
+    1000 * handles.HP.GEQU.xi(s,:) + 1000 *x_sample(CI.CD.indexHP(handles.HP_num(s))), -1000 * handles.HP.GEQU.y_vec(s,:),'-r')
 end
 
 set(hAxes,'xlim',1000*[x_min, x_min+axes_W]);

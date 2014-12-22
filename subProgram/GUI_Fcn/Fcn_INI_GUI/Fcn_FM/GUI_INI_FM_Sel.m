@@ -432,6 +432,7 @@ switch indexFM
         HP.FMEXP.nFTF           = 0;
         HP.FMEXP.indexModify    = 0;
     case 4
+        
 end
 %
 % --- Executes on button press in pb_Edit.
@@ -465,7 +466,8 @@ switch indexFM
         GUI_INI_FM(handles.figure, HP_num, indexFM);
     case 3
         GUI_INI_FMEXP(handles.figure, HP_num, indexFM);
-    case 4
+    case 4 % G-equation case
+        GUI_INI_GEQU(handles.figure, HP_num, indexFM);
 end
 assignin('base','CI',CI);
 guidata(hObject, handles);
