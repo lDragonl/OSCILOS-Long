@@ -48,7 +48,7 @@ if ~isempty(CI.CD.indexHP)    % if there are heat perturbations
             case 4
                  % ************* need further change **************
                 taufNLimit      = 0;  % G-equation
-                taufLimit = CI.FM.NL.Model4.tau_f + taufNLimit;
+                taufLimit = HP.GEQU.tau_f + taufNLimit;
                  % ************* need further change **************s
         end
         tauPadding = max(tauPadding, max(taufLimit));

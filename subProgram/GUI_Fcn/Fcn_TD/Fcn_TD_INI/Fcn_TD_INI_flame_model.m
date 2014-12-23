@@ -37,7 +37,7 @@ if ~isempty(CI.CD.indexHP)    % if there are heat perturbations
                 % ************* need further change **************
             case 4 % G-equation case, these are filled to coherency with other models. 
                 Lf(ss) = 1;
-                tauf(ss) = CI.FM.NL.Model4.tau_f;
+                tauf(ss) = HP.GEQU.tau_f;
                 % ************* need further change **************
             otherwise
         end

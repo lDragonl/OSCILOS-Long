@@ -46,7 +46,7 @@ if ~isempty(CI.CD.indexHP)    % if there are heat perturbations
                 error('The current version does not support this situation!')
                 % ************* need further change **************
             case 4 % G-equation, the time delay here is fixed through GUI  
-                taufMin(ss) = CI.FM.NL.Model4.tau_f;
+                taufMin(ss) = HP.GEQU.tau_f;
                 % ************* need further change **************
         end
         taufMin0 = min(taufMin);

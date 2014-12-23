@@ -21,7 +21,7 @@ Fcn_TD_results_plot                                     % Plot the result
 % load from OSCILOS_long.m file
 function Fcn_TD_main_calculation_with_GUI
 global CI
-switch CI.FM.NL.style                                                           
+switch CI.FM.indexFM(1) % at the moment all flame models must be the same for all flames                                                          
     case 3
         GUI_TD_Cal_JLI_AMorgans('OSCILOS_long', handles.figure);   
     otherwise
@@ -55,14 +55,14 @@ hWaitBar = waitbar(0,'Time domain calculations, please wait...');
 for mm = 1:CI.TD.nPeriod
     waitbar(mm/CI.TD.nPeriod);
     drawnow
-    switch CI.FM.NL.style
+    switch CI.FM.indexFM(1) % at the moment all flame models must be the same for all flames    
         case 3
             Iteration.tol = 1e-5;
             Iteration.num = 50;
             Fcn_TD_main_calculation_iteration_convergence(mm,Iteration)
             
         case 4 % G-equation
-            CI.FM.NL.Model4.IT = mm;
+            CI.TD.IT = mm;
             % --------------------------
             Fcn_TD_calculation_one_period(mm)
             % --------------------------

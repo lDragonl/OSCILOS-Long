@@ -71,15 +71,15 @@ for ss = 1:CI.TP.numSection-1
             indexHP_num = indexHP_num + 1;
             if CI.FM.indexFM(indexHP_num) == 4  % In the case of the G-equation, the value of qratio is computed from a pde, not from a transfer function using Greens function
                 
-                CI.TD.uRatio(indexHP_num,Var(1):Var(2)) = Fcn_TD_calculation_uRatio(Var,ss, indexHP_num); % compute the values of uratio in every section
-                
+                CI.TD.uRatio(indexHP_num,Var(1):Var(2)) = Fcn_TD_calculation_uRatio(Var,ss, indexHP_num); % compute the values of uratio in this section
+                           
                 % Compute the flame shape and area
-                [CI.FM.NL.Model4.q_ratio(indexHP_num ),CI.FM.NL.Model4.xi(indexHP_num ,:),CI.FM.NL.Model4.bashforth_data(indexHP_num ,:,:) ] = Fcn_TD_Gequ_interface...
-                ( CI.FM.NL.Model4.SU(indexHP_num ), CI.FM.NL.Model4.xi(indexHP_num ,:), CI.FM.NL.Model4.y_vec(indexHP_num ,:), CI.TD.dt, 0, CI.FM.NL.Model4.U1(indexHP_num ), ...
-                CI.FM.NL.Model4.area_ratio(indexHP_num ), CI.TD.uRatio(indexHA_num,Var(1):Var(2)),CI.TP.Q(indexHA_num) * CI.FM.NL.Model4.area_ratio(indexHP_num ), CI.TP.DeltaHr(indexHA_num),...
-                CI.FM.NL.Model4.rho1(indexHP_num ),CI.FM.NL.Model4.bashforth_data(indexHP_num ,:,:),CI.FM.NL.Model4.IT,CI.FM.NL.Model4.time_integration); % In this case CI.TD.uRatio(indexHA_num,Var(1):Var(2)) this is a scalar
+                [CI.FM.HP{indexHP_num}.GEQU.q_ratio,CI.FM.HP{indexHP_num}.GEQU.xi,CI.FM.HP{indexHP_num}.GEQU.bashforth_data ] = Fcn_TD_Gequ_interface...
+                ( CI.FM.HP{indexHP_num}.GEQU.SU, CI.FM.HP{indexHP_num}.GEQU.xi, CI.FM.HP{indexHP_num}.GEQU.y_vec, CI.TD.dt, 0, CI.FM.HP{indexHP_num}.GEQU.U1, ...
+                CI.FM.HP{indexHP_num}.GEQU.area_ratio, CI.TD.uRatio(indexHP_num,Var(1):Var(2)),CI.TP.Q(indexHA_num) * CI.FM.HP{indexHP_num}.GEQU.area_ratio, CI.TP.DeltaHr(indexHA_num),...
+                CI.FM.HP{indexHP_num}.GEQU.rho1,CI.FM.HP{indexHP_num}.GEQU.bashforth_data,CI.TD.IT,CI.FM.HP{indexHP_num}.GEQU.time_integration); % In this case CI.TD.uRatio(indexHA_num,Var(1):Var(2)) is a scalar
                 
-                CI.TD.qRatio(indexHP_num ,Var(1):Var(2)) = CI.FM.NL.Model4.q_ratio(indexHP_num ); % This is a scalar
+                CI.TD.qRatio(indexHP_num ,Var(1):Var(2)) = CI.FM.HP{indexHP_num}.GEQU.q_ratio; % This is a scalar
               
             elseif CI.FM.indexFM(indexHP_num) < 3
                 indexHPTF_num = indexHPTF_num + 1;
