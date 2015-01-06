@@ -295,9 +295,9 @@ popData     = get(handles.pop1,'Value');   % data type
 popPlot     = get(handles.pop2,'Value');   % plot type
 x           = str2double(get(handles.edit1,'string'));
 if x > CI.CD.x_sample(end) || x < CI.CD.x_sample(1)
-    StrWarning = ['The axial position is out of the chamber! Choose a value between '...
-        num2str(CI.CD.x_sample(1)) ' m and ' num2str(CI.CD.x_sample(end)) ' m!' ];
-    errordlg(StrWarning,'Error');
+    StrWarning = ['The axial position is out of the chamber! Choose a value between'...
+        CI.CD.x_sample(1) ' m and ' CI.CD.x_sample(e) ]
+    errordlg('The axial position is out of the chamber! Choose a value between','Error');
 else
     % ----------------------------------------
     [pPrime, uPrime] = Fcn_calculate_u_p_perturbations_at_a_give_position(x);

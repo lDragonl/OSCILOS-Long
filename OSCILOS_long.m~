@@ -131,23 +131,26 @@ switch selection
     if filename~=0
         load(filename);    
     end
-    try
+%     try
     assignin('base','CI',CI)
     Menu{1} = findobj('-regexp','Tag','FILE');
     Menu{2} = findobj('-regexp','Tag','INI');
     Menu{3} = findobj('-regexp','Tag','FREQ');
     Menu{4} = findobj('-regexp','Tag','TD');
+
     for ss = 1 : length(Menu)
-        a1 = Menu{ss};
-        a2 = CI.Menu.Enable{ss};
-        a3 = CI.Menu.Visible{ss};
-        for kk = 1 : length(a1)
-        set(a1(kk),     'enable',a2{kk},...
-                        'visible',a3{kk});
+        a = Menu{ss}
+        b = 
+        for kk = 1 : length(a)
+        set(a{kk},      'enable',CI.Menu.Enable{ss},...
+                        'visible', CI.Menu.Visible{ss});
         end
     end
-    catch
-    end
+%     CI.Menu.Enable{ss}  = get(Menu{ss},'enable');
+%     CI.Menu.Visible{ss} = get(Menu{ss},'visible');
+%     CI.Menu.Lable{ss}   = get(Menu{ss},'label');
+%     catch
+%     end
 %     ------------------------------
 %     try
 %         if CI.IsRun.GUI_INI_CD == 1;

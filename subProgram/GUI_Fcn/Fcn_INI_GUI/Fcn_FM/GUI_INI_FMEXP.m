@@ -632,7 +632,7 @@ pos2                = get(hAxes(2),'position');
 posAxesOuter = [0 0 600 600];
 hChildren = get(hAxes(2), 'children');
 for ss = 1:round((length(hChildren))/2)
-set(get(get(hChildren(ss),'Annotation'),'LegendInformation'),'IconDisplayStyle','on'); 
+set(get(get(hChildren(ss),'Annotation'),'LegendInformation'),'IconDisplayStyle','off'); 
 set(hChildren(ss),'DisplayName',['$\hat{u}_1/\bar{u}_1=$' num2str(HP.FMEXP.uRatio(end+1-ss))]);
 end
 axes(hAxes(2))

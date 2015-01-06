@@ -446,7 +446,7 @@ global CI
 set(handles.edit_a1, 'string', num2str(CI.TD.tauMin));
 set(handles.edit_a2, 'string', num2str(CI.TD.tEndRaw));
 set(handles.edit_a3, 'string', num2str(CI.TD.dt));
-set(handles.edit_d1, 'string', num2str(CI.TD.nGapMax));
+set(handles.edit_d2, 'string', num2str(CI.TD.nGap));
 set(handles.edit_d2, 'string', num2str(CI.TD.nGap));
 set(handles.edit_b1, 'string', num2str(CI.TD.uRatioMax));
 set(handles.edit_c1, 'string', num2str(CI.TD.NoiseInfo.t(1)));

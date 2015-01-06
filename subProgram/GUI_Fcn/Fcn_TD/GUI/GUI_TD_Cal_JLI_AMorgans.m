@@ -22,7 +22,7 @@ function varargout = GUI_TD_Cal_JLI_AMorgans(varargin)
 
 % Edit the above text to modify the response to help GUI_TD_Cal_JLI_AMorgans
 
-% Last Modified by GUIDE v2.5 16-Dec-2014 11:54:15
+% Last Modified by GUIDE v2.5 05-Jan-2015 14:09:19
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -52,7 +52,7 @@ function GUI_TD_Cal_JLI_AMorgans_OpeningFcn(hObject, eventdata, handles, varargi
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 % varargin   command line arguments to GUI_TD_Cal_JLI_AMorgans (see VARARGIN)
-indexEdit = 1;
+indexEdit = 0;
 switch indexEdit 
     case 0
         %--------------------------------------------------------------------------
@@ -122,7 +122,7 @@ set(0, 'units', 'points');
 screenSize  = get(0, 'ScreenSize');                             % get the screen size
 sW          = handles.sW;                                       % screen width
 sH          = handles.sH;                                       % screen height
-FigW        = sW.*1/2;                                          % window width
+FigW        = sW.*11/20;                                          % window width
 FigH        = sH.*3/5;                                          % window height
 set(handles.figure,     'units', 'points',...
                         'position',[(screenSize(3)-FigW)./2 (screenSize(4)-FigH)./2 FigW FigH],...
@@ -232,45 +232,49 @@ set(handles.uipanel_AOC,...
                         'backgroundcolor',handles.bgcolor{3}); 
 pannelsize=get(handles.uipanel_AOC,'position');                    
 pW=pannelsize(3);
-pH=pannelsize(4);                
-set(handles.pb_OK,      'units', 'points',...
-                        'Fontunits','points',...
-                        'position',[pW*4.0/10 pH*2/10 pW*2.0/10 pH*6/10],...
-                        'fontsize',handles.FontSize(2),...
-                        'string','Calculate',...
-                        'backgroundcolor',handles.bgcolor{3});
+pH=pannelsize(4);    
 set(handles.pb_Config,....
                         'units', 'points',...
                         'Fontunits','points',...
-                        'position',[pW*1/10 pH*2/10 pW*2/10 pH*6/10],...
+                        'position',[pW*0.5/10 pH*2/10 pW*1.8/10 pH*6/10],...
                         'fontsize',handles.FontSize(2),...
                         'string','Configuration',...
                         'backgroundcolor',handles.bgcolor{3});
-set(handles.pb_SaveFig,...
+set(handles.pb_Cal,      'units', 'points',...
+                        'Fontunits','points',...
+                        'position',[pW*2.9/10 pH*2/10 pW*1.8/10 pH*6/10],...
+                        'fontsize',handles.FontSize(2),...
+                        'string','Calculate',...
+                        'backgroundcolor',handles.bgcolor{3});
+set(handles.pb_OK,...
                         'units', 'points',...
                         'Fontunits','points',...
-                        'position',[pW*1/10 pH*2/10 pW*2.5/10 pH*6/10],...
+                        'position',[pW*5.3/10 pH*2/10 pW*1.8/10 pH*6/10],...
                         'fontsize',handles.FontSize(2),...
-                        'string','Save figure',...
+                        'string','OK',...
                         'backgroundcolor',handles.bgcolor{3},...
                         'enable','on',...
-                        'visible','off'); 
+                        'visible','on'); 
 set(handles.pb_Cancel,....
                         'units', 'points',...
                         'Fontunits','points',...
-                        'position',[pW*7/10 pH*2/10 pW*2/10 pH*6/10],...
+                        'position',[pW*7.7/10 pH*2/10 pW*1.8/10 pH*6/10],...
                         'fontsize',handles.FontSize(2),...
                         'string','Cancel',...
                         'backgroundcolor',handles.bgcolor{3});
 %
 guidata(hObject, handles);  
 
-% Fcn_Pre_calculation(hObject) 
-% handles = guidata(hObject);
-% guidata(hObject, handles);  
-% Fcn_Update_Plots(hObject);
-% handles = guidata(hObject);
-% guidata(hObject, handles); 
+switch CI.IsRun.GUI_TD_Cal_JLI_AMorgans
+    case 1
+        Fcn_Plots(hObject)
+        Fcn_set_ui_enable(hObject,handles,1);
+        text1 = [num2str(CI.TD.nPeriod) '/' num2str(CI.TD.nPeriod)];
+        set(handles.edit_a1, 'string', text1);
+        set(handles.edit_a2, 'string', num2str(CI.TD.JLI.error));
+    otherwise
+end
+
 %
 % -------------------------------------------------------------------------
 function Fcn_main_calculation_JLI_AMorgans(varargin)
@@ -333,6 +337,7 @@ for mm = 1:CI.TD.nPeriod
     % We only calculate this envelope, no others!!!
     CI.TD.uRatioEnv(Var(1):Var(2)) = uRatioEnv2((Var(1):Var(2))-CI.TD.nPadding);
 end
+CI.TD.JLI.error = error;
 assignin('base','CI',CI);
 Fcn_set_ui_enable(hObject,handles,1);
 
@@ -378,9 +383,9 @@ end
 %
 % -------------------------------------------------------------------------
 %
-% --- Executes on button press in pb_OK.
-function pb_OK_Callback(hObject, eventdata, handles)
-% hObject    handle to pb_OK (see GCBO)
+% --- Executes on button press in pb_Cal.
+function pb_Cal_Callback(hObject, eventdata, handles)
+% hObject    handle to pb_Cal (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 Fcn_main_calculation_JLI_AMorgans(hObject)
@@ -396,22 +401,22 @@ delete(handles.figure);
 %
 % -------------------------------------------------------------------------
 %
-% --- Executes on button press in pb_SaveFig.
-function pb_SaveFig_Callback(hObject, eventdata, handles)
+% --- Executes on button press in pb_OK.
+function pb_OK_Callback(hObject, eventdata, handles)
 handles         = guidata(hObject);
-Fig             = figure;
-copyobj(handles.axes1, Fig);
-set(Fig,        'units','points')
-posFig          = get(handles.figure,'position');
-hAxes           = get(Fig,'children');
-set(hAxes(1),       'units','points',...
-                    'position',[60 60 400 400],...
-                    'ActivePositionProperty','position')
-posAxesOuter    = [0 0 500 500];
-set(Fig,        'units','points',...
-                'position', [   posFig(1)+0.5*posFig(3)-0.5*posAxesOuter(3),...
-                                posFig(2)+0.5*posFig(4)-0.5*posAxesOuter(4),...
-                                posAxesOuter(3:4)]) 
+global CI
+CI.IsRun.GUI_TD_Cal_JLI_AMorgans = 1;
+assignin('base','CI',CI)
+%
+%
+main = handles.MainGUI;                     % get the handle of OSCILOS_long
+if(ishandle(main))
+    mainHandles = guidata(main);            %
+   set(mainHandles.TD_Plots, 'enable' , 'on') 
+end
+guidata(hObject, handles);
+delete(handles.figure);
+
 %
 % -------------------------------------------------------------------------
 %
@@ -493,13 +498,13 @@ function Fcn_set_ui_enable(hObject,handles,indexValiable)
 switch indexValiable
     case 0
         set(handles.pb_Config,      'enable','off');
-        set(handles.pb_SaveFig,     'enable','off');
         set(handles.pb_OK,          'enable','off');
+        set(handles.pb_Cal,         'enable','off');
         set(handles.pb_Cancel,      'enable','off');
     case 1
         set(handles.pb_Config,      'enable','on');
-        set(handles.pb_SaveFig,     'enable','on');
         set(handles.pb_OK,          'enable','on');
+        set(handles.pb_Cal,         'enable','on');
         set(handles.pb_Cancel,      'enable','on');
 end
 % --- Executes during object creation, after setting all properties.
