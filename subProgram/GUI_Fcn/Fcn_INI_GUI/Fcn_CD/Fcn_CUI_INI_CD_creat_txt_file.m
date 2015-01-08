@@ -17,7 +17,7 @@ data        = cat(1,x_sample,r_sample,SectionIndex,TubeIndex);
 currentFolder   = pwd;
 currentFolder   = fullfile(currentFolder,CI.SD.name_program,'CD_example.txt');
 fid             = fopen(currentFolder,'wt');
-data_title      = {'x[m]','r[m]','SectionIndex','TubeIndex'};
+data_title      = {'x[m]','r[m]','InterfaceIndex','ModuleIndex'};
 fprintf(fid,'%s\b',data_title{1:end});
 fprintf(fid,'\n');
 fprintf(fid,'%6.5f\b%6.5f\b%6.0f\b%6.0f\b\n',data);
