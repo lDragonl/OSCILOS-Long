@@ -143,7 +143,7 @@ FigW        = sW.*1/2;                                          % window width
 FigH        = sH.*4/5;                                          % window height
 set(handles.figure,     'units', 'points',...
                         'position',[(screenSize(3)-FigW)./2 (screenSize(4)-FigH)./2 FigW FigH],...
-                        'name','Green''function examination',...
+                        'name','Greens''s function examination',...
                         'color',handles.bgcolor{3});
 %----------------------------------------
 set(handles.uipanel_Msg,...
@@ -161,7 +161,7 @@ pW=pannelsize(3);
 pH=pannelsize(4); 
 msg={   '<HTML><FONT color="blue">This GUI is used examine the convergence of the Green''s function of each tranfer function;';...
         '<HTML><FONT color="blue">The inlet and outlet boundaries are needed to be checked:';...
-        '<HTML><FONT color="blue">The flame transfer functions are needed to be checked;'};
+        '<HTML><FONT color="blue">The flame transfer functions need to be checked;'};
 set(handles.listbox1,...
                         'units', 'points',...
                         'fontunits','points',...
@@ -422,14 +422,24 @@ fontSize1   = handles.FontSize(1);
 ss          = get(handles.pop_type,'Value');
 global Green
 try
-    delete(hl)
+    delete(h1)
+    delete(h2)
 catch
 end
 cla(hAxes1)
 axes(hAxes1)
 hold on
-plot(hAxes1,Green.t1{ss}.*1e3,Green.y1{ss},'-','color','b','Linewidth',2); 
-plot(hAxes1,Green.t2{ss}.*1e3,Green.y2{ss},'--','color','r','Linewidth',1); 
+h1 = plot(hAxes1,Green.t1{ss}.*1e3,Green.y1{ss},'-','color','b','Linewidth',2); 
+h2 = plot(hAxes1,Green.t2{ss}.*1e3,Green.y2{ss},'--','color','r','Linewidth',1); 
+% tMax = max(max(Green.t1{ss}),max(Green.t2{ss}));
+% tMinUD = 0;
+% if tMax <= 0
+%     tMaxUD = 10;
+% else
+%     tMaxUD = ceil((tMax./floor(log10(tMax)))).*floor(log10(tMax));
+% end
+%     
+set(hAxes1,'xlimmode','auto','ylimmode','auto')
 set(hAxes1,'YColor','k','Box','on','ygrid','on','xgrid','on');
 set(hAxes1,'FontName','Helvetica','FontSize',fontSize1,'LineWidth',1)
 xlabel(hAxes1,'Time [ms]','Color','k','Interpreter','LaTex','FontSize',fontSize1);
@@ -448,6 +458,7 @@ global Green
 ss = get(handles.pop_type,'Value');
 set(handles.edit_a1, 'string', num2str(Green.tauConv1(ss).*1e3));
 set(handles.edit_a2, 'string', num2str(Green.tauConv2(ss).*1e3));
+guidata(hObject, handles);
 Fcn_Update_Plots(hObject)
 handles = guidata(hObject);
 guidata(hObject, handles);
