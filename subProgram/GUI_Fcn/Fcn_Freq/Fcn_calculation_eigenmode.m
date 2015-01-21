@@ -12,7 +12,7 @@ for ss = 1:CI.TP.numSection-1
     D1 = diag([ exp(-s_star*tau_plus(ss)),...
                 exp( s_star*tau_minus(ss)),...
                 exp(-s_star*tau_c(ss))]);
-    switch CI.CD.index(ss+1)
+    switch CI.CD.SectionIndex(ss+1)
         case 0
         case 1
             B2b     = zeros(3);

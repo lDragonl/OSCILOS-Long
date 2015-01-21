@@ -28,7 +28,7 @@ function varargout = OSCILOS_long(varargin)
 
 % Edit the above text to modify the response to help OSCILOS_long
 
-% Last Modified by GUIDE v2.5 14-Nov-2014 21:15:22
+% Last Modified by GUIDE v2.5 21-Nov-2014 14:43:29
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -133,27 +133,62 @@ switch selection
     end
     try
     assignin('base','CI',CI)
+    Menu{1} = findobj('-regexp','Tag','FILE');
+    Menu{2} = findobj('-regexp','Tag','INI');
+    Menu{3} = findobj('-regexp','Tag','FREQ');
+    Menu{4} = findobj('-regexp','Tag','TD');
+    for ss = 1 : length(Menu)
+        a1 = Menu{ss};
+        a2 = CI.Menu.Enable{ss};
+        a3 = CI.Menu.Visible{ss};
+        for kk = 1 : length(a1)
+        set(a1(kk),     'enable',a2{kk},...
+                        'visible',a3{kk});
+        end
+    end
     catch
     end
-    % ------------------------------
-    try
-        if CI.IsRun.GUI_INI_CD == 1;
-            set(handles.INI_TP,         'enable','on')
-        end
-        if CI.IsRun.GUI_INI_TP == 1;
-            set(handles.INI_FM,         'enable','on')
-        end
-        if CI.IsRun.GUI_INI_FM == 1 || CI.IsRun.GUI_INI_FMEXP == 1;
-            set(handles.INI_BC,         'enable','on')
-        end
-        if CI.IsRun.GUI_INI_BC == 1;
-            set(handles.FREQ,           'enable','on')
-            set(handles.FREQ_EigCal,    'enable','on')
-        end
-    catch
-    end
-  case 'No'
-  return 
+%     ------------------------------
+%     try
+%         if CI.IsRun.GUI_INI_CD == 1;
+%             set(handles.INI_TP,         'enable','on')
+%         end
+%         if CI.IsRun.GUI_INI_TP == 1;
+%             set(handles.INI_FM,         'enable','on')
+%         end
+%         if CI.IsRun.GUI_INI_FM == 1 || CI.IsRun.GUI_INI_FMEXP == 1 || CI.IsRun.GUI_INI_GEQU == 1 || CI.IsRun.GUI_INI_FM_Sel == 1
+%             set(handles.INI_BC,         'enable','on')
+%         end
+%         if CI.IsRun.GUI_INI_BC == 1; 
+%             set(handles.FREQ,           'enable','on')
+%             set(handles.FREQ_EigCal,    'enable','on')
+%             set(handles.TD,             'enable','on')
+%             if ~isempty(CI.CD.indexHP)                  % with heat perturbations
+%                 if ~isempty(find(CI.FM.indexFM == 4))   % Frequency calculation can only be run if the G-EQuation is not being used
+%                     set(handles.FREQ,           'enable','off')
+%                     set(handles.FREQ_EigCal,    'enable','off')
+%                     set(handles.TD,             'enable','on')
+%                 end
+%                 if ~isempty(find(CI.FM.indexFM == 3))   % with loaded experimental/CFD FDF, time domain code is not avaliable
+%                     set(handles.FREQ,           'enable','on')
+%                     set(handles.FREQ_EigCal,    'enable','on')
+%                     set(handles.TD,             'enable','off')
+%                 end
+%             end
+%         end
+%         if CI.IsRun.GUI_TD_Convg == 1
+%             set(handles.TD_Para_Config,         'enable','on')
+%         end
+%         if CI.IsRun.GUI_TD_Para_Config == 1
+%             set(handles.TD_SIM,                 'enable','on')
+%         end
+%         if CI.IsRun.GUI_TD_Cal_JLI_AMorgans == 1 || CI.IsRun.GUI_TD_Cal_simple == 1 
+%             set(handles.TD_Plots,               'enable','on')
+%         end                  
+%     catch
+%     end
+    case 'No'
+    return 
 end
 guidata(hObject, handles); 
 
@@ -173,7 +208,20 @@ switch selection
                                          'Save as');
     if filename~=0
         try
-            save(filename,'CI')  
+            % ------------------------------------
+            Menu{1} = findobj('-regexp','Tag','FILE');
+            Menu{2} = findobj('-regexp','Tag','INI');
+            Menu{3} = findobj('-regexp','Tag','FREQ');
+            Menu{4} = findobj('-regexp','Tag','TD');
+            for ss = 1 : length(Menu)
+                CI.Menu.Enable{ss}  = get(Menu{ss},'enable');
+                CI.Menu.Visible{ss} = get(Menu{ss},'visible');
+                CI.Menu.Lable{ss}   = get(Menu{ss},'label');
+            end
+            assignin('base','CI',CI)
+            % ------------------------------------
+            matfile = fullfile(pathname, filename);
+            save(matfile,'CI') 
         catch 
         end
     end
@@ -197,6 +245,7 @@ guidata(hObject,handles);
 handles=guidata(hObject);
 GUI_INI_CD('OSCILOS_long', handles.figure);
 
+
 function INI_TP_Callback(hObject, eventdata, handles)
 % hObject    handle to INI_TP (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -209,29 +258,33 @@ function INI_FM_Callback(hObject, eventdata, handles)
 % hObject    handle to INI_FM (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-guidata(hObject,handles);
-handles=guidata(hObject);
-global CI
-string={...
-'The flame describing function (FDF) is configured in this pannel.'...
-'One can use a simple nonlinear flame describing function model,'...
-'which is assumed can be decoupled as a nonlinear model and a'...
-'linear flame transfer function (FTF) model.'...
-'One can also load experimental flame transfer functions  for'...
-'different velocities, and fit the FTF data with state-space models.'};
-choice = questdlg(string, ...
-	'Flame describing function setting', ...
-	'Decoupled FDF model','From experimental FDF','Decoupled FDF model');
-% Handle response
-switch choice
-    case 'Decoupled FDF model'
-        GUI_INI_FM('OSCILOS_long', handles.figure);
-        CI.indexFM = 0;
-    case 'From experimental FDF'
-        CI.indexFM = 1;
-        GUI_INI_FMEXP('OSCILOS_long', handles.figure);
-end
-assignin('base','CI',CI);
+% guidata(hObject,handles);
+% handles=guidata(hObject);
+% global CI
+% string={...
+% 'The flame model is configured in this pannel; choose between:'...
+% '- A simple nonlinear flame describing function model,'...
+% 'which is assumed can be decoupled as a nonlinear model and a'...
+% 'linear flame transfer function (FTF) model.'...
+% ' - An experimental flame transfer functions (loaded from a file) for'...
+% 'different velocities, and fit the FTF data with state-space models.'...
+% ' - The fully non-linear G-EQuation model (Williams 1988)'};
+% choice = questdlg(string, ...
+% 	'Flame function setting', ...
+% 	'Decoupled FDF model','From experimental FDF','G-Equation','Decoupled FDF model');
+% % Handle response
+% switch choice
+%     case 'Decoupled FDF model'
+%         GUI_INI_FM('OSCILOS_long', handles.figure);
+%         CI.indexFM = 0;
+%     case 'From experimental FDF'
+%         CI.indexFM = 1;
+%         GUI_INI_FMEXP('OSCILOS_long', handles.figure);
+%     case 'G-Equation'
+%         GUI_INI_GEQU('OSCILOS_long', handles.figure);
+% end
+% assignin('base','CI',CI);
+GUI_INI_FM_Sel(handles.figure);
 
 
 
@@ -250,7 +303,18 @@ function FREQ_EigCal_Callback(hObject, eventdata, handles)
 % hObject    handle to FREQ_EigCal (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-GUI_FREQ_EigCal('OSCILOS_long', handles.figure);
+global CI
+if ~isempty(CI.CD.indexHP)
+    numHPNL = length(find(CI.FM.indexFM > 1));
+    if numHPNL>1
+        errordlg('The current version still does not support this situation!','Error');
+    %     return
+    else
+        GUI_FREQ_EigCal('OSCILOS_long', handles.figure);
+    end
+else
+    GUI_FREQ_EigCal('OSCILOS_long', handles.figure);
+end
 
 
 function TD_Callback(hObject, eventdata, handles)
@@ -270,17 +334,52 @@ function TD_SIM_Callback(hObject, eventdata, handles)
 % hObject    handle to TD_SIM (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-
-function EX_Callback(hObject, eventdata, handles)
-% hObject    handle to EX (see GCBO)
+global CI
+% --------------------------
+F = findall(0,'type','figure','tag','TMWWaitbar');
+delete(F);  % kill the useless waitbar
+% ---------------------------
+indexLoadProg = 1;
+if ~isempty(CI.CD.indexHP)    % if there are heat perturbations
+    numFM2 = find(CI.FM.indexFM == 2);
+    if ~isempty(numFM2)
+        if CI.FM.HP{1,numFM2}.NL.style == 3
+            indexLoadProg = 2;
+        end
+    end
+end
+switch indexLoadProg                                                          
+    case 2
+        GUI_TD_Cal_JLI_AMorgans('OSCILOS_long', handles.figure);                            
+    case 1
+        Fcn_TD_main_calculation_without_identification_uRatio;
+        CI.IsRun.GUI_TD_Cal_simple = 1;
+        set(handles.TD_Plots, 'enable' , 'on') 
+end
+% --------------------------------------------------------------------
+function TD_Sensors_Actuators_Callback(hObject, eventdata, handles)
+% hObject    handle to TD_Sensors_Actuators (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-function EX_RT_Callback(hObject, eventdata, handles)
-% hObject    handle to EX_RT (see GCBO)
+
+% --------------------------------------------------------------------
+function TD_Para_Config_Callback(hObject, eventdata, handles)
+% hObject    handle to TD_Para_Config (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-GUI_RijkeTube('OSCILOS_long', handles.figure);
+guidata(hObject,handles);
+handles=guidata(hObject);
+GUI_TD_Para_Config('OSCILOS_long', handles.figure)
+
+% --------------------------------------------------------------------
+function TD_Plots_Callback(hObject, eventdata, handles)
+% hObject    handle to TD_Plots (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+guidata(hObject,handles);
+handles=guidata(hObject);
+GUI_TD_Plot_Results('OSCILOS_long', handles.figure)
 
 function HP_Callback(hObject, eventdata, handles)
 % hObject    handle to HP (see GCBO)
@@ -307,12 +406,12 @@ function HP_About_Callback(hObject, eventdata, handles)
 string={...
             'OSCILOS_long: Open-Source Combustion Instabilities Low-Order Simulator'; 
             '(For longitudinal modes)';...
-            'Version: 1.2';...
+            'Version: 1.4';...
             '';...
             'Developed by Dr. Jingxuan LI and Dr. Aimee S.MORGANS';...
             'Published under the BSD licence';...
             '';...
-            'Programmed with MATLAB 2013b';...
+            'Programmed with MATLAB 2014a';...
             'First released April 08, 2014';...
             '';...
             'http://www.oscilos.com/';...
@@ -369,7 +468,7 @@ clearvars -global
 %------------------------------
 % user define sets
 % background colors 
-handles.bgcolor{1} = [0.95, 0.95, 0.95];
+handles.bgcolor{1} = [1, 1, 1];
 handles.bgcolor{2} = [0, 0, 0];
 handles.bgcolor{3} = [.75, .75, .75];
 handles.bgcolor{4} = [0.90,0.90,1];
@@ -430,6 +529,7 @@ set(handles.figure,     'units',    'points',...
                         'name',     'OSCILOS (for longitudinal modes)',...
                         'color',    handles.bgcolor{3});
 
+                    
 % set Menu
 % File
 set(handles.FILE,...
@@ -462,6 +562,7 @@ set(handles.FILE_SS,...
                         'visible',              'on',...
                         'Accelerator',          'S' )
 % Initialization
+
 set(handles.INI,...
                         'Enable',   'on',...
                         'ForegroundColor',      handles.bgcolor{2},...
@@ -498,6 +599,7 @@ set(handles.INI_BC,...
                         'visible',              'on',...
                         'Accelerator',          'B' )  
 % Frequency domain analysis
+
 set(handles.FREQ,...
                         'Enable',   'off',...
                         'ForegroundColor',      handles.bgcolor{2},...
@@ -514,29 +616,49 @@ set(handles.FREQ_EigCal,...
                         'visible',              'on',...
                         'Accelerator',          'E',...
                         'Separator',             'on')
-
 % Time domain analysis
-
 set(handles.TD,...
-                        'Enable',   'on',...
+                        'Enable',   'off',...
                         'ForegroundColor',      handles.bgcolor{2},...
                         'Label',                'Time domain simulation',...
                         'Position',             4,...
+                        'visible',              'on',...
+                        'Accelerator',          '' )
+set(handles.TD_Sensors_Actuators,...
+                        'Enable',   'on',...
+                        'ForegroundColor',      handles.bgcolor{2},...
+                        'Label',                'Feedback control sensors and actuators configuration',...
+                        'Position',             1,...
                         'visible',              'off',...
                         'Accelerator',          '' )
 set(handles.TD_GreenFcn,...
                         'Enable',   'on',...
                         'ForegroundColor',      handles.bgcolor{2},...
                         'Label',                'Examination of the Green''s function',...
-                        'Position',             1,...
+                        'Position',             2,...
                         'visible',              'on',...
                         'Accelerator',          '' )
+set(handles.TD_Para_Config,...
+                        'Enable',   'off',...
+                        'ForegroundColor',      handles.bgcolor{2},...
+                        'Label',                'Parameters configuration',...
+                        'Position',             3,...
+                        'visible',              'on',...
+                        'Accelerator',          '')
                     
 set(handles.TD_SIM,...
-                        'Enable',   'on',...
+                        'Enable',   'off',...
                         'ForegroundColor',      handles.bgcolor{2},...
-                        'Label',                'Simulation',...
-                        'Position',             2,...
+                        'Label',                'Simulation...',...
+                        'Position',             4,...
+                        'visible',              'on',...
+                        'Accelerator',          '',...
+                        'Separator',             'on')
+set(handles.TD_Plots,...
+                        'Enable',   'off',...
+                        'ForegroundColor',      handles.bgcolor{2},...
+                        'Label',                'Results output and plot ...',...
+                        'Position',             5,...
                         'visible',              'on',...
                         'Accelerator',          '' )
 set(handles.HP,...
@@ -577,10 +699,15 @@ pannelsize=get(handles.uipanel_Logo,'position');
 pW=pannelsize(3);
 pH=pannelsize(4);  
 set(handles.axes1,      'units', 'points',...
-                        'position',[pW*0/10 pH*1/10 pW*2/10 pH*6/10],...
+                        'position',[pW*0.25/10 pH*1/10 pW*2/10 pH*6/10],...
                         'fontsize',handles.FontSize(1),...
                         'color',handles.bgcolor{1},...
                         'box','off');  
+[Image1, map, alpha] = imread('ImperialLogo1.png','BackgroundColor',handles.bgcolor{3});
+hImage = imagesc(Image1);
+hAxis = get(hImage,'parent');
+set(hAxis,'visible','off')
+%
 set(handles.text_LOGO,...
                         'units', 'points',...
                         'Fontweight','bold',...
@@ -589,11 +716,8 @@ set(handles.text_LOGO,...
                         'fontsize',2.0*handles.FontSize(2),...
                         'string','OSCILOS',...
                         'backgroundcolor',handles.bgcolor{3},...
-                        'horizontalalignment','right');  
-Image1 = imread('ImperialLogo.png');
-hImage = imagesc(Image1);
-hAxis = get(hImage,'parent');
-set(hAxis,'visible','off')
+                        'horizontalalignment','right'); 
+
 % -------------------------------------------------------------------------
 set(handles.uipanel_Info,...
                         'units', 'points',...
@@ -607,10 +731,20 @@ set(handles.uipanel_Info,...
                         'backgroundcolor',handles.bgcolor{3});  
 pannelsize=get(handles.uipanel_Info,'position');
 pW=pannelsize(3);
-pH=pannelsize(4);                                
-msg={   '<HTML><FONT color="red">Welcome to OSCILOS_long!';...
-        'version 1.2';...
-        ''};
+pH=pannelsize(4); 
+
+% --------------    
+msg = {     '<HTML><FONT color="red">Welcome to OSCILOS_long!';...
+            'version 1.4';...
+            '';...
+            '<HTML><FONT color="red">What is OSCILOS?';...
+            'The open source combustion instability low-order simulator (OSCILOS)';...
+            'is an open source code for simulating combustion instability.';...
+            'It represents a combustor as a network of connected modules.';...
+            'The acoustic waves are modeled as 1-D plane waves for longitudinal combustors. ';...
+            'This assumes longitudinal/cannular/can combustor geometry or an annular geometry';...
+            'but where only plane acoustic waves are known to be of interest.'};
+
 set(handles.listbox_Info,...
                         'units', 'points',...
                         'fontunits','points',...
@@ -623,23 +757,36 @@ set(handles.listbox_Info,...
 %  index indicates that if the sub GUI program has ever been run
 % if index == 0, the sub GUI program has not been run
 % if index == 1, has been run
+%
+% Initialization pannels
 CI.IsRun.GUI_INI_CD         = 0;
 CI.IsRun.GUI_INI_TP         = 0;
+CI.IsRun.GUI_INI_FM_Sel     = 0;
 CI.IsRun.GUI_INI_FM         = 0;
+CI.IsRun.GUI_INI_GEQU       = 0;
 CI.IsRun.GUI_INI_FMEXP      = 0;
 CI.IsRun.GUI_INI_BC         = 0;
 CI.IsRun.GUI_INI_BC_Entropy = 0;
 %
+% Frequency domain calculation pannels
 CI.IsRun.GUI_FREQ_EigCal    = 0;
 CI.IsRun.GUI_FREQ_EigCal_AD = 0;
 %
+% Time domain simulation
+CI.IsRun.GUI_TD_Convg       = 0;  
+CI.IsRun.GUI_TD_Para_Config = 0;
+CI.IsRun.GUI_TD_Cal_JLI_AMorgans = 0;
+CI.IsRun.GUI_TD_Cal_simple = 0;
 assignin('base','CI',CI)
 guidata(hObject, handles); 
-% --------------------------------end--------------------------------------
 
+% --------------------------------end--------------------------------------
 
 % --- Executes during object deletion, before destroying properties.
 function figure_DeleteFcn(hObject, eventdata, handles)
 % hObject    handle to figure (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+
+
+

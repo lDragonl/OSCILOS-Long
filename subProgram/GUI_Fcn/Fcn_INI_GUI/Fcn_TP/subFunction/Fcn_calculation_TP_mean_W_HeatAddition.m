@@ -5,6 +5,9 @@ function [p_mean2,rho_mean2,u_mean2]...
 % The calculation  consists two steps
 % calculate the properties after the flame, herein, considere there is
 % section areas are constant which equals to that of section 2
+% first created: 2014-04-01
+% last modified: 2014-12-04
+% author: Jingxuan LI (jingxuan.li@imperial.ac.uk)
 %-----------------------------step  ---------------------------------------
 global MF
 MF.x1   = [p_mean1,rho_mean1,u_mean1];
@@ -29,7 +32,8 @@ global MF
 x1          = MF.x1;
 Rg2         = MF.Rg2;
 T2          = MF.T2;
-F(1) = x2(2)*x2(3) - x1(2)*x1(3);
-F(2) = (x2(1)+x2(2)*x2(3)^2) - (x1(1)+x1(2)*x1(3)^2);
-F(3) = x2(1) - x2(2)*Rg2*T2;
+F(1) = x2(2)*x2(3) - x1(2)*x1(3);                               % mass conservation equation
+F(2) = (x2(1)+x2(2)*x2(3)^2) - (x1(1)+x1(2)*x1(3)^2);           % momentum conservation equation
+F(3) = x2(1) - x2(2)*Rg2*T2;                                    % gas law equation
+% ---------------------------------end-------------------------------------
     

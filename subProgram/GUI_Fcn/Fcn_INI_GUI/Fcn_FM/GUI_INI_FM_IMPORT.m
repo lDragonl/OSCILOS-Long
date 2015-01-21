@@ -22,7 +22,7 @@ function varargout = GUI_INI_FM_IMPORT(varargin)
 
 % Edit the above text to modify the response to help GUI_INI_FM_IMPORT
 
-% Last Modified by GUIDE v2.5 09-Oct-2014 09:42:08
+% Last Modified by GUIDE v2.5 15-Dec-2014 23:45:09
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -98,7 +98,7 @@ switch indexEdit
 %            uiwait(hObject);
         end
     case 1
-        global CI
+        global HP
         handles.bgcolor{1} = [0.95, 0.95, 0.95];
         handles.bgcolor{2} = [0, 0, 0];
         handles.bgcolor{3} = [.75, .75, .75];
@@ -115,9 +115,8 @@ switch indexEdit
             handles.FontSize(2)=10;   
         end
         handles.indexApp = 0;
-        CI.Ru = 8.3145;
-        CI.FMEXP.indexIMPORT = 1;
-        assignin('base','CI',CI);                   % save the current information to the works
+        HP.FMEXP.indexIMPORT = 1;
+        assignin('base','HP',HP);                   % save the current information to the works
         guidata(hObject, handles);  
         GUI_INI_FM_IMPORT_Initialization(hObject, eventdata, handles)
         handles = guidata(hObject);  
@@ -341,14 +340,14 @@ pH=pannelsize(4);
 set(handles.pb_fitfrd,...
                         'units', 'points',...
                         'Fontunits','points',...
-                        'position',[pW*0.4/10 pH*2/10 pW*2.0/10 pH*6/10],...
+                        'position',[pW*1/10 pH*2/10 pW*2.0/10 pH*6/10],...
                         'fontsize',handles.FontSize(2),...
                         'string','Fit and plot',...
                         'backgroundcolor',handles.bgcolor{3});
 set(handles.pb_SaveFitting,...
                         'units', 'points',...
                         'Fontunits','points',...
-                        'position',[pW*2.8/10 pH*2/10 pW*2.0/10 pH*6/10],...
+                        'position',[pW*4/10 pH*2/10 pW*2.0/10 pH*6/10],...
                         'fontsize',handles.FontSize(2),...
                         'string','Save fitting',...
                         'backgroundcolor',handles.bgcolor{3},...
@@ -356,15 +355,16 @@ set(handles.pb_SaveFitting,...
 set(handles.pb_SaveFig,...
                         'units', 'points',...
                         'Fontunits','points',...
-                        'position',[pW*5.2/10 pH*2/10 pW*2.0/10 pH*6/10],...
+                        'position',[pW*4/10 pH*2/10 pW*2.0/10 pH*6/10],...
                         'fontsize',handles.FontSize(2),...
                         'string','Save figure',...
                         'backgroundcolor',handles.bgcolor{3},...
-                        'enable','off');
+                        'enable','off',...
+                        'visible','off');
 set(handles.pb_Cancel,...
                         'units', 'points',...
                         'Fontunits','points',...
-                        'position',[pW*7.6/10 pH*2/10 pW*2.0/10 pH*6/10],...
+                        'position',[pW*7/10 pH*2/10 pW*2.0/10 pH*6/10],...
                         'fontsize',handles.FontSize(2),...
                         'string','Cancel',...
                         'backgroundcolor',handles.bgcolor{3});
@@ -383,13 +383,13 @@ handles.ObjVisible_FIT      = findobj('-regexp','Tag','FIT');
 handles.ObjEditEnable_FIT   = findobj('-regexp','Tag','edit_FIT');
 set(handles.ObjVisible_FIT,         'visible','on')
 set(handles.ObjEditEnable_FIT,      'enable', 'on')
-global CI
+global HP
 guidata(hObject, handles);
-switch CI.FMEXP.indexIMPORT 
+switch HP.FMEXP.indexIMPORT 
     case 1
         set(handles.pb_Import,              'enable','on'); 
     case 2  % edit selected FTF
-        handles.FMFit   = CI.FMEXP.FTF{CI.FMEXP.indexModify};        
+        handles.FMFit   = HP.FMEXP.FTF{HP.FMEXP.indexModify};        
         fmin            = handles.FMFit.freq_band(1);
         fmax            = handles.FMFit.freq_band(2);
         set(handles.edit_uRatio,    'string', num2str(handles.FMFit.uRatio));
@@ -594,15 +594,15 @@ guidata(hObject,handles);
 function pb_SaveFitting_Callback(varargin)
 hObject = varargin{1};
 handles = guidata(hObject);
-global CI
+global HP
 set(handles.pb_SaveFig, 'enable','on')
-switch CI.FMEXP.indexIMPORT 
+switch HP.FMEXP.indexIMPORT 
     case 1  % add new FTF
-        nCount                      = CI.FMEXP.nFTF + 1;
-        CI.FMEXP.nFTF              = nCount;
-        CI.FMEXP.FTF{nCount}       = handles.FMFit;
-        CI.FMEXP.uRatio(nCount)    = handles.FMFit.uRatio; 
-        assignin('base','CI',CI);                  
+        nCount                      = HP.FMEXP.nFTF + 1;
+        HP.FMEXP.nFTF              = nCount;
+        HP.FMEXP.FTF{nCount}       = handles.FMFit;
+        HP.FMEXP.uRatio(nCount)    = handles.FMFit.uRatio; 
+        assignin('base','HP',HP);                  
         main = handles.MainGUI;
         if(ishandle(main))
             mainHandles             = guidata(main);
@@ -614,10 +614,10 @@ switch CI.FMEXP.indexIMPORT
             set(changeMain,'string',String_Listbox,'value',nCount);
         end   
     case 2  % edit selected FTF
-        nCount                      = CI.FMEXP.indexModify;
-        CI.FMEXP.FTF{nCount}       = handles.FMFit;
-        CI.FMEXP.uRatio(nCount)    = handles.FMFit.uRatio; 
-        assignin('base','CI',CI);                  
+        nCount                      = HP.FMEXP.indexModify;
+        HP.FMEXP.FTF{nCount}       = handles.FMFit;
+        HP.FMEXP.uRatio(nCount)    = handles.FMFit.uRatio; 
+        assignin('base','HP',HP);                  
         main = handles.MainGUI;
         if(ishandle(main))
             mainHandles             = guidata(main);
@@ -628,7 +628,7 @@ switch CI.FMEXP.indexIMPORT
             set(changeMain,'string',String_Listbox,'value',nCount);
         end 
 end  
-assignin('base','CI',CI);                   % save the current information to the works
+assignin('base','HP',HP);                   % save the current information to the works
 delete(handles.figure);
 %
 %--------------------------------------------------------------------------
@@ -849,7 +849,7 @@ if rem(datEdit ,1)~=0
     set(hObject, 'String', num2str(round(datEdit)));
     errordlg('Input must be a positive integer','Error');
 end
-if datEdit >20
+if datEdit >50
     set(hObject, 'String', 2);
     errordlg('Too large input number! Try a smaller one','Error');
 end
@@ -912,3 +912,30 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
 end
 %
 %----------------------------end-------------------------------------------
+
+
+% --------------------------------------------------------------------
+function uipushtool1_ClickedCallback(hObject, eventdata, handles)
+% hObject    handle to uipushtool1 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+Fig = figure;
+set(Fig,        'units','points')
+posFig = get(handles.figure,'position');
+copyobj(handles.axes1, Fig);
+copyobj(handles.axes2, Fig);
+
+hAxes = get(Fig,'children');
+set(hAxes(1),       'units','points',...
+                    'position',[80 60 200 150],...
+                    'ActivePositionProperty','position')
+set(hAxes(2),       'units','points',...
+                    'position',[80 210 200 150],...
+                    'ActivePositionProperty','position')
+pos1=get(hAxes(1),'position');
+pos2=get(hAxes(2),'position');
+posAxesOuter = [0 0 310 400];
+set(Fig,        'units','points',...
+                'position', [posFig(1)+0.5*posFig(3)-0.5*posAxesOuter(3),...
+                            posFig(2)+0.5*posFig(4)-0.5*posAxesOuter(4),...
+                            posAxesOuter(3:4)])   
