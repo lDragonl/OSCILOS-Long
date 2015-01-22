@@ -35,7 +35,7 @@ if ~isempty(CI.CD.indexHP)    % if there are heat perturbations
             case 3
                 error('The current version does not support this situation!');
                 % ************* need further change **************
-            case 4 % G-equation case, these are filled to coherency with other models. 
+            case 4 % G-equation case, these are filled for coherency with other models. 
                 Lf(ss) = 1;
                 tauf(ss) = HP.GEQU.tau_f;
                 % ************* need further change **************

@@ -97,10 +97,10 @@ handles.HP.NL.style      = 4; % G-EQuation (Williams 1985)
 handles.HP.GEQU.nb_points = 35; % Number of points used for discretisation along r
 handles.HP.GEQU.rb = CI.CD.r_sample(CI.CD.indexHP(handles.HP_num)); % If there are multiple heat zones in the duct, this is a vector
 handles.HP.GEQU.ra   = handles.HP.GEQU.rb/2; % in m, also a vector
-handles.HP.GEQU.U1 = CI.TP.u_mean(1,max(CI.CD.indexHP(handles.HP_num) - 1,1)); % This is a vector if there are multple flame. The max function is required is the flame is at the begining of the duct.
-handles.HP.GEQU.rho1 = CI.TP.u_mean(1,max(CI.CD.indexHP(handles.HP_num) - 1,1));% This is a vector if there are multple flame. The max function is required is the flame is at the end of the duct.
+handles.HP.GEQU.rho1 = CI.TP.rho_mean(1,max(CI.CD.indexHP(handles.HP_num) - 1,1));% This is a vector if there are multple flame. The max function is required is the flame is at the begining of the duct.
+handles.HP.GEQU.U1 = CI.TP.u_mean(1,max(CI.CD.indexHP(handles.HP_num) - 1,1));% This is a vector if there are multple flame. The max function is required is the flame is at the begining of the duct.
 handles.HP.GEQU.SU   = handles.HP.GEQU.U1 * 0.088; % in m/s, this is a vector if there are multple flame.
-handles.HP.GEQU.time_integration = 1; % Set to adam bashforth
+handles.HP.GEQU.time_integration = 3; % Set to adam bashforth
 handles.HP.GEQU.dowst_of_heat_lengths = CI.CD.x_sample(min(CI.CD.indexHP(handles.HP_num) + 1,end)) - CI.CD.x_sample(CI.CD.indexHP(handles.HP_num));
 guidata(hObject, handles);
 %
