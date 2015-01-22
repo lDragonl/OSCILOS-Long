@@ -27,7 +27,10 @@ CI.TD.AP(1, Var(1):Var(2))...
                             Var,...
                             CI.TP.tau_minus(1) + CI.BC.tau_d1,...
                             CI.TD.dt);
-CI.TD.AP(1, Var(1):Var(2)) = CI.TD.AP(1, Var(1):Var(2));% + CI.TD.pNoiseBG(Var(1):Var(2)); % add additional noise to wave propagating in direction of flow
+CI.TD.AP(1, Var(1):Var(2)) = CI.TD.AP(1, Var(1):Var(2)) + CI.TD.pNoiseBG(Var(1):Var(2)); % add additional noise to wave propagating in direction of flow
+if CI.TD.ExtForceInfo.indexPos == 1
+    CI.TD.AP(1, Var(1):Var(2)) = CI.TD.AP(1, Var(1):Var(2)) + CI.TD.pExtForce(Var(1):Var(2));  % external driving;
+end
 %
 % -------------------------------------------------------------------------
 % ------------------ interfaces between two sections ----------------------
@@ -39,6 +42,12 @@ for ss = 1:CI.TP.numSection-1
     y(1,1:CI.TD.nGap)   = Fcn_interp1_varied_td(CI.TD.AP(ss,:),    Var, CI.TP.tau_plus(ss),    CI.TD.dt);
     y(2,1:CI.TD.nGap)   = Fcn_interp1_varied_td(CI.TD.AM(ss+1,:),  Var, CI.TP.tau_minus(ss+1), CI.TD.dt);
     y(3,1:CI.TD.nGap)  = 0; 
+    if CI.TD.ExtForceInfo.indexPos == 2*ss % the loudspeaker is located at the left side of interface
+        y(1,1:CI.TD.nGap) = y(1,1:CI.TD.nGap) + 0.5*CI.TD.pExtForce(Var(1):Var(2));
+    end
+    if CI.TD.ExtForceInfo.indexPos == 2*ss+1 % the loudspeaker is located at the left side of interface
+        y(2,1:CI.TD.nGap) = y(2,1:CI.TD.nGap) + 0.5*CI.TD.pExtForce(Var(1):Var(2));
+    end
     switch CI.CD.SectionIndex(ss+1)
         case 0   % only area change
             % ---------------------------
@@ -98,6 +107,12 @@ for ss = 1:CI.TP.numSection-1
             end
             % 
             x = CI.TD.IF.Z{ss}*y + CI.TD.IF.Ar{indexHP_num}*CI.TD.qRatio(Var(1):Var(2)).*CI.TP.RhoCU(ss);
+            if CI.TD.ExtForceInfo.indexPos == 2*ss % the loudspeaker is located at the left side of interface
+                x(2,1:CI.TD.nGap) = x(2,1:CI.TD.nGap) + 0.5*CI.TD.pExtForce(Var(1):Var(2));
+            end
+            if CI.TD.ExtForceInfo.indexPos == 2*ss+1 % the loudspeaker is located at the left side of interface
+                x(1,1:CI.TD.nGap) = x(1,1:CI.TD.nGap) + 0.5*CI.TD.pExtForce(Var(1):Var(2));
+            end
     end
     CI.TD.AP(ss+1,Var(1):Var(2)) = x(1,:);
     CI.TD.AM(ss  ,Var(1):Var(2)) = x(2,:);
@@ -114,6 +129,9 @@ CI.TD.AM(end, Var(1):Var(2))...
                                 Var,...
                                 CI.TP.tau_plus(end) + CI.BC.tau_d2,...
                                 CI.TD.dt);
-CI.TD.AM(end, Var(1):Var(2)) = CI.TD.AM(end, Var(1):Var(2)) + CI.TD.pNoiseBG(Var(1):Var(2)); % add additional noise to wave propagating in direction of flow
+CI.TD.AM(end, Var(1):Var(2)) = CI.TD.AM(end, Var(1):Var(2));% + CI.TD.pNoiseBG(Var(1):Var(2)); % add additional noise to wave propagating in direction of flow
+if CI.TD.ExtForceInfo.indexPos == 2*(length(CI.CD.x_sample) - 1)
+    CI.TD.AM(end, Var(1):Var(2)) = CI.TD.AM(end, Var(1):Var(2))+ CI.TD.pExtForce(Var(1):Var(2));  % external driving;
+end
 %
 % -----------------------------end-----------------------------------------

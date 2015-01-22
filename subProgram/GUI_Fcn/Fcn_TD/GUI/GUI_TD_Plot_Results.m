@@ -306,7 +306,7 @@ else
     hold on
     switch popData
         case 1
-            ylabelStr = ['$p^\prime/p^\prime_{noise}$~[-]'];
+            ylabelStr = ['$p^\prime $~[Pa]'];
             yData = pPrime;
         case 2
             ylabelStr = ['$u^\prime$~[m/s]'];
