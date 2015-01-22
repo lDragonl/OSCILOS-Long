@@ -27,7 +27,7 @@ CI.TD.AP(1, Var(1):Var(2))...
                             Var,...
                             CI.TP.tau_minus(1) + CI.BC.tau_d1,...
                             CI.TD.dt);
-CI.TD.AP(1, Var(1):Var(2)) = CI.TD.AP(1, Var(1):Var(2));% + CI.TD.pNoiseBG(Var(1):Var(2)); % add additional noise to wave propagating in direction of flow
+CI.TD.AP(1, Var(1):Var(2)) = CI.TD.AP(1, Var(1):Var(2)) + CI.TD.pNoiseBG(Var(1):Var(2)); % add additional noise to wave propagating in direction of flow
 %
 % -------------------------------------------------------------------------
 % ------------------ interfaces between two sections ----------------------
@@ -78,7 +78,10 @@ for ss = 1:CI.TP.numSection-1
                  ( CI.FM.HP{indexHP_num}.GEQU.SU, CI.FM.HP{indexHP_num}.GEQU.xi, CI.FM.HP{indexHP_num}.GEQU.y_vec, CI.TD.dt, 0, CI.FM.HP{indexHP_num}.GEQU.U1, ...
                  CI.FM.HP{indexHP_num}.GEQU.area_ratio, CI.TD.uRatio(indexHP_num,Var(1):Var(2)),CI.TP.Q(indexHA_num), CI.TP.DeltaHr(indexHA_num),...
                  CI.FM.HP{indexHP_num}.GEQU.rho1,CI.FM.HP{indexHP_num}.GEQU.bashforth_data,CI.TD.IT,CI.FM.HP{indexHP_num}.GEQU.time_integration); % In this case CI.TD.uRatio(indexHA_num,Var(1):Var(2)) is a scalar
-            
+            CI.FM.HP{indexHP_num}.GEQU.saved_xi(CI.TD.IT,:) = CI.FM.HP{indexHP_num}.GEQU.xi;
+                 
+
+             
                 CI.TD.qRatio(indexHP_num ,Var(1):Var(2)) = CI.FM.HP{indexHP_num}.GEQU.q_ratio; % This is a scalar
               
             elseif CI.FM.indexFM(indexHP_num) < 3

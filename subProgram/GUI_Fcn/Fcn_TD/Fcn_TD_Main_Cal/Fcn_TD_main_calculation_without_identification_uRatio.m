@@ -4,7 +4,7 @@ global CI
 % --------------------------------------
 hWaitBar = waitbar(0,'Time domain calculations, please wait...');
 %
-%
+%  
 for nn = 1:CI.TD.nRound
     Var(1:2)     = CI.TD.nPadding + [(nn-1)*CI.TD.nGap + 1,...
                                  nn*CI.TD.nGap];  
