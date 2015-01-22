@@ -306,7 +306,7 @@ else
     hold on
     switch popData
         case 1
-            ylabelStr = ['$p^\prime$~[Pa]'];
+            ylabelStr = ['$p^\prime/p^\prime_{noise}$~[-]'];
             yData = pPrime;
         case 2
             ylabelStr = ['$u^\prime$~[m/s]'];
@@ -325,6 +325,7 @@ else
             ylabel(hAxes1,ylabelStr,'Color','k','Interpreter','LaTex','FontSize',fontSize1)
         case 2  % psd
             PSD_plot = calculate_psd(yData,CI.TD.fs);
+            PSD_plot_noise = calculate_psd(CI.TD.pNoiseBG(CI.TD.nPadding+1:end),CI.TD.fs);
             plot(hAxes1, PSD_plot(1,:),PSD_plot(2,:),'-','color',0*[1 1 1],'Linewidth',0.5);
             xlabel(hAxes1,'$\rm Frequency~[Hz]$','Color','k','Interpreter','LaTex','FontSize',fontSize1);
             ylabel(hAxes1,'$\rm Power/Frequency ~ [dB/Hz]$','Color','k','Interpreter','LaTex','FontSize',fontSize1);

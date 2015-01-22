@@ -22,7 +22,7 @@ function varargout = GUI_TD_GreenFcn(varargin)
 
 % Edit the above text to modify the response to help GUI_TD_GreenFcn
 
-% Last Modified by GUIDE v2.5 16-Dec-2014 08:35:56
+% Last Modified by GUIDE v2.5 13-Jan-2015 17:41:51
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -621,6 +621,30 @@ function uipushtool2_ClickedCallback(hObject, eventdata, handles)
 % hObject    handle to uipushtool2 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+handles     = guidata(hObject);
+Fig         = figure;
+copyobj(handles.axes1, Fig);
+set(Fig,        'units','points')
+posFig      = get(handles.figure,'position');
+hAxes       = get(Fig,'children');
+set(hAxes(1),       'units','points',...
+                    'position',[60 60 200 150],...
+                    'ActivePositionProperty','position')
+posAxesOuter = [0 0 300 300];
+set(Fig,        'units','points',...
+                'position', [posFig(1)+0.5*posFig(3)-0.5*posAxesOuter(3),...
+                            posFig(2)+0.5*posFig(4)-0.5*posAxesOuter(4),...
+                            posAxesOuter(3:4)]) 
+hl=legend(hAxes(1),'Suggested','User defined');
+set(hl,'interpreter','latex','Fontsize',handles.FontSize(2),'box','off','Unit','points')
+
+
+% --------------------------------------------------------------------
+function uipushtool3_ClickedCallback(hObject, eventdata, handles)
+% hObject    handle to uipushtool3 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
 handles     = guidata(hObject);
 Fig         = figure;
 copyobj(handles.axes1, Fig);
