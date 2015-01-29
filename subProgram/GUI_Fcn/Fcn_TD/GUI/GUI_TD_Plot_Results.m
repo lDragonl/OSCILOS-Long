@@ -516,6 +516,7 @@ function pop1_Callback(hObject, eventdata, handles)
 %
 pop1Val = get(handles.pop1, 'value');
 if pop1Val > 2
+    set(handles.edit1,'string','0')
     set(handles.edit1,'enable','off','visible','off');
     set(handles.text3,'visible','off');
 else
