@@ -215,7 +215,8 @@ pW=pannelsize(3);
 pH=pannelsize(4);
 msg={   '<HTML><FONT color="blue">This GUI is used to plot the time domain calculation results;';...
     '<HTML><FONT color="blue">Please select the data type and plot type and then click plot';...
-    '<HTML><FONT color="blue">After plotting, use the add and save buttons to save plotted variables to a file.'};
+    '<HTML><FONT color="blue">After plotting, use the add and save buttons to save plotted variables to a file.';
+    '<HTML><FONT color="blue">Note that the axial position box supports entering matlab functions or vectors.';};
 set(handles.listbox,...
     'units', 'points',...
     'fontunits','points',...
@@ -355,14 +356,21 @@ popPlot     = get(handles.pop2,'Value');   % plot type
 plot_data_types = get(handles.pop2,'string');
 plot_diplay_types = get(handles.pop1,'string');
 
-x           = str2double(get(handles.edit1,'string'));
-if x > CI.CD.x_sample(end) || x < CI.CD.x_sample(1)
+x           = str2num(get(handles.edit1,'string'));
+if max(x) > CI.CD.x_sample(end) || min(x) < CI.CD.x_sample(1)
     StrWarning = ['The axial position is out of the chamber! Choose a value between '...
         num2str(CI.CD.x_sample(1)) ' m and ' num2str(CI.CD.x_sample(end)) ' m!' ];
     errordlg(StrWarning,'Error');
 else
     % ----------------------------------------
-    [pPrime, uPrime] = Fcn_calculate_u_p_perturbations_at_a_give_position(x);
+    % initialise matrices
+    axial_locations = length(x);
+    time_iterations = length(CI.TD.tSp);
+    pPrime = zeros(axial_locations,time_iterations);
+    uPrime = zeros(axial_locations,time_iterations);
+    for runner = 1:axial_locations
+        [pPrime(runner,:), uPrime(runner,:)] = Fcn_calculate_u_p_perturbations_at_a_give_position(x(runner));
+    end
     cla(hAxes1)
     axes(hAxes1)
     hold on
@@ -370,12 +378,20 @@ else
         case 1
             ylabelStr = ['$p^\prime $~[Pa]'];
             yData = pPrime;
-            CI.TD.OUT_temp.name = [plot_diplay_types{popData} ' at x= ' num2str(x) 'm, ' plot_data_types{popPlot}]; % full name of plot, for data saving purposes
+            if axial_locations == 1
+                CI.TD.OUT_temp.name = [plot_diplay_types{popData} ' at x= ' num2str(x) 'm, ' plot_data_types{popPlot}]; % full name of plot, for data saving purposes
+            else
+                CI.TD.OUT_temp.name = [plot_diplay_types{popData} ' field, ' plot_data_types{popPlot}]; % full name of plot, for data saving purposes
+            end
             CI.TD.OUT_temp.position = x;
         case 2
             ylabelStr = ['$u^\prime$~[m/s]'];
             yData = uPrime;
-            CI.TD.OUT_temp.name = [plot_diplay_types{popData} ' at x= ' num2str(x) 'm, ' plot_data_types{popPlot}]; % full name of plot, for data saving purposes
+            if axial_locations == 1
+                CI.TD.OUT_temp.name = [plot_diplay_types{popData} ' at x= ' num2str(x) 'm, ' plot_data_types{popPlot}]; % full name of plot, for data saving purposes
+            else
+                CI.TD.OUT_temp.name = [plot_diplay_types{popData} ' field, ' plot_data_types{popPlot}]; % full name of plot, for data saving purposes
+            end
             CI.TD.OUT_temp.position = x;
         case {3,5,7,9}
             ylabelStr = ['$\hat{u}/\bar{u}$~[-]'];
@@ -389,28 +405,62 @@ else
 
     switch popPlot
         case 1  % time evolution
-            plot(hAxes1,1*CI.TD.tSp,yData,'-k','linewidth',0.5);
-            xlabelStr = ['Time [s]'];
-            xlabel(hAxes1,xlabelStr,'Color','k','Interpreter','LaTex','FontSize',fontSize1);
-            ylabel(hAxes1,ylabelStr,'Color','k','Interpreter','LaTex','FontSize',fontSize1)
-            CI.TD.OUT_temp.DataType = 1; % Standard x,y plot
-            CI.TD.OUT_temp.xLabel = xlabelStr; % store x label
-            CI.TD.OUT_temp.yLabel = ylabelStr; % store x label
-            CI.TD.OUT_temp.xData = CI.TD.tSp; % store time vector
-            
+            if axial_locations == 1
+                plot(hAxes1,1*CI.TD.tSp,yData,'-k','linewidth',0.5);
+                xlabelStr = ['Time [s]'];
+                xlabel(hAxes1,xlabelStr,'Color','k','Interpreter','LaTex','FontSize',fontSize1);
+                ylabel(hAxes1,ylabelStr,'Color','k','Interpreter','LaTex','FontSize',fontSize1)
+                CI.TD.OUT_temp.DataType = 1; % Standard x,y plot
+                CI.TD.OUT_temp.xData = CI.TD.tSp;
+                CI.TD.OUT_temp.yData = yData;
+                CI.TD.OUT_temp.xLabel = xlabelStr; % store x label
+                CI.TD.OUT_temp.yLabel = ylabelStr; % store y label 
+            else
+                xlabelStr = ['Axial position [m]'];
+                zlabelStr = ['Time [s]'];
+                Fcn_GUI_plot_with_slider(yData',CI.TD.tSp,x,{xlabelStr,ylabelStr,zlabelStr},handles.figure,handles.uipanel_axes);
+                CI.TD.OUT_temp.DataType = 2; % field plot
+                CI.TD.OUT_temp.xData = x;
+                CI.TD.OUT_temp.yData = yData;
+                CI.TD.OUT_temp.zData = CI.TD.tSp;
+                CI.TD.OUT_temp.xLabel = xlabelStr; % store x label
+                CI.TD.OUT_temp.yLabel = ylabelStr; % store y label
+                CI.TD.OUT_temp.zLabel = zlabelStr; % store time vector
+            end
         case 2  % psd
-            PSD_plot = calculate_psd(yData,CI.TD.fs);
-            PSD_plot_noise = calculate_psd(CI.TD.pNoiseBG(CI.TD.nPadding+1:end),CI.TD.fs);
-            plot(hAxes1, PSD_plot(1,:),PSD_plot(2,:),'-','color',0*[1 1 1],'Linewidth',0.5);
-            xlabelStr = ['\rm Frequency~[Hz]'];
-            ylabelStr = ['$\rm Power/Frequency ~ [dB/Hz]$'];
-            xlabel(hAxes1,xlabelStr,'Color','k','Interpreter','LaTex','FontSize',fontSize1);
-            ylabel(hAxes1,ylabelStr,'Color','k','Interpreter','LaTex','FontSize',fontSize1);
-            CI.TD.OUT_temp.DataType = 1; % Standard x,y plot
-            CI.TD.OUT_temp.xLabel = xlabelStr; % store x label
-            CI.TD.OUT_temp.yLabel = ylabelStr; % store x label
-            CI.TD.OUT_temp.xData = PSD_plot(1,:); % store freq vector
-            CI.TD.OUT_temp.yData = PSD_plot(2,:); % Store yData
+            PSD_plot_y = zeros(axial_locations,2^nextpow2(time_iterations)/2);
+            temp = zeros(axial_locations,2^nextpow2(time_iterations)/2);
+            for runner = 1:axial_locations
+                 [temp,PSD_plot_y(runner,:)] = calculate_psd(yData(runner,:),CI.TD.fs);
+            end
+                PSD_plot_x = temp;
+                PSD_plot_noise = calculate_psd(CI.TD.pNoiseBG(CI.TD.nPadding+1:end),CI.TD.fs);
+            
+            if axial_locations == 1
+                plot(hAxes1, PSD_plot_x,PSD_plot_y,'-','color',0*[1 1 1],'Linewidth',0.5);
+                xlabelStr = ['\rm Frequency~[Hz]'];
+                ylabelStr = ['$\rm Power/Frequency ~ [dB/Hz]$'];
+                xlabel(hAxes1,xlabelStr,'Color','k','Interpreter','LaTex','FontSize',fontSize1);
+                ylabel(hAxes1,ylabelStr,'Color','k','Interpreter','LaTex','FontSize',fontSize1);
+                CI.TD.OUT_temp.DataType = 1; % Standard x,y plot
+                CI.TD.OUT_temp.xLabel = xlabelStr; % store x label
+                CI.TD.OUT_temp.yLabel = ylabelStr; % store y label
+                CI.TD.OUT_temp.xData = PSD_plot_x; % store freq vector
+                CI.TD.OUT_temp.yData = PSD_plot_y; % Store yData
+            else
+                xlabelStr = ['\rm Frequency~[Hz]'];
+                ylabelStr = ['$\rm Power/Frequency ~ [dB/Hz]$'];
+                zlabelStr = ['Axial position [m]'];
+                Fcn_GUI_plot_with_slider(PSD_plot_y,x,PSD_plot_x,{xlabelStr,ylabelStr,zlabelStr},handles.figure,handles.uipanel_axes);
+                CI.TD.OUT_temp.DataType = 2; % field plot
+                CI.TD.OUT_temp.xData = PSD_plot_x;
+                CI.TD.OUT_temp.yData = PSD_plot_y;
+                CI.TD.OUT_temp.zData = x;
+                CI.TD.OUT_temp.xLabel = xlabelStr; % store x label
+                CI.TD.OUT_temp.yLabel = ylabelStr; % store y label
+                CI.TD.OUT_temp.zLabel = zlabelStr; % store time vector
+            end
+            
     end
     set(hAxes1,'YColor','k','Box','on','ygrid','on','xgrid','on');
     set(hAxes1,'FontName','Helvetica','FontSize',fontSize1,'LineWidth',1)
@@ -436,13 +486,13 @@ pPrime      = APlus + AMinus;
 uPrime      = (APlus - AMinus)./(CI.TP.c_mean(1,indexSection).*CI.TP.rho_mean(1,indexSection));
 
 
-function PSD_plot=calculate_psd(xx,Fs)
+function [PSD_plot_x,PSD_plot_y]=calculate_psd(xx,Fs)
 % the signal xx
 %Fs = 1e5;    % this is equal to the inverse of the sample time
 nfft = 2^nextpow2(length(xx));
 Pxx = abs(fft(xx,nfft)).^2/length(xx)/Fs;
-PSD_plot(1,:)=linspace(0,Fs/2,length(Pxx)/2);   % the x axis values for the plot of PSD
-PSD_plot(2,:)=10*log10(Pxx(1:length(Pxx)/2));                    % the y axis vaules for the plot of PSD
+PSD_plot_x=linspace(0,Fs/2,length(Pxx)/2);   % the x axis values for the plot of PSD
+PSD_plot_y=10*log10(Pxx(1:length(Pxx)/2));                    % the y axis vaules for the plot of PSD
 
 %
 % -------------------------------------------------------------------------
@@ -527,14 +577,14 @@ function edit1_Callback(hObject, eventdata, handles)
 % Hints: get(hObject,'String') returns contents of edit1 as text
 %        str2double(get(hObject,'String')) returns contents of edit1 as a double
 global CI
-datEdit = str2double(get(hObject, 'String'));
+datEdit = str2num(get(hObject, 'String')); % allow inpout of vectors here
 ValDefault = CI.CD.x_sample(1);
-if isnan(datEdit) || ~isreal(datEdit)
-    set(hObject, 'String', ValDefault);
-    errordlg('Input must be a real number','Error');
-    % when the input is not a number, it is set to the default value
-end
-if datEdit < CI.CD.x_sample(1) || datEdit > CI.CD.x_sample(end)
+if any(isnan(datEdit)) || any(~isreal(datEdit))
+     set(hObject, 'String', ValDefault);
+     errordlg('Input must be a real number or vector','Error');
+     % when the input is not a number, it is set to the default value
+ end
+if min(datEdit) < CI.CD.x_sample(1) || max(datEdit) > CI.CD.x_sample(end)
     set(hObject, 'String', ValDefault);
     errordlg('The location must inside the chamber','Error');
 end
