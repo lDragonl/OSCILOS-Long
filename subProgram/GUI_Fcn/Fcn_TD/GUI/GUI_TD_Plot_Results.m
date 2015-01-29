@@ -147,7 +147,7 @@ pW=pannelsize(3);
 pH=pannelsize(4);
 set(handles.axes1,      'units', 'points',...
     'Fontunits','points',...
-    'position',[pW*2/10 pH*2.0/10 pW*7.5/10 pH*6.5/10],...
+    'position',[pW*2/10 pH*2.5/10 pW*7.5/10 pH*6.3/10],...
     'fontsize',handles.FontSize(1),...
     'color',handles.bgcolor{1},...
     'box','on');
@@ -348,6 +348,18 @@ guidata(hObject, handles);
 function Fcn_Plots(varargin)
 hObject     = varargin{1};
 handles     = guidata(hObject);
+
+try
+    % Delete all text and sliders that might ahve been added from a
+    % previous plot
+  h=findobj(handles.uipanel_axes,'style','text');
+  delete(h)
+  h=findobj(handles.uipanel_axes,'style','slider');
+  delete(h)
+catch
+end
+
+
 hAxes1      = handles.axes1;
 fontSize1   = handles.FontSize(1);
 global CI
@@ -418,7 +430,7 @@ else
             else
                 xlabelStr = ['Axial position [m]'];
                 zlabelStr = ['Time [s]'];
-                Fcn_GUI_plot_with_slider(yData',CI.TD.tSp,x,{xlabelStr,ylabelStr,zlabelStr},handles.figure,handles.uipanel_axes);
+                Fcn_GUI_plot_with_slider(hObject,yData',CI.TD.tSp,x,{xlabelStr,ylabelStr,zlabelStr});
                 CI.TD.OUT_temp.DataType = 2; % field plot
                 CI.TD.OUT_temp.xData = x;
                 CI.TD.OUT_temp.yData = yData;
@@ -436,7 +448,7 @@ else
                 PSD_plot_x = temp;
                 PSD_plot_noise = calculate_psd(CI.TD.pNoiseBG(CI.TD.nPadding+1:end),CI.TD.fs);
             
-            if axial_locations == 1
+            if axial_locations == 1 
                 plot(hAxes1, PSD_plot_x,PSD_plot_y,'-','color',0*[1 1 1],'Linewidth',0.5);
                 xlabelStr = ['\rm Frequency~[Hz]'];
                 ylabelStr = ['$\rm Power/Frequency ~ [dB/Hz]$'];
@@ -451,7 +463,7 @@ else
                 xlabelStr = ['\rm Frequency~[Hz]'];
                 ylabelStr = ['$\rm Power/Frequency ~ [dB/Hz]$'];
                 zlabelStr = ['Axial position [m]'];
-                Fcn_GUI_plot_with_slider(PSD_plot_y,x,PSD_plot_x,{xlabelStr,ylabelStr,zlabelStr},handles.figure,handles.uipanel_axes);
+                Fcn_GUI_plot_with_slider(hObject,PSD_plot_y,x,PSD_plot_x,{xlabelStr,ylabelStr,zlabelStr});
                 CI.TD.OUT_temp.DataType = 2; % field plot
                 CI.TD.OUT_temp.xData = PSD_plot_x;
                 CI.TD.OUT_temp.yData = PSD_plot_y;
