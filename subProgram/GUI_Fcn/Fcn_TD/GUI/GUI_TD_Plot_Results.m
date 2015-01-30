@@ -111,10 +111,11 @@ hObject = varargin{1};
 handles = guidata(hObject);
 global CI
 % Initilialise the output structure if the variable does not already exist
-if exist('CI.TD.OUT','var') == 0
+isfield(CI.TD,'OUT')
+if isfield(CI.TD,'OUT')== 0
     % use cells here and not matrices as they refer to pointers of memory, 
     % and are not super slow to extend in lists
-    CI.TD.OUT= {}; 
+    CI.TD.OUT= {}; % this is created empty at the begining so teh length can be measured.
     show_save_del_pb = 'off';
 else
     show_save_del_pb = 'on';
@@ -175,6 +176,7 @@ set(handles.savelist,...
     'fontsize',handles.FontSize(1),...
     'backgroundcolor',handles.bgcolor{4},...
     'value',1);
+refresh_save_buffer_list(hObject); % refresh the saved list in case we had old saved vars
 set(handles.pb_add,    'units', 'points',...
     'Fontunits','points',...
     'position',[pW*0.4/10 pH*7/10 pW*1/10 pH*2/10],...
@@ -549,6 +551,10 @@ function pb_Cancel_Callback(hObject, eventdata, handles)
 % hObject    handle to pb_Cancel (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+global CI
+if isempty(CI.TD.OUT) == true  
+   CI.TD = rmfield(CI.TD,'OUT'); % clear out output variable if empty
+end     
 delete(handles.figure);
 %
 % -------------------------------------------------------------------------
@@ -622,6 +628,11 @@ function figure_CloseRequestFcn(hObject, eventdata, handles)
 % hObject    handle to figure (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+global CI
+
+if isempty(CI.TD.OUT) == true  
+   CI.TD = rmfield(CI.TD,'OUT'); % clear out output variable if empty
+end   
 delete(hObject);
 %
 
@@ -749,6 +760,7 @@ global CI
 Fcn_Save(CI.TD.OUT)
 
 
+
 function Fcn_Save(output_vars)
 
 % convert the cell array to matrix, nicer display
@@ -789,7 +801,8 @@ set(handles.pb_add,'enable','off') % disable add button
 set(handles.pb_del,'enable','on') % enable del button
 set(handles.pb_SaveData,'enable','on') % enable del button
 CI.TD = rmfield(CI.TD,'OUT_temp'); % clear temp variable
-refresh_save_buffer_list(hObject)
+refresh_save_buffer_list(hObject);
+assignin('base','CI',CI);
     
 
 
@@ -803,23 +816,27 @@ index_selected = get(handles.savelist,'Value');
 % Delete cell array from OUT variable 
 % (note use of parenthsesis, not curly brackets)
 CI.TD.OUT(index_selected) = [];
-refresh_save_buffer_list(hObject)
+refresh_save_buffer_list(hObject);
+assignin('base','CI',CI);
+
 
 
 function refresh_save_buffer_list(hObject)
 global CI
 handles         = guidata(hObject);
+
 if isempty(CI.TD.OUT) == false
     for runner = 1:length(CI.TD.OUT)
         handles.plot_names{runner} =   CI.TD.OUT{runner}.name;
     end
     set(handles.savelist,'String',handles.plot_names,...
         'Value',1)
-else % list of variables to save is empty
-    set(handles.savelist,'String','Empty',...
-        'Value',1)
+else
     set(handles.pb_del,'enable','off') % disable del button
     set(handles.pb_SaveData,'enable','off') % disable del button
+    set(handles.savelist,'String','Empty',...
+        'Value',1)
 end
+
 
 
