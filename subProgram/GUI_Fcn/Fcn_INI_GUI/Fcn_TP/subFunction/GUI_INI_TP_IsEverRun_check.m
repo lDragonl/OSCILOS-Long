@@ -25,7 +25,18 @@ switch CI.IsRun.GUI_INI_TP    % This value is defined in the OSCILOS_Long.m
         set(handles.edit_TP_M1,         'string',   num2str(CI.TP.u_mean(1,1)));    % ...
         %
         % --------------------update the rest -----------------------------
-        %
+        %--------------- set the UI and initialize some heat addition properties -- 
+        if CI.CD.isHA == 1   
+            NumHA = length(CI.CD.indexHA);
+            for k = 1:NumHA
+                StringHA{k}         = ['Heat source number:' num2str(k)]; 
+            end
+        end
+        set(handles.pop_HA_num,...
+                        'string',StringHA,...
+                        'enable','on',...
+                        'value',1);   
+        % -----------------------------------------------------------------
         guidata(hObject, handles);
         Fcn_GUI_INI_TP_HA_Para2UI(hObject)
         handles = guidata(hObject);
@@ -36,8 +47,7 @@ switch CI.IsRun.GUI_INI_TP    % This value is defined in the OSCILOS_Long.m
         Fcn_GUI_INI_TP_plot(handles.axes1,handles);
         handles = guidata(hObject);
         guidata(hObject, handles);
-        %
-        % -----------------------------------------------------------------
+
     case 0
         % ------------------initialize HA -----------------------------------------
         Fcn_GUI_INI_TP_HA_initialization(hObject);
