@@ -6,6 +6,7 @@ function Fcn_GUI_INI_TP_Main_calculation(varargin)
 hObject     = varargin{1};
 handles     = guidata(hObject);
 % ----------------------------
+index_gamma = get(handles.pop_gamma,'Value');    % flag for gamma 
 global CI
 CI.TP.numSection    = length(CI.CD.x_sample)-1;                 % number of sections
 % 
