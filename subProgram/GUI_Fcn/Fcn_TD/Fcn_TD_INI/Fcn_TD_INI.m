@@ -1,4 +1,4 @@
-function Fcn_TD_INI(dt,tEndRaw,uRatioMax,nGapRatio,NoiseInfo)
+function Fcn_TD_INI(dt,tEndRaw,uRatioMax,nGapRatio,NoiseInfo,ExtForceInfo)
 global CI
 % This function is used to initilize the time domain calculation code
 % The sampling frequency and the raw time ends,
@@ -40,6 +40,8 @@ Fcn_TD_INI_Green_function                                                   % Gr
 Fcn_TD_INI_constant_variables                                               % pre-calculate some constant values to improve the calculation speed
 %   
 % Fcn_TD_INI_Period_Seperation(nPeriod,RatioGapPadding)                     %
+%
+Fcn_TD_INI_external_forcing(ExtForceInfo)                                   % external forcing from a loudspeaker mounted to the combustor wall
 %
 assignin('base','CI',CI);
 %

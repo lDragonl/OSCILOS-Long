@@ -44,10 +44,10 @@ if ~isempty(CI.CD.indexHP)    % if there are heat perturbations
                 end
             case 3
                 error('The current version does not support this situation!')
-                % ************* need further change **************
+                
             case 4 % G-equation, the time delay here is fixed through GUI  
                 taufMin(ss) = HP.GEQU.tau_f;
-                % ************* need further change **************
+                
         end
         taufMin0 = min(taufMin);
     end

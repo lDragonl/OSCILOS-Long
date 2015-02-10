@@ -25,6 +25,10 @@ else
 end
 CI.TD.NoiseInfo         = NoiseInfo;                                            % background noise level = 10^(value/20) Pa;
 CI.TD.pNoiseBG          = wgn(1,CI.TD.nTotal,CI.TD.NoiseInfo.level);            % background noise
+% CI.TD.pNoiseBG          = chirp(CI.TD.tSpTotal,10,CI.TD.tSpTotal(end),2000); 
+% f = CI.TD.NoiseInfo.level;
+% CI.TD.pNoiseBG  = 1e-2*sin(2*pi*f.*CI.TD.tSpTotal);
+% y = chirp(t,f0,t1,f1)
 N1                      = round((NoiseInfo.t(1)-CI.TD.tSpTotal(1)).*CI.TD.fs) + 1;
 N2                      = round((NoiseInfo.t(end)-CI.TD.tSpTotal(1)).*CI.TD.fs) + 1;
 
