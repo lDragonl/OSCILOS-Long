@@ -90,8 +90,7 @@ switch CI.IsRun.GUI_FREQ_EigCal
                         'min',1,...
                         'max',n,...
                         'value',1,...
-                        'SliderStep',[1/n, 1/n])
-%                         'SliderStep',[1/(n-1), 1/(n-1)]);
+                        'SliderStep',[1/(n-1), 1/(n-1)]);
                 set(handles.edit_uRatio,'string',num2str(CI.EIG.FDF.uRatioSp(1)));
                 set(handles.edit_uRatio_min,       'string',num2str(CI.EIG.FDF.uRatioSp(1)));
                 set(handles.edit_uRatio_max,       'string',num2str(CI.EIG.FDF.uRatioSp(end)));

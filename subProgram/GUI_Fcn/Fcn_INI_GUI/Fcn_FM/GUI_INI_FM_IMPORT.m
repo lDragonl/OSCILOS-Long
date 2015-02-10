@@ -469,7 +469,11 @@ switch HP.FMEXP.indexIMPORT
         set(handles.edit_FIT_a4,    'string', num2str(handles.FMFit.fitting_level));
         set(handles.edit_FIT_a5,    'string', num2str(handles.FMFit.RD));
         set(handles.pb_Import,      'Enable','off');
-        set(handles.pop_source,     'value',handles.FMFit.popSourceValue);
+        try
+            set(handles.pop_source,     'value',handles.FMFit.popSourceValue);
+        catch
+            set(handles.pop_source,     'value',1);
+        end
         set(handles.pb_fitfrd,      'Enable','on');
         set(handles.pb_SaveFitting, 'Enable','on');
         % -------------
