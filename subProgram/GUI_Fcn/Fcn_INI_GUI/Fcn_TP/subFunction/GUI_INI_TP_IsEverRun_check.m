@@ -32,10 +32,13 @@ switch CI.IsRun.GUI_INI_TP    % This value is defined in the OSCILOS_Long.m
                 StringHA{k}         = ['Heat source number:' num2str(k)]; 
             end
         end
+        try
         set(handles.pop_HA_num,...
                         'string',StringHA,...
                         'enable','on',...
                         'value',1);   
+        catch
+        end
         % -----------------------------------------------------------------
         guidata(hObject, handles);
         Fcn_GUI_INI_TP_HA_Para2UI(hObject)

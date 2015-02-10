@@ -7,6 +7,9 @@ hObject     = varargin{1};
 handles     = guidata(hObject);
 % ----------------------------
 index_gamma = get(handles.pop_gamma,'Value');    % flag for gamma 
+gamma_cst = 1.4;
+Cp_cst = 1005;
+
 global CI
 CI.TP.numSection    = length(CI.CD.x_sample)-1;                 % number of sections
 % 
@@ -25,13 +28,20 @@ CI.TP.T_mean(1:2,1)     = str2num(get(handles.edit_TP_T1,'string'));
 % calculate  Cp and gamma of air in unburned gases
 % use the program:
 % [ci,co,DeltaHr,Cp_o]=Fcn_calculation_c_q_air(Ti,To)
-[CI.TP.c_mean(1:2,1),temp1,temp2,CI.TP.Cp(1:2,1)]...
-    = Fcn_calculation_c_q_air(CI.TP.T_mean(1,1));
+switch index_gamma
+    case 1
+        CI.TP.c_mean(1:2,1)     = Fcn_c_gamma_cst(CI.TP.T_mean(1,1));
+        CI.TP.Cp(1:2,1)         = Cp_cst;
+        CI.TP.gamma(1:2,1)      = gamma_cst;
+    case 2
+        [CI.TP.c_mean(1:2,1),temp1,temp2,CI.TP.Cp(1:2,1)]...
+        = Fcn_calculation_c_q_air(CI.TP.T_mean(1,1));
+        CI.TP.gamma(1:2,1)  = CI.TP.Cp(1,1)./(CI.TP.Cp(1,1) - CI.R_air);            % gamma
+end
 % It is necessary to indicate that T_mean(a1:a2,b), herein, a1 denotes the 
 % final state in the current interface, and a2 denotes the intermediate state
 % b means the index number of the section
 %
-CI.TP.gamma(1:2,1)  = CI.TP.Cp(1,1)./(CI.TP.Cp(1,1) - CI.R_air);            % gamma
 %
 CI.TP.M1_u1_style   = get(handles.pop_TP_M1_u1,'Value');                    % Heat addition style
 %
@@ -93,22 +103,32 @@ for ss = 1:CI.TP.numSection-1
                                                                 indexHA_num,...
                                                                 CI.TP.T_mean(2,ss+1),...
                                                                 CI.TP.p_mean(2,ss+1));
-            CI.TP.T_mean(1,ss+1) = CI.TP.TRatio(indexHA_num).*CI.TP.T_mean(2,ss+1);
+            CI.TP.T_mean(1,ss+1)    = CI.TP.TRatio(indexHA_num).*CI.TP.T_mean(2,ss+1);
+            switch index_gamma
+                case 1
+                        % % % % % % % % % 
+                        CI.TP.gamma(1,ss+1)     = gamma_cst;
+                        CI.TP.Cp(1,ss+1)        = Cp_cst;
+                        CI.TP.c_mean(1,ss+1)    = Fcn_c_gamma_cst(CI.TP.T_mean(1,ss+1));
+                         % % % % % % % % %                     
+                case 2
+                    % nothing happens!
+            end
             Rg2 = CI.TP.Cp(1,ss+1)./(CI.TP.gamma(1,ss+1)./(CI.TP.gamma(1,ss+1)-1));
-            % ---------then, use the resolved temperature, Rg and the mean
-            % properties after the area changes to calculate the mean
-            % properties after HA ----------------------------------------
-            [   CI.TP.p_mean(1,ss+1),...               
-                CI.TP.rho_mean(1,ss+1),...
-                CI.TP.u_mean(1,ss+1)] = ...
-            Fcn_calculation_TP_mean_W_HeatAddition( CI.TP.p_mean(2,ss+1),...
-                                                    CI.TP.rho_mean(2,ss+1),...
-                                                    CI.TP.u_mean(2,ss+1),...
-                                                    Rg2,...
-                                                    CI.TP.T_mean(1,ss+1));
-            CI.TP.M_mean(1,ss+1)  = CI.TP.u_mean(1,ss+1)./CI.TP.c_mean(1,ss+1);
-            mass = CI.TP.rho_mean(2,ss+1).*CI.TP.u_mean(2,ss+1).*CI.CD.r_sample(ss+1).^2.*pi; % mass flow rate before HA
-            CI.TP.Q(indexHA_num)  = CI.TP.DeltaHr(indexHA_num).*mass;       % heat release rate
+                    % ---------then, use the resolved temperature, Rg and the mean
+                    % properties after the area changes to calculate the mean
+                    % properties after HA ----------------------------------------
+                    [   CI.TP.p_mean(1,ss+1),...               
+                        CI.TP.rho_mean(1,ss+1),...
+                        CI.TP.u_mean(1,ss+1)] = ...
+                    Fcn_calculation_TP_mean_W_HeatAddition( CI.TP.p_mean(2,ss+1),...
+                                                            CI.TP.rho_mean(2,ss+1),...
+                                                            CI.TP.u_mean(2,ss+1),...
+                                                            Rg2,...
+                                                            CI.TP.T_mean(1,ss+1));
+                    CI.TP.M_mean(1,ss+1)  = CI.TP.u_mean(1,ss+1)./CI.TP.c_mean(1,ss+1);
+                    mass = CI.TP.rho_mean(2,ss+1).*CI.TP.u_mean(2,ss+1).*CI.CD.r_sample(ss+1).^2.*pi; % mass flow rate before HA
+                    CI.TP.Q(indexHA_num)  = CI.TP.DeltaHr(indexHA_num).*mass;       % heat release rate
     end
 end
 %
@@ -120,5 +140,11 @@ handles = guidata(hObject);
 guidata(hObject, handles);
 %
 assignin('base','CI',CI)
+
+
+function c = Fcn_c_gamma_cst(T)
+gamma = 1.4;
+Rs = 287;
+c = (gamma*Rs*T).^0.5;
 %
 % -------------------------------end --------------------------------------
