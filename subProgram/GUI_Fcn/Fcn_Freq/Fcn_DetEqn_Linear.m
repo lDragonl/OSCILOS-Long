@@ -83,10 +83,11 @@ switch CI.BC.ET.pop_type_model
     case 2
         Te = k.*exp((tau.*s).^2./4);
     case 3
-        if tau == 0
-            tau = eps;
-        end
-        Te = k.*(exp(tau*s) - exp(-tau*s))./(2*tau);
+%         if tau == 0
+%             tau = eps;
+%         end
+%         Te = k.*(exp(tau*s) - exp(-tau*s))./(2*tau);
+        Te = k.*sinc(tau*s./pi);
 end                        
 %
 % ----------------------linear Flame transfer function --------------------

@@ -23,7 +23,8 @@ assignin('base','TF',TF);
 %
 %-- calculate the flame temperature without dilution
 Tini=2000;
-TF.Tf_wodil = fsolve(@MyFcn_Tf,Tini);               % flame temperature without dilution
+options= optimset('Display','off');
+TF.Tf_wodil = fsolve(@MyFcn_Tf,Tini, options);               % flame temperature without dilution
 assignin('base','TF',TF); 
 
 Tf=TF.Tf_wodil;

@@ -79,6 +79,10 @@ switch CI.IsRun.GUI_FREQ_EigCal
             case {21,22}                             % nonlinear flame model
                 set(handles.ObjEditVisible_uRatio,      'visible','on');
                 % -----------------------------------
+                set(handles.edit_uRatio,'string',num2str(CI.EIG.FDF.uRatioSp(1)));
+                set(handles.edit_uRatio_min,       'string',num2str(CI.EIG.FDF.uRatioSp(1)));
+                set(handles.edit_uRatio_max,       'string',num2str(CI.EIG.FDF.uRatioSp(end)));
+                set(handles.edit_uRatio_SampNum,   'string',num2str(CI.EIG.FDF.uRatioNum));
                 %  pannel related to uRatio 
                 n = str2double(get(handles.edit_uRatio_SampNum,'string'));
                 set(handles.slider_uRatio,...
@@ -86,7 +90,8 @@ switch CI.IsRun.GUI_FREQ_EigCal
                         'min',1,...
                         'max',n,...
                         'value',1,...
-                        'SliderStep',[1/(n-1), 1/(n-1)]);
+                        'SliderStep',[1/n, 1/n])
+%                         'SliderStep',[1/(n-1), 1/(n-1)]);
                 set(handles.edit_uRatio,'string',num2str(CI.EIG.FDF.uRatioSp(1)));
                 set(handles.edit_uRatio_min,       'string',num2str(CI.EIG.FDF.uRatioSp(1)));
                 set(handles.edit_uRatio_max,       'string',num2str(CI.EIG.FDF.uRatioSp(end)));

@@ -44,9 +44,21 @@ switch HA_style
                                                 pMean1,...
                                                 CI.TP.eff(ss),...
                                                 CI.TP.dil(ss));
+        index_cMean_calculation  = 1;
+        % if index_cMean_calculation == 1, then consider the burnt gases as
+        % air and use the air program to calculate the cMean
+        % if index_cMean_calculation == 2, then use the burnt gases
+        % mixture and use the corresponding program to calculate cMean
+        switch index_cMean_calculation 
+            case 1
+                [temp1,cMean2,temp2,Cp2] = Fcn_calculation_c_q_air(TMean2);
+                 RProd               = CI.R_air;
+                gamma2  = Cp2./(Cp2-CI.R_air);  
+            case 2
+                RProd               = CI.Ru./(WProd).*1000;                     % gas constant per mass for the combustion product
+                gamma2              = Cp2./(Cp2-RProd);
+        end
         TRatio              = TMean2./TMean1;                           % Temperature jump ratio
-        RProd               = CI.Ru./(WProd).*1000;                     % gas constant per mass for the combustion product
-        gamma2              = Cp2./(Cp2-RProd);
     otherwise
         % Code for when there is no match.
 end
