@@ -128,8 +128,10 @@ switch selection
                                         {'*.mat','MATLAB Files (*.mat)';
                                            '*.*',  'All Files (*.*)'}, ...
                                            'Pick a file');
+               
     if filename~=0
-        load(filename);    
+        matfile = fullfile(pathname, filename);
+        load(matfile);    
     end
     try
     assignin('base','CI',CI)

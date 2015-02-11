@@ -652,6 +652,10 @@ switch CI.BC.StyleInlet
         M1              = CI.TP.M_mean(1,1);
         TEMP            = gamma*M1/(1+(gamma-1)*M1^2);
         %
+        %%% test of boundary conditions in Coh See's paper, CST 2013, added
+        %%% in 2015-02-11
+        TEMP = M1;
+        %%% END
         CI.BC.num1      = (1-TEMP)/(1+TEMP);
         CI.BC.den1      = 1;
         CI.BC.tau_d1    = 0;
