@@ -724,7 +724,14 @@ switch CI.BC.StyleOutlet
         [CI.BC.num2,CI.BC.den2] = tfdata(handles.sysFit2,'v');
         CI.BC.tau_d2    = str2num(get(handles.edit_td_Outlet, 'String'))./1000; 
 end
-assignin('base','CI',CI);                   % save the current information to the workspace
+switch CI.BC.StyleOutlet
+    case 3
+    otherwise
+        CI.BC.ET.pop_type_model         = 1;
+        CI.BC.ET.Dissipation.k          = 0;
+        CI.BC.ET.Dispersion.Delta_tauCs = 0e-3;
+end
+assignin('base','CI',CI);                   % save the current information to the workspace        
 guidata(hObject, handles);
 
 
