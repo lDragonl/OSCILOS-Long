@@ -5,7 +5,7 @@ global CI
 global FDF
 
 [R1,R2]     = Fcn_boundary_condition(s_star);
-Rs          = -0.5*CI.TP.M_mean(end)./(1 + 0.5*(CI.TP.gamma(end) - 1 ).*CI.TP.M_mean(end));
+Rs          = -0.5*CI.TP.M_mean(end)./(1 + 0.5*(CI.TP.gamma(end) - 1 ).*CI.TP.M_mean(end)).*CI.TP.rho_mean(1,end).*CI.TP.c_mean(1,end).^2./CI.TP.p_mean(1,end);
 %
 %
 Te          = Fcn_TF_entropy_convection(s_star);
@@ -109,7 +109,8 @@ switch CI.BC.ET.pop_type_model
         if tau == 0
             tau = eps;
         end
-        Te = k.*(exp(tau*s) - exp(-tau*s))./(2*tau);
+%         Te = k.*(exp(tau*s) - exp(-tau*s))./(2*tau);
+        Te = k.*sinc(tau*s./pi);
 end                        
 % ----------------------linear Flame transfer function --------------------
 %         
