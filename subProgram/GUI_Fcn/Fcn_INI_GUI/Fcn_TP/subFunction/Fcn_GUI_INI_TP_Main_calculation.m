@@ -110,6 +110,7 @@ for ss = 1:CI.TP.numSection-1
                         CI.TP.gamma(1,ss+1)     = gamma_cst;
                         CI.TP.Cp(1,ss+1)        = Cp_cst;
                         CI.TP.c_mean(1,ss+1)    = Fcn_c_gamma_cst(CI.TP.T_mean(1,ss+1));
+                        CI.TP.DeltaHr(indexHA_num) = CI.TP.Cp(1,ss+1).*(CI.TP.T_mean(1,ss+1) -  CI.TP.T_mean(2,ss+1));
                          % % % % % % % % %                     
                 case 2
                     % nothing happens!
