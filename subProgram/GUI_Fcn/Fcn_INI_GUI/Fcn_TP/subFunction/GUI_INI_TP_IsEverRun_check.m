@@ -23,6 +23,11 @@ switch CI.IsRun.GUI_INI_TP    % This value is defined in the OSCILOS_Long.m
         set(handles.edit_TP_T1,         'string',   num2str(CI.TP.T_mean(1,1)));
         set(handles.pop_TP_M1_u1,       'value',    2);                             % set to mean velocity
         set(handles.edit_TP_M1,         'string',   num2str(CI.TP.u_mean(1,1)));    % ...
+        try
+            set(handles.pop_gamma,          'Value',    CI.TP.index_gamma);
+        catch
+            set(handles.pop_gamma,          'Value',    1);
+        end
         %
         % --------------------update the rest -----------------------------
         %--------------- set the UI and initialize some heat addition properties -- 
