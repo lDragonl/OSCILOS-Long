@@ -654,7 +654,7 @@ switch CI.BC.StyleInlet
         %
         %%% test of boundary conditions in Coh See's paper, CST 2013, added
         %%% in 2015-02-11
-        TEMP = M1;
+%         TEMP = M1;
         %%% END
         CI.BC.num1      = (1-TEMP)/(1+TEMP);
         CI.BC.den1      = 1;
