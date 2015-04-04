@@ -395,7 +395,31 @@ set(handles.pb_Cancel,...
 guidata(hObject, handles);
 switch CI.IsRun.GUI_INI_CD
     case 1
-        switch CI.CD.pop_CD_type
+        if CI.IsRun.GUI_INI_PD==1 && (CI.CD.NUM_HR+CI.CD.NUM_Liner) >0
+            % Enable all the geometry settings
+            set(handles.pop_CB_type,        'enable','off'); 
+            set(handles.ed_US,              'enable','off'); 
+            set(handles.ed_DS,              'enable','off'); 
+            set(handles.ed_Diameter,        'enable','off'); 
+            set(handles.checkbox1,          'enable','off'); 
+            set(handles.checkbox2,          'enable','off'); 
+            set(handles.pb_load,            'enable','off'); 
+            set(handles.pb_Plot,            'enable','off');
+            set(handles.pb_SaveFig,         'enable','off');
+            set(handles.pb_OK,              'enable','off');
+            set(handles.pb_Cancel,          'enable','off');
+            switch CI.CD.pop_CD_type
+                case 1
+                set(handles.uipanel_Rijke_DM,   'visible','on'); 
+                set(handles.uipanel_Load,       'visible','off');    
+                case 2
+                set(handles.uipanel_Rijke_DM,   'visible','off'); 
+                set(handles.uipanel_Load,       'visible','on'); 
+                set(handles.uitable_DM,         'data',table_data_cell);
+                set(handles.pop_CB_type,        'value',2); 
+            end
+        else
+          switch CI.CD.pop_CD_type
             case 1
                 set(handles.uipanel_Rijke_DM,   'visible','on'); 
                 set(handles.uipanel_Load,       'visible','off'); 
@@ -403,24 +427,25 @@ switch CI.IsRun.GUI_INI_CD
                 set(handles.ed_DS,              'string', num2str((CI.CD.x_sample(3)-CI.CD.x_sample(2)).*1000));
                 set(handles.ed_Diameter,        'string', num2str(1000*CI.CD.r_sample(1)));
                 set(handles.pop_CB_type,        'value',1);
-                if isempty(CI.CD.indexHP) == 0
+                  if isempty(CI.CD.indexHP) == 0
                     set(handles.checkbox1,'value', 1);
                     set(handles.checkbox2,'value', 1);
-                end
-                if isempty(CI.CD.indexHP) == 1 && isempty(CI.CD.indexHA) == 0
+                  end
+                  if isempty(CI.CD.indexHP) == 1 && isempty(CI.CD.indexHA) == 0
                     set(handles.checkbox1,'value', 1);
                     set(handles.checkbox2,'value', 0);
-                end
-                 if isempty(CI.CD.indexHP) == 1 && isempty(CI.CD.indexHA) == 1
+                  end
+                  if isempty(CI.CD.indexHP) == 1 && isempty(CI.CD.indexHA) == 1
                     set(handles.checkbox1,'value', 0);
                     set(handles.checkbox2,'value', 0);
-                 end         
+                  end         
             case 2
                 set(handles.uipanel_Rijke_DM,   'visible','off'); 
                 set(handles.uipanel_Load,       'visible','on'); 
                 set(handles.uitable_DM,         'data',table_data_cell);
                 set(handles.pop_CB_type,        'value',2);
-            end
+          end
+        end
     otherwise
 end
 % hToolbar = get(handles.figure,'toolbar')
@@ -682,6 +707,10 @@ function pb_OK_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 % Fcn_GUI_INI_CD_Update_Data(hObject, eventdata, handles);
 global CI
+handles = guidata(hObject);
+guidata(hObject, handles);
+Fcn_GUI_INI_CD_Plot_CD_Shape(hObject);        % draw the combustor shap
+
 CI.IsRun.GUI_INI_CD = 1;
 Fcn_GUI_INI_CD_Update_Data(hObject);
 Fcn_GUI_INI_CD_Update_Main_GUI(hObject);
@@ -747,7 +776,7 @@ hObject = varargin{1};
 Fcn_GUI_INI_CD_Update_Data(hObject);
 handles = guidata(hObject);
 guidata(hObject, handles);
-Fcn_CD_plot(handles.axes1,handles,1)
+Fcn_CD_plot_with_dampers(handles.axes1,handles,1)
 %
 % --- Update the data 
 function Fcn_GUI_INI_CD_Update_Data(varargin)
@@ -755,8 +784,10 @@ hObject = varargin{1};
 handles = guidata(hObject);
 global CI
 CI.CD.pop_CD_type=get(handles.pop_CB_type,'Value');
-switch CI.CD.pop_CD_type    
-    case 1
+switch CI.IsRun.GUI_INI_CD
+    case 0
+    switch CI.CD.pop_CD_type    
+       case 1
         l(1)    = 0;
         l(2)    = str2num(get(handles.ed_US,'string'));
         l(3)    = str2num(get(handles.ed_DS,'string'));
@@ -773,16 +804,17 @@ switch CI.CD.pop_CD_type
             CI.CD.SectionIndex = [0 0 0];              % without heat addition
         end
         CI.CD.TubeIndex = [0 0 0]; 
-    case 2
+       case 2
         data_cell = get(handles.uitable_DM,'data');
         CI.CD.x_sample          = cell2mat(data_cell(1,:))./1000;
         CI.CD.r_sample          = cell2mat(data_cell(2,:))./1000;
         CI.CD.SectionIndex      = cell2mat(data_cell(3,:));
         CI.CD.TubeIndex         = cell2mat(data_cell(4,:));
-    otherwise
+       otherwise
         % Code for when there is no match.
-end
-CI.CD.pop_CD_type = get(handles.pop_CB_type,'Value');
+    end
+otherwise
+end 
 
 %Compute the length downstream of a flame. If a flame is at the end of a section, use the min to set that to 0
 %index_flame =   find(CI.CD.SectionIndex==11);
@@ -800,7 +832,7 @@ global CI
 % Obtain handles using GUIDATA with the caller's handle 
 if(ishandle(main))
     mainHandles = guidata(main);
-    changeMain = mainHandles.INI_TP;
+    changeMain = mainHandles.INI_PD;
     set(changeMain, 'Enable', 'on');
     String_Listbox=get(mainHandles.listbox_Info,'string');
     ind=find(ismember(String_Listbox,'<HTML><FONT color="blue">Information 1:'));

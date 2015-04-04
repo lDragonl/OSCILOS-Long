@@ -28,7 +28,7 @@ function varargout = OSCILOS_long(varargin)
 
 % Edit the above text to modify the response to help OSCILOS_long
 
-% Last Modified by GUIDE v2.5 21-Nov-2014 14:43:29
+% Last Modified by GUIDE v2.5 29-Mar-2015 18:09:30
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -70,17 +70,19 @@ Main_program_Initialization(hObject, eventdata, handles)
 handles = guidata(hObject);
 guidata(hObject, handles);
 %---------------------------------
-% % Set waiting flag in appdata
-% setappdata(handles.figure,'waiting',0)
-% % UIWAIT makes changeme_main wait for user response (see UIRESUME)
-% uiwait(handles.figure);
+% Set waiting flag in appdata
+setappdata(handles.figure,'waiting',0)
+% UIWAIT makes changeme_main wait for user response (see UIRESUME)
+uiwait(handles.figure);
 
 % --- Executes during object creation, after setting all properties.
 function figure_CreateFcn(hObject, eventdata, handles) %#ok<*DEFNU,*INUSD> 
 
 % --- Outputs from this function are returned to the command line.
 function varargout = OSCILOS_long_OutputFcn(hObject, eventdata, handles) 
+try
 varargout{1} = handles.output;
+end
 
 % --------------------------------------------------------------------
 function FILE_Callback(hObject, eventdata, handles)
@@ -247,6 +249,14 @@ guidata(hObject,handles);
 handles=guidata(hObject);
 GUI_INI_CD('OSCILOS_long', handles.figure);
 
+function INI_PD_Callback(hObject, eventdata, handles)
+% hObject    handle to INI_PD (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+% Call GUI_INI_PD to include passive dampers into the configurations
+guidata(hObject, handles);
+handles=guidata(hObject);
+GUI_INI_PD('OSCILOS_long',handles.figure);
 
 function INI_TP_Callback(hObject, eventdata, handles)
 % hObject    handle to INI_TP (see GCBO)
@@ -323,6 +333,11 @@ function TD_Callback(hObject, eventdata, handles)
 % hObject    handle to TD (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+global CI
+if CI.CD.NUM_HR+CI.CD.NUM_Liner > 0
+    errordlg('The current version does not support Time domain simulation with dampers!','Error');
+else
+end
 
 % --------------------------------------------------------------------
 function TD_GreenFcn_Callback(hObject, eventdata, handles)
@@ -580,25 +595,32 @@ set(handles.INI_CD,...
                         'Position',             1,...
                         'visible',              'on',...
                         'Accelerator',          'D' ) 
+set(handles.INI_PD,...
+                        'Enable',   'off',...
+                        'ForegroundColor',      handles.bgcolor{2},...
+                        'Label',                'Passive Dampers',...
+                        'Position',             2,...
+                        'visible',              'on',...
+                        'Accelerator',          'P' )                                      
 set(handles.INI_TP,...
                         'Enable',   'off',...
                         'ForegroundColor',      handles.bgcolor{2},...
                         'Label',                'Thermal properties',...
-                        'Position',             2,...
+                        'Position',             3,...
                         'visible',              'on',...
                         'Accelerator',          'T' ) 
 set(handles.INI_FM,...
                         'Enable',   'off',...
                         'ForegroundColor',      handles.bgcolor{2},...
                         'Label',                'Flame model',...
-                        'Position',             3,...
+                        'Position',             4,...
                         'visible',              'on',...
                         'Accelerator',          'F' ) 
 set(handles.INI_BC,...
                         'Enable',   'off',...
                         'ForegroundColor',      handles.bgcolor{2},...
                         'Label',                'Boundary conditions',...
-                        'Position',             4,...
+                        'Position',             5,...
                         'visible',              'on',...
                         'Accelerator',          'B' )  
 % Frequency domain analysis
@@ -763,6 +785,7 @@ set(handles.listbox_Info,...
 %
 % Initialization pannels
 CI.IsRun.GUI_INI_CD         = 0;
+CI.IsRun.GUI_INI_PD         = 0;
 CI.IsRun.GUI_INI_TP         = 0;
 CI.IsRun.GUI_INI_FM_Sel     = 0;
 CI.IsRun.GUI_INI_FM         = 0;
@@ -790,6 +813,3 @@ function figure_DeleteFcn(hObject, eventdata, handles)
 % hObject    handle to figure (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-
-
-

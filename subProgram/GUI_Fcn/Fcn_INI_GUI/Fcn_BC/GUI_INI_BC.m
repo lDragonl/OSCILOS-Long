@@ -889,7 +889,7 @@ if(ishandle(main))
     end
     % ---------------
     String_Listbox=get(mainHandles.listbox_Info,'string');
-    ind=find(ismember(String_Listbox,'<HTML><FONT color="blue">Information 4:'));
+    ind=find(ismember(String_Listbox,'<HTML><FONT color="blue">Information 5:'));
     nLength=size(String_Listbox);
     if isempty(ind)
         indStart=nLength(1);
@@ -899,7 +899,7 @@ if(ishandle(main))
             String_Listbox(i)=[];
         end
     end
-    String_Listbox{indStart+1}=['<HTML><FONT color="blue">Information 4:'];
+    String_Listbox{indStart+1}=['<HTML><FONT color="blue">Information 5:'];
     String_Listbox{indStart+2}=['<HTML><FONT color="blue">Boundary condition:'];
     String_Listbox{indStart+3}=['Inlet boundary condition type:' num2str(CI.BC.StyleInlet) ];
     String_Listbox{indStart+4}=['Outlet boundary condition type:' num2str(CI.BC.StyleOutlet) ];
