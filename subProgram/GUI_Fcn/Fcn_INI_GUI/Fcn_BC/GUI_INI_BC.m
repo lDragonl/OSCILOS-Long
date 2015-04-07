@@ -156,7 +156,7 @@ screenSize  = get(0, 'ScreenSize');                             % get the screen
 sW          = handles.sW;                                       % screen width
 sH          = handles.sH;                                       % screen height
 FigW        = sW.*4/5;                                          % window width
-FigH        = sH.*2/3;                                          % window height
+FigH        = sH.*5/9;                                          % window height
 set(handles.figure,     'units', 'points',...
                         'position',[(screenSize(3)-FigW)./2 (screenSize(4)-FigH)./2 FigW FigH],...
                         'name','Boundary condition configurations',...
@@ -474,7 +474,7 @@ switch pop_type_Inlet
             set(handles.text_Amp_Inlet,             'visible','on',...
                                                     'string','Amplitude [-]'); 
             set(handles.edit_td_Inlet,              'visible','on',...
-                                                    'string', num2str(CI.BC.tau_d1));
+                                                    'string', num2str(CI.BC.tau_d1*1e3));
             set(handles.text_td_Inlet,              'visible','on',...
                                                     'string','Time delay [ms]:');
             set(handles.edit_add_Inlet,             'visible','off');
@@ -543,7 +543,7 @@ switch pop_type_Outlet
             set(handles.text_Amp_Outlet,            'visible','on',...
                                                     'string','Amplitude [-]'); 
             set(handles.edit_td_Outlet,             'visible','on',...
-                                                    'string', num2str(CI.BC.tau_d2));
+                                                    'string', num2str(CI.BC.tau_d2*1e3));
             set(handles.text_td_Outlet,             'visible','on',...
                                                     'string','Time delay [ms]:');
             set(handles.edit_add_Outlet,            'visible','off');
@@ -654,7 +654,7 @@ switch CI.BC.StyleInlet
         %
         %%% test of boundary conditions in Coh See's paper, CST 2013, added
         %%% in 2015-02-11
-        TEMP = M1;
+%         TEMP = M1;
         %%% END
         CI.BC.num1      = (1-TEMP)/(1+TEMP);
         CI.BC.den1      = 1;
@@ -889,7 +889,7 @@ if(ishandle(main))
     end
     % ---------------
     String_Listbox=get(mainHandles.listbox_Info,'string');
-    ind=find(ismember(String_Listbox,'<HTML><FONT color="blue">Information 5:'));
+    ind=find(ismember(String_Listbox,'<HTML><FONT color="blue">Information 4:'));
     nLength=size(String_Listbox);
     if isempty(ind)
         indStart=nLength(1);
@@ -899,7 +899,7 @@ if(ishandle(main))
             String_Listbox(i)=[];
         end
     end
-    String_Listbox{indStart+1}=['<HTML><FONT color="blue">Information 5:'];
+    String_Listbox{indStart+1}=['<HTML><FONT color="blue">Information 4:'];
     String_Listbox{indStart+2}=['<HTML><FONT color="blue">Boundary condition:'];
     String_Listbox{indStart+3}=['Inlet boundary condition type:' num2str(CI.BC.StyleInlet) ];
     String_Listbox{indStart+4}=['Outlet boundary condition type:' num2str(CI.BC.StyleOutlet) ];
