@@ -70,10 +70,10 @@ Main_program_Initialization(hObject, eventdata, handles)
 handles = guidata(hObject);
 guidata(hObject, handles);
 %---------------------------------
-% Set waiting flag in appdata
-setappdata(handles.figure,'waiting',0)
-% UIWAIT makes changeme_main wait for user response (see UIRESUME)
-uiwait(handles.figure);
+% % Set waiting flag in appdata
+% setappdata(handles.figure,'waiting',0)
+% % UIWAIT makes changeme_main wait for user response (see UIRESUME)
+% uiwait(handles.figure);
 
 % --- Executes during object creation, after setting all properties.
 function figure_CreateFcn(hObject, eventdata, handles) %#ok<*DEFNU,*INUSD> 
@@ -153,44 +153,6 @@ switch selection
     catch
     end
 %     ------------------------------
-%     try
-%         if CI.IsRun.GUI_INI_CD == 1;
-%             set(handles.INI_TP,         'enable','on')
-%         end
-%         if CI.IsRun.GUI_INI_TP == 1;
-%             set(handles.INI_FM,         'enable','on')
-%         end
-%         if CI.IsRun.GUI_INI_FM == 1 || CI.IsRun.GUI_INI_FMEXP == 1 || CI.IsRun.GUI_INI_GEQU == 1 || CI.IsRun.GUI_INI_FM_Sel == 1
-%             set(handles.INI_BC,         'enable','on')
-%         end
-%         if CI.IsRun.GUI_INI_BC == 1; 
-%             set(handles.FREQ,           'enable','on')
-%             set(handles.FREQ_EigCal,    'enable','on')
-%             set(handles.TD,             'enable','on')
-%             if ~isempty(CI.CD.indexHP)                  % with heat perturbations
-%                 if ~isempty(find(CI.FM.indexFM == 4))   % Frequency calculation can only be run if the G-EQuation is not being used
-%                     set(handles.FREQ,           'enable','off')
-%                     set(handles.FREQ_EigCal,    'enable','off')
-%                     set(handles.TD,             'enable','on')
-%                 end
-%                 if ~isempty(find(CI.FM.indexFM == 3))   % with loaded experimental/CFD FDF, time domain code is not avaliable
-%                     set(handles.FREQ,           'enable','on')
-%                     set(handles.FREQ_EigCal,    'enable','on')
-%                     set(handles.TD,             'enable','off')
-%                 end
-%             end
-%         end
-%         if CI.IsRun.GUI_TD_Convg == 1
-%             set(handles.TD_Para_Config,         'enable','on')
-%         end
-%         if CI.IsRun.GUI_TD_Para_Config == 1
-%             set(handles.TD_SIM,                 'enable','on')
-%         end
-%         if CI.IsRun.GUI_TD_Cal_JLI_AMorgans == 1 || CI.IsRun.GUI_TD_Cal_simple == 1 
-%             set(handles.TD_Plots,               'enable','on')
-%         end                  
-%     catch
-%     end
     case 'No'
     return 
 end
@@ -423,7 +385,7 @@ function HP_About_Callback(hObject, eventdata, handles)
 string={...
             'OSCILOS_long: Open-Source Combustion Instabilities'; 
             'Low-Order Simulator (For longitudinal modes)';...
-            'Version: 1.4.2';...
+            'Version: 1.4.4';...
             '';...
             'Developed by Dr. Jingxuan Li, Dong Yang, Charles Luzzato';...
             'and Dr. Aimee S.Morgans';...
@@ -760,15 +722,17 @@ pH=pannelsize(4);
 
 % --------------    
 msg = {     '<HTML><FONT color="red">Welcome to OSCILOS_long!';...
-            'version 1.4.2';...
+            'version 1.4.4';...
             '';...
-            '<HTML><FONT color="red">What is OSCILOS?';...
-            'The open source combustion instability low-order simulator (OSCILOS)';...
-            'is an open source code for simulating combustion instability.';...
-            'It represents a combustor as a network of connected modules.';...
-            'The acoustic waves are modeled as 1-D plane waves for longitudinal combustors. ';...
-            'This assumes longitudinal/cannular/can combustor geometry or an annular geometry';...
-            'but where only plane acoustic waves are known to be of interest.'};
+            '<HTML><FONT color="blue">Please note that the recommended versions of Matlab are 2013b and 2014a!'};%;...
+%             '';...
+%             '<HTML><FONT color="red">What is OSCILOS?';...
+%             'The open source combustion instability low-order simulator (OSCILOS)';...
+%             'is an open source code for simulating combustion instability.';...
+%             'It represents a combustor as a network of connected modules.';...
+%             'The acoustic waves are modeled as 1-D plane waves for longitudinal combustors. ';...
+%             'This assumes longitudinal/cannular/can combustor geometry or an annular geometry';...
+%             'but where only plane acoustic waves are known to be of interest.'};
 
 set(handles.listbox_Info,...
                         'units', 'points',...

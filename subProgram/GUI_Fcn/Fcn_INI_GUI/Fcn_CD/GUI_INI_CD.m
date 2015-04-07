@@ -393,63 +393,120 @@ set(handles.pb_Cancel,...
                         'string','Cancel',...
                         'backgroundcolor',handles.bgcolor{3}); 
 guidata(hObject, handles);
+% switch CI.IsRun.GUI_INI_CD
+%     case 1
+%         if CI.IsRun.GUI_INI_PD==1 && (CI.CD.NUM_HR+CI.CD.NUM_Liner) >0
+%             % Enable all the geometry settings
+%             set(handles.pop_CB_type,        'enable','off'); 
+%             set(handles.ed_US,              'enable','off'); 
+%             set(handles.ed_DS,              'enable','off'); 
+%             set(handles.ed_Diameter,        'enable','off'); 
+%             set(handles.checkbox1,          'enable','off'); 
+%             set(handles.checkbox2,          'enable','off'); 
+%             set(handles.pb_load,            'enable','off'); 
+%             set(handles.pb_Plot,            'enable','off');
+%             set(handles.pb_SaveFig,         'enable','off');
+%             set(handles.pb_OK,              'enable','off');
+%             set(handles.pb_Cancel,          'enable','off');
+%             switch CI.CD.pop_CD_type
+%                 case 1
+%                 set(handles.uipanel_Rijke_DM,   'visible','on'); 
+%                 set(handles.uipanel_Load,       'visible','off');    
+%                 case 2
+%                 set(handles.uipanel_Rijke_DM,   'visible','off'); 
+%                 set(handles.uipanel_Load,       'visible','on'); 
+%                 set(handles.uitable_DM,         'data',table_data_cell);
+%                 set(handles.pop_CB_type,        'value',2); 
+%             end
+%         else
+%           switch CI.CD.pop_CD_type
+%             case 1
+%                 set(handles.uipanel_Rijke_DM,   'visible','on'); 
+%                 set(handles.uipanel_Load,       'visible','off'); 
+%                 set(handles.ed_US,              'string', num2str((CI.CD.x_sample(2)-CI.CD.x_sample(1)).*1000));
+%                 set(handles.ed_DS,              'string', num2str((CI.CD.x_sample(3)-CI.CD.x_sample(2)).*1000));
+%                 set(handles.ed_Diameter,        'string', num2str(1000*CI.CD.r_sample(1)));
+%                 set(handles.pop_CB_type,        'value',1);
+%                   if isempty(CI.CD.indexHP) == 0
+%                     set(handles.checkbox1,'value', 1);
+%                     set(handles.checkbox2,'value', 1);
+%                   end
+%                   if isempty(CI.CD.indexHP) == 1 && isempty(CI.CD.indexHA) == 0
+%                     set(handles.checkbox1,'value', 1);
+%                     set(handles.checkbox2,'value', 0);
+%                   end
+%                   if isempty(CI.CD.indexHP) == 1 && isempty(CI.CD.indexHA) == 1
+%                     set(handles.checkbox1,'value', 0);
+%                     set(handles.checkbox2,'value', 0);
+%                   end         
+%             case 2
+%                 set(handles.uipanel_Rijke_DM,   'visible','off'); 
+%                 set(handles.uipanel_Load,       'visible','on'); 
+%                 set(handles.uitable_DM,         'data',table_data_cell);
+%                 set(handles.pop_CB_type,        'value',2);
+%           end
+%         end
+%     otherwise
+% end
+
+
+
 switch CI.IsRun.GUI_INI_CD
     case 1
-        if CI.IsRun.GUI_INI_PD==1 && (CI.CD.NUM_HR+CI.CD.NUM_Liner) >0
-            % Enable all the geometry settings
-            set(handles.pop_CB_type,        'enable','off'); 
-            set(handles.ed_US,              'enable','off'); 
-            set(handles.ed_DS,              'enable','off'); 
-            set(handles.ed_Diameter,        'enable','off'); 
-            set(handles.checkbox1,          'enable','off'); 
-            set(handles.checkbox2,          'enable','off'); 
-            set(handles.pb_load,            'enable','off'); 
-            set(handles.pb_Plot,            'enable','off');
-            set(handles.pb_SaveFig,         'enable','off');
-            set(handles.pb_OK,              'enable','off');
-            set(handles.pb_Cancel,          'enable','off');
-            switch CI.CD.pop_CD_type
-                case 1
-                set(handles.uipanel_Rijke_DM,   'visible','on'); 
-                set(handles.uipanel_Load,       'visible','off');    
-                case 2
-                set(handles.uipanel_Rijke_DM,   'visible','off'); 
-                set(handles.uipanel_Load,       'visible','on'); 
-                set(handles.uitable_DM,         'data',table_data_cell);
-                set(handles.pop_CB_type,        'value',2); 
-            end
-        else
-          switch CI.CD.pop_CD_type
-            case 1
-                set(handles.uipanel_Rijke_DM,   'visible','on'); 
-                set(handles.uipanel_Load,       'visible','off'); 
-                set(handles.ed_US,              'string', num2str((CI.CD.x_sample(2)-CI.CD.x_sample(1)).*1000));
-                set(handles.ed_DS,              'string', num2str((CI.CD.x_sample(3)-CI.CD.x_sample(2)).*1000));
-                set(handles.ed_Diameter,        'string', num2str(1000*CI.CD.r_sample(1)));
-                set(handles.pop_CB_type,        'value',1);
-                  if isempty(CI.CD.indexHP) == 0
-                    set(handles.checkbox1,'value', 1);
-                    set(handles.checkbox2,'value', 1);
-                  end
-                  if isempty(CI.CD.indexHP) == 1 && isempty(CI.CD.indexHA) == 0
-                    set(handles.checkbox1,'value', 1);
-                    set(handles.checkbox2,'value', 0);
-                  end
-                  if isempty(CI.CD.indexHP) == 1 && isempty(CI.CD.indexHA) == 1
-                    set(handles.checkbox1,'value', 0);
-                    set(handles.checkbox2,'value', 0);
-                  end         
+        switch CI.CD.pop_CD_type
             case 2
                 set(handles.uipanel_Rijke_DM,   'visible','off'); 
                 set(handles.uipanel_Load,       'visible','on'); 
                 set(handles.uitable_DM,         'data',table_data_cell);
                 set(handles.pop_CB_type,        'value',2);
-          end
+            case 1     
+                try
+                    if CI.IsRun.GUI_INI_PD==1 && (CI.CD.NUM_HR+CI.CD.NUM_Liner) >0
+                        indexPD = 1;
+                    else 
+                        indexPD = 0;
+                    end
+                catch
+                    indexPD = 0;
+                end
+                if indexPD == 1
+                    % Enable all the geometry settings
+                    set(handles.pop_CB_type,        'enable','off'); 
+                    set(handles.ed_US,              'enable','off'); 
+                    set(handles.ed_DS,              'enable','off'); 
+                    set(handles.ed_Diameter,        'enable','off'); 
+                    set(handles.checkbox1,          'enable','off'); 
+                    set(handles.checkbox2,          'enable','off'); 
+                    set(handles.pb_load,            'enable','off'); 
+                    set(handles.pb_Plot,            'enable','off');
+                    set(handles.pb_SaveFig,         'enable','off');
+                    set(handles.pb_OK,              'enable','off');
+                    set(handles.pb_Cancel,          'enable','off');
+                    set(handles.uipanel_Rijke_DM,   'visible','on'); 
+                    set(handles.uipanel_Load,       'visible','off');  
+                else
+                    set(handles.uipanel_Rijke_DM,   'visible','on'); 
+                    set(handles.uipanel_Load,       'visible','off'); 
+                    set(handles.ed_US,              'string', num2str((CI.CD.x_sample(2)-CI.CD.x_sample(1)).*1000));
+                    set(handles.ed_DS,              'string', num2str((CI.CD.x_sample(3)-CI.CD.x_sample(2)).*1000));
+                    set(handles.ed_Diameter,        'string', num2str(1000*CI.CD.r_sample(1)));
+                    set(handles.pop_CB_type,        'value',1);
+                    if isempty(CI.CD.indexHP) == 0
+                        set(handles.checkbox1,'value', 1);
+                        set(handles.checkbox2,'value', 1);
+                    end
+                    if isempty(CI.CD.indexHP) == 1 && isempty(CI.CD.indexHA) == 0
+                        set(handles.checkbox1,'value', 1);
+                        set(handles.checkbox2,'value', 0);
+                    end
+                    if isempty(CI.CD.indexHP) == 1 && isempty(CI.CD.indexHA) == 1
+                        set(handles.checkbox1,'value', 0);
+                        set(handles.checkbox2,'value', 0);
+                    end         
+                end
         end
     otherwise
 end
-% hToolbar = get(handles.figure,'toolbar')
-% get(hToolbar,'children')
 %----------------------------------------
 % Update handles structure
 guidata(hObject, handles);
