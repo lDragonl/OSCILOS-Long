@@ -71,14 +71,15 @@ tau     = CI.BC.ET.Dispersion.Delta_tauCs;
 k       = CI.BC.ET.Dissipation.k;
 switch CI.BC.ET.pop_type_model
     case 1
-        Te = 0;
+        Te = k;
     case 2
         Te = k.*exp((tau.*s).^2./4);
     case 3
         if tau == 0
             tau = eps;
         end
-        Te = k.*(exp(tau*s) - exp(-tau*s))./(2*tau);
+%         Te = k.*(exp(tau*s) - exp(-tau*s))./(2*tau);
+        Te = k.*sinc(tau*s./pi);
 end                        
 %
 % ----------------------Flame transfer function ---------------------------
