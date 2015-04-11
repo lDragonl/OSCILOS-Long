@@ -150,15 +150,15 @@ switch selection
         % account for the version before 1.4.4. PD menu is added to version
         % 1.4.4
         if length(a2) < length(a1)
-            for kk = 1 : 4
+            for kk = 1 : 2
                 set(a1(kk),     'enable',a2{kk},...
                                 'visible',a3{kk});
             end
-            for kk = 5 : 5  % dampers
+            for kk = 3 : 3
                 set(a1(kk),     'enable','off',...
                                 'visible','off');
             end
-            for kk = 6 : length(a1)
+            for kk = 4 : length(a1)
                 set(a1(kk),     'enable',a2{kk-1},...
                                 'visible',a3{kk-1});
             end
@@ -398,7 +398,7 @@ function HP_pdf_Callback(hObject, eventdata, handles)
 if ispc
     open('OSCILOS_Long User Guide.pdf')
 else
-    msgbox('Please refer to ''OSCILOS_Long User Guide.pdf'' in doc folder!');
+    msgbox('Please refer to ''OSCILOS_Long User Guide.pdf'' in the current folder!');
 end
 
 

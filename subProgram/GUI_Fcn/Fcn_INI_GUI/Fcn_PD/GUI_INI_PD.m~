@@ -1407,7 +1407,7 @@ switch idExistHR
         end
 end
 if NumHR2 ~= NumHR1
-    CI.IsRun.GUI_INI_TP = 0;
+    
 end
 % ------------------------------------------------------------
 assignin('base','CI',CI);                   % save the current information to the workspace
