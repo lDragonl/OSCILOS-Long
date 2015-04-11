@@ -32,7 +32,7 @@ if(ishandle(main))
     mainHandles = guidata(main);            %
     % ------------------------------------
     String_Listbox=get(mainHandles.listbox_Info,'string');
-    ind=find(ismember(String_Listbox,'<HTML><FONT color="blue">Information 2:'));
+    ind=find(ismember(String_Listbox,'<HTML><FONT color="blue">Information 3:'));
     nLength=size(String_Listbox);
     if isempty(ind)
         indStart=nLength(1);
@@ -42,7 +42,7 @@ if(ishandle(main))
             String_Listbox(i)=[];
         end
     end
-    String_Listbox{indStart+1}='<HTML><FONT color="blue">Information 2:';
+    String_Listbox{indStart+1}='<HTML><FONT color="blue">Information 3:';
     String_Listbox{indStart+2}=['<HTML><FONT color="blue">Mean flow and thermal properties:'];
     % -----------------------------------
     if CI.TP.isHA_final == 0    % No heat addition

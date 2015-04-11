@@ -11,8 +11,12 @@ fontSize1           = handles.FontSize(1);
 fontSize2           = handles.FontSize(2);
 CI.EIG.pop_numMode  = get(handles.pop_numMode,  'Value');
 CI.EIG.pop_PlotType = get(handles.pop_PlotType, 'Value');
-ValueSlider         = get(handles.slider_uRatio,'Value');
-indexShow           = round(ValueSlider);   
+if CI.EIG.APP_style~=3
+    ValueSlider         = get(handles.slider_uRatio,'Value');  
+else
+    ValueSlider         = get(handles.slider_pRatio,'Value');
+end
+indexShow           = round(ValueSlider);
 Eigenvalue          = CI.EIG.Scan.EigValCol{indexShow};
 ValueContour        = CI.EIG.Cont.ValCol{indexShow};
 pannelsize          = get(handles.uipanel_Axes,'position');
@@ -116,6 +120,10 @@ switch CI.EIG.pop_PlotType
         FDF.uRatio  = CI.EIG.FDF.uRatioSp(indexShow);
         assignin('base','FDF',FDF);
         [x_resample,p,u] = Fcn_calculation_eigenmode_frozen_nonlinear(s_star);
+    case {3}
+        CI.EIG.PR.A1minus_this_step=CI.EIG.PR.A1minusSp(indexShow);
+        assignin('base','CI',CI);
+        [x_resample,p,u] = Fcn_calculation_eigenmode_nonlinear_dampers(s_star);    
     end
     cla(hAxes1,'reset')
     axes(hAxes1)
@@ -182,6 +190,50 @@ switch CI.EIG.pop_PlotType
     guidata(hObject, handles);
     %--------------------------------
     case 3 %'Evolution of eigenvalue with velocity ratio'
+    
+    if CI.EIG.APP_style==11 || CI.EIG.APP_style==12 
+       set(hObject, 'String', 0);
+       errordlg('There is not any evolution result','Error');
+    elseif CI.EIG.APP_style==21 || CI.EIG.APP_style==22
+        RatioNum = length(CI.EIG.FDF.uRatioSp);
+    else
+        RatioNum = length(CI.EIG.FDF.pRatioSp);    
+    end
+      
+    Modes_Num     =length(CI.EIG.Scan.EigValCol{1});
+    EigFreq       =abs(imag(CI.EIG.Scan.EigValCol{1}))/2/pi;
+    frequency_gap =min(abs(diff(EigFreq)));
+        if RatioNum==1
+            set(hObject, 'String', 0);
+            errordlg('There is not any evolution result','Error');
+        else
+            for M_Num=1:1:Modes_Num 
+                EigFreq_mode(M_Num,1)    = abs(imag(CI.EIG.Scan.EigValCol{1}(M_Num)))/2/pi;
+                EigGR_mode(M_Num,1)      = real(CI.EIG.Scan.EigValCol{1}(M_Num));
+                k=2;
+                Ratio_num_step=1;
+                while k<=RatioNum
+                      mod_fre_diff  =abs(EigFreq(M_Num)-abs(imag(CI.EIG.Scan.EigValCol{k}))/2/pi);
+                      [min_fre_diff,min_mod_num]= min(mod_fre_diff);
+                      if min_fre_diff<frequency_gap/2
+                         EigFreq_mode(M_Num,k)     = abs(imag(CI.EIG.Scan.EigValCol{k}(min_mod_num)))/2/pi;
+                         EigGR_mode(M_Num,k)       = real(CI.EIG.Scan.EigValCol{k}(min_mod_num));
+                         Ratio_num_step            = Ratio_num_step+1;
+                         k                         = k+1;
+                      else
+                          k=k+1;
+                      end
+                end
+                Ratio_num(M_Num)                       =Ratio_num_step;
+                if CI.EIG.APP_style==21 || CI.EIG.APP_style==22
+                    Ratio_mode(M_Num,1:1:Ratio_num(M_Num))=CI.EIG.FDF.uRatioSp(1:1:Ratio_num(M_Num));
+                else
+                    Ratio_mode(M_Num,1:1:Ratio_num(M_Num))=CI.EIG.FDF.pRatioSp(1:1:Ratio_num(M_Num));
+                end
+                   
+            end   
+        end
+    % Get the pop_numMode and plot its evolution 
     set(handles.pop_numMode,'enable','on');
     set(hAxes1,'position',[pW*2.0/10 pH*1.5/10 pW*7/10 pH*3.5/10]); 
     set(hAxes2,'position',[pW*2.0/10 pH*5.0/10 pW*7/10 pH*3.5/10]); 
@@ -190,12 +242,10 @@ switch CI.EIG.pop_PlotType
         delete(cbh)
     catch
     end    
-    x = CI.EIG.FDF.uRatioSp;
-    for k=1:length(x)
-        EIG = CI.EIG.Scan.EigValCol{k};
-        EigFreq(k) = abs(imag(EIG(CI.EIG.pop_numMode))./2./pi);
-        EigGR(k)   = real(EIG(CI.EIG.pop_numMode));
-    end
+    % Calculate the eigen values for a specific mode
+    x       = Ratio_mode(CI.EIG.pop_numMode,1:Ratio_num(CI.EIG.pop_numMode));
+    EigFreq = EigFreq_mode(CI.EIG.pop_numMode,1:Ratio_num(CI.EIG.pop_numMode));
+    EigGR   = EigGR_mode(CI.EIG.pop_numMode,1:Ratio_num(CI.EIG.pop_numMode));
     cla(hAxes1,'reset')
     axes(hAxes1)
     hold on
@@ -209,14 +259,22 @@ switch CI.EIG.pop_PlotType
         yticklabelUD{ss}=num2str(ytickUD(ss));
     end
     yticklabelUD{end}='';
-    xmax1=max(max(x));
-    xmin1=min(min(x));
+    if length(x)==1
+        xmax1=max(max(x))+0.1;
+        xmin1=min(min(x))-0.1;
+    else
+         xmax1=max(max(x));
+         xmin1=min(min(x));
+    end
     xlimitUD=[xmin1 xmax1];
     xtickUD=linspace(xlimitUD(1),xlimitUD(2),6);
-
     set(hAxes1,'YColor','k','Box','on');
-    set(hAxes1,'FontName','Helvetica','FontSize',fontSize1,'LineWidth',1)
-    xlabel(hAxes1,'$\hat{u}_1/\bar{u}_1 $ [-]','Color','k','Interpreter','LaTex','FontSize',fontSize1);
+    set(hAxes1,'FontName','Helvetica','FontSize',fontSize1,'LineWidth',1);
+    if CI.EIG.APP_style==11 || CI.EIG.APP_style==12 
+      xlabel(hAxes1,'$\hat{u}_1/\bar{u}_1 $ [-]','Color','k','Interpreter','LaTex','FontSize',fontSize1);
+    else
+      xlabel(hAxes1,'$\hat{p}_1/\bar{p}_1 $ [$\times 10^{-5}$]','Color','k','Interpreter','LaTex','FontSize',fontSize1);
+    end
     ylabel(hAxes1,'Frequency [Hz] ','Color','k','Interpreter','LaTex','FontSize',fontSize1);
     set(hAxes1,     'ylim', ylimitUD,...
                     'yTick',ytickUD,...

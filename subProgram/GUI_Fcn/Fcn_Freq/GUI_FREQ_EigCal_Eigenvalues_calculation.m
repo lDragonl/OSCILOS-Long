@@ -16,8 +16,10 @@ Fcn_Para_initialization
 switch CI.EIG.APP_style
     case {11,12}  
         Fcn_calculation_APP_1(hObject)
-    case {21,22}                             % nonlinear flame model
+    case {21,22}                             % nonlinear flame model with enforcing before the flame
         Fcn_calculation_APP_2(hObject)
+    case {3}
+        Fcn_calculation_APP_3(hObject)       % nonlinear system with enforcing at the inlet
 end
 handles = guidata(hObject);
 guidata(hObject, handles);
@@ -168,7 +170,71 @@ set(handles.pop_PlotType,...
                 'enable','on'); 
 % ---------------update popup plot -------------
 guidata(hObject, handles);
+%
+%--------------------------------------------------------------------------
 
+function Fcn_calculation_APP_3(varargin)
+% CI.EIG.APP_style = {3} 
+% nonlinear
+hObject = varargin{1};
+handles = guidata(hObject);
+global CI
+global FDF
+% -----------------------get flame describing function --------------------
+    % use nonlinear flame model
+    pRatioMin           = str2double(get(handles.edit_pRatio_min,'string'));
+    pRatioMax           = str2double(get(handles.edit_pRatio_max,'string'));
+    pRatioNum           = str2double(get(handles.edit_pRatio_SampNum,'string'));
+    CI.EIG.FDF.pRatioSp = linspace(pRatioMin,pRatioMax,pRatioNum);
+    CI.EIG.FDF.pRatioNum = pRatioNum;
+    CI.EIG.PR.R1abs     = abs(polyval(CI.BC.num1,0)./polyval(CI.BC.den1,0));
+    CI.EIG.PR.A1minusSp = CI.EIG.FDF.pRatioSp.*10^(-5).*CI.TP.p_mean(1,1)./(1+CI.EIG.PR.R1abs);
+assignin('base','CI',CI);
+%
+% ---------------calculate the eigenvalues---------------
+%
+hWaitBar = waitbar(0,'The calculation may take several minutes, please wait...');
+for ss =1:CI.EIG.FDF.pRatioNum
+    FDF.pRatio  = CI.EIG.FDF.pRatioSp(ss);
+%     FDF.num     = CI.EIG.FDF.num{ss};
+%     FDF.den     = CI.EIG.FDF.den{ss};
+%     FDF.tauf    = CI.EIG.FDF.tauf(ss);
+    CI.EIG.PR.A1minus_this_step=CI.EIG.PR.A1minusSp(ss);
+    assignin('base','CI',CI);
+    assignin('base','FDF',FDF);
+    CI.EIG.Scan.EigValCol{ss}   = Fcn_calculation_eigenvalues(3);
+    CI.EIG.Cont.ValCol{ss}      = Fcn_calculation_contour(3);
+    waitbar(ss/CI.EIG.FDF.pRatioNum);
+    drawnow
+end
+close(hWaitBar)
+assignin('base','CI',CI);
+% ---------------update the table---------------
+data_num(:,1)   = abs(imag(CI.EIG.Scan.EigValCol{1})./2./pi);
+data_num(:,2)   = real(CI.EIG.Scan.EigValCol{1});
+data_cell       = num2cell(data_num);
+set(handles.uitable,'data',data_cell);         % Update the table
+% ---------------update the table---------------
+%
+% ---------------update the slider---------------
+if CI.EIG.FDF.pRatioNum == 1
+    set(handles.slider_pRatio,'visible','off')
+else
+set(handles.slider_pRatio,...
+                        'Enable','on',...
+                        'min',1,...
+                        'max',CI.EIG.FDF.pRatioNum,...
+                        'value',1,...
+                        'SliderStep',[1/(CI.EIG.FDF.pRatioNum-1), 1/(CI.EIG.FDF.pRatioNum-1)]);
+end
+set(handles.edit_pRatio,'string',num2str(CI.EIG.FDF.pRatioSp(1)));
+% ---------------update the slider---------------
+% ---------------update popup plot -------------
+set(handles.pop_PlotType,...
+                'string',{'Map of eigenvalues';'Modeshape'; 'Evolution of eigenvalue with pressure ratio'},...
+                'enable','on'); 
+% ---------------update popup plot -------------
+guidata(hObject, handles);
 %
 % -------------------------------------------------------------------------
 %
@@ -176,6 +242,8 @@ function Fcn_Para_initialization
 global CI
 CI.EIG.FDF.uRatioNum    = 1;
 CI.EIG.FDF.uRatioSp(1)  = 0;
+CI.EIG.FDF.pRatioNum    = 1;
+CI.EIG.FDF.pRatioSp(1)  = 0;
 CI.EIG.FDF.num{1}       = [];
 CI.EIG.FDF.den{1}       = [];
 CI.EIG.FDF.tauf(1)      = 0;

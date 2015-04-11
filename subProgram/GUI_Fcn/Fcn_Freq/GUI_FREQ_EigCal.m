@@ -22,7 +22,7 @@ function varargout = GUI_FREQ_EigCal(varargin)
 
 % Edit the above text to modify the response to help GUI_FREQ_EigCal
 
-% Last Modified by GUIDE v2.5 16-Dec-2014 08:32:36
+% Last Modified by GUIDE v2.5 02-Apr-2015 17:42:48
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -53,7 +53,7 @@ function GUI_FREQ_EigCal_OpeningFcn(hObject, eventdata, handles, varargin)
 % varargin   command line arguments to GUI_FREQ_EigCal (see VARARGIN)
 % --------------------------------------------------------------------------
 global CI
-handles.indexEdit = 0;
+handles.indexEdit = 1;
 switch handles.indexEdit 
     case 0
         %--------------------------------------------------------------------------
@@ -175,7 +175,7 @@ set(handles.uipanel_INI,...
                         'units', 'points',...
                         'fontUnits','points',...
                         'position',[FigW*0.5/20 FigH*12.5/20 FigW*8.5/20 FigH*7/20],...
-                        'Title','Set velocity perturbation ratio range before the flame ',...
+                        'Title',{'Set perturbation ratio (v''/v before the flame or p''1/p1) range'},...
                         'visible','on',...
                         'highlightcolor',handles.bgcolor{3},...
                         'borderwidth',1,...
@@ -234,7 +234,62 @@ set(handles.edit_uRatio_SampNum,...
                         'string',11,...
                         'backgroundcolor',handles.bgcolor{1},...
                         'horizontalalignment','right',...
-                        'Enable','on');                   
+                        'Enable','on');
+                    
+% Similar settings for pRatio
+set(handles.text_pRatio_min,...
+                        'units', 'points',...
+                        'fontUnits','points',...
+                        'position',[pW*0.5/10 pH*7.0/10 pW*6/10 pH*1.0/10],...
+                        'fontsize',handles.FontSize(2),...
+                        'string','Minimum value (p''_1/p_1): [x10^(-5)]',...
+                        'backgroundcolor',handles.bgcolor{3},...
+                        'horizontalalignment','left');                         
+set(handles.edit_pRatio_min,...
+                        'units', 'points',...
+                        'fontUnits','points',...
+                        'position',[pW*7/10 pH*7/10 pW*2.5/10 pH*1.25/10],...
+                        'fontsize',handles.FontSize(2),...
+                        'string',0,...
+                        'backgroundcolor',handles.bgcolor{1},...
+                        'horizontalalignment','right',...
+                        'Enable','on');
+set(handles.text_pRatio_max,...
+                        'units', 'points',...
+                        'fontUnits','points',...
+                        'position',[pW*0.5/10 pH*5.0/10 pW*6/10 pH*1.0/10],...
+                        'fontsize',handles.FontSize(2),...
+                        'string','Maximum value (p''_1/p_1): [x10^(-5)]',...
+                        'backgroundcolor',handles.bgcolor{3},...
+                        'horizontalalignment','left');                         
+set(handles.edit_pRatio_max,...
+                        'units', 'points',...
+                        'fontUnits','points',...
+                        'position',[pW*7/10 pH*5/10 pW*2.5/10 pH*1.25/10],...
+                        'fontsize',handles.FontSize(2),...
+                        'string',1000,...
+                        'backgroundcolor',handles.bgcolor{1},...
+                        'horizontalalignment','right',...
+                        'Enable','on');                    
+set(handles.text_pRatio_SampNum,...
+                        'units', 'points',...
+                        'fontUnits','points',...
+                        'position',[pW*0.5/10 pH*3.0/10 pW*6/10 pH*1.0/10],...
+                        'fontsize',handles.FontSize(2),...
+                        'string','Number of pressure ratio samples: [-]',...
+                        'backgroundcolor',handles.bgcolor{3},...
+                        'horizontalalignment','left');                         
+set(handles.edit_pRatio_SampNum,...
+                        'units', 'points',...
+                        'fontUnits','points',...
+                        'position',[pW*7/10 pH*3/10 pW*2.5/10 pH*1.25/10],...
+                        'fontsize',handles.FontSize(2),...
+                        'string',11,...
+                        'backgroundcolor',handles.bgcolor{1},...
+                        'horizontalalignment','right',...
+                        'Enable','on');                    
+% Settings for the calculating botton and the scan domain setting botton                    
+                                       
 set(handles.pb_CalEig,...
                         'units', 'points',...
                         'fontUnits','points',...
@@ -298,7 +353,7 @@ set(handles.edit_uRatio,...
                         'string',0,...
                         'backgroundcolor',handles.bgcolor{1},...
                         'horizontalalignment','right',...
-                        'Enable','off');                    
+                        'Enable','on');                    
 set(handles.slider_uRatio,...
                         'units', 'points',...
                         'fontUnits','points',...
@@ -306,11 +361,43 @@ set(handles.slider_uRatio,...
                         'fontsize',handles.FontSize(2),...
                         'backgroundcolor',handles.bgcolor{1},...
                         'horizontalalignment','right',...
-                        'Enable','off',...
+                        'Enable','on',...
                         'min',1,...
                         'max',str2double(get(handles.edit_uRatio_SampNum,'string')),...
                         'value',1);
-                    
+% Similiar settings for pRatio
+set(handles.text_pRatio,...
+                        'units', 'points',...
+                        'fontUnits','points',...
+                        'position',[pW*0.5/10 pH*2.25/10 pW*6/10 pH*0.9/10],...
+                        'fontsize',handles.FontSize(2),...
+                        'string','Selected pressure ratio: [-]',...
+                        'backgroundcolor',handles.bgcolor{3},...
+                        'horizontalalignment','left');                         
+set(handles.edit_pRatio,...
+                        'units', 'points',...
+                        'fontUnits','points',...
+                        'position',[pW*7/10 pH*2.5/10 pW*2.5/10 pH*0.9/10],...
+                        'fontsize',handles.FontSize(2),...
+                        'string',0,...
+                        'backgroundcolor',handles.bgcolor{1},...
+                        'horizontalalignment','right',...
+                        'Enable','on');                    
+set(handles.slider_pRatio,...
+                        'units', 'points',...
+                        'fontUnits','points',...
+                        'position',[pW*0.5/10 pH*0.5/10 pW*9/10 pH*1.5/10],...
+                        'fontsize',handles.FontSize(2),...
+                        'backgroundcolor',handles.bgcolor{1},...
+                        'horizontalalignment','right',...
+                        'Enable','on',...
+                        'min',1,...
+                        'max',str2double(get(handles.edit_pRatio_SampNum,'string')),...
+                        'value',1);
+
+
+
+
 %---------------------------
 % pannel AOC                   
 set(handles.uipanel_AOC,...
@@ -360,6 +447,9 @@ set(handles.pb_Cancel,...
 %
 handles.ObjEditEnable_AOC       = findobj('-regexp','Tag','_AOC_');
 handles.ObjEditVisible_uRatio   = findobj('-regexp','Tag','_uRatio');
+handles.ObjEditVisible_pRatio   = findobj('-regexp','Tag','_pRatio');
+
+
 guidata(hObject, handles);
 % lauch this function
 Fcn_PreProcessing
@@ -369,6 +459,7 @@ handles = guidata(hObject);
 % default enable settings
 set(handles.ObjEditEnable_AOC,          'Enable','on');
 set(handles.ObjEditVisible_uRatio,      'visible','on');
+set(handles.ObjEditVisible_pRatio,      'visible','on');
 %
 guidata(hObject, handles);
 % GUI_FREQ_EigCal_Initialization_check_ever_run(hObject)
@@ -522,6 +613,35 @@ data_num(:,2)   = real(CI.EIG.Scan.EigValCol{indexShow});
 data_cell       = num2cell(data_num);
 set(handles.uitable,'data',data_cell);         % Update the table
 %
+% Update the plotType choices
+pop_PlotType = get(handles.pop_PlotType, 'Value');
+switch pop_PlotType
+    case 1
+        set(handles.pop_numMode,        'visible','off',...
+                                        'enable','on');
+    case 2
+        set(handles.pop_numMode,        'visible','on',...
+                                        'enable','on',...
+                                        'Value',1); 
+        % Renew the number of modes with this u-ratio
+        eigenvalue          = CI.EIG.Scan.EigValCol{indexShow};
+        for k = 1:1:length(eigenvalue)
+        StringMode{k} = ['Mode number: ' num2str(k)]; 
+        end
+        set(handles.pop_numMode,    'string',StringMode);
+        
+    case 3
+        set(handles.pop_numMode,        'visible','on',...
+                                        'enable','on',...
+                                        'Value',1);
+        % The number of modes is always the same as that of the first group
+        eigenvalue          = CI.EIG.Scan.EigValCol{1};
+        for k = 1:1:length(eigenvalue)
+        StringMode{k} = ['Mode number: ' num2str(k)]; 
+        end
+        set(handles.pop_numMode,     'string',StringMode);
+end
+
 guidata(hObject, handles);
 GUI_FREQ_EigCal_PLOT(hObject)
 
@@ -561,6 +681,206 @@ function edit_uRatio_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
+
+%-----------Similar settings for pressure oscillation ratios---------------
+%--------------------------------------------------------------------------
+
+function edit_pRatio_min_Callback(hObject, eventdata, handles)
+% hObject    handle to edit_pRatio_min (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+pRatio_min      = str2double(get(handles.edit_pRatio_min,'string'));
+pRatio_max      = str2double(get(handles.edit_pRatio_max,'string'));
+if isnan(pRatio_min)
+    set(handles.edit_pRatio_min, 'String', 0);
+    errordlg('Input must be a number','Error');
+end
+if pRatio_min<=0
+    set(handles.edit_pRatio_min, 'String', 0);
+end
+if pRatio_max <= pRatio_min
+    set(handles.edit_pRatio_min, 'String', 0);
+    set(handles.edit_pRatio_max, 'String', 1000);
+    errordlg('Minimum value input must be smaller than Maximum value input','Error');
+end
+% Hints: get(hObject,'String') returns contents of edit_pRatio_min as text
+%        str2double(get(hObject,'String')) returns contents of edit_pRatio_min as a double
+
+
+
+% --- Executes during object creation, after setting all properties.
+function edit_pRatio_min_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to edit_pRatio_min (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+function edit_pRatio_max_Callback(hObject, eventdata, handles)
+% hObject    handle to edit_pRatio_max (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+pRatio_min      = str2double(get(handles.edit_pRatio_min,'string'));
+pRatio_max      = str2double(get(handles.edit_pRatio_max,'string'));
+if isnan(pRatio_max)
+    set(handles.edit_pRatio_max, 'String', 1);
+    errordlg('Input must be a number','Error');
+end
+if pRatio_max<=0
+    set(handles.edit_pRatio_max, 'String', 1);
+end
+if pRatio_max <= pRatio_min
+    set(handles.edit_pRatio_min, 'String', 0);
+    set(handles.edit_pRatio_max, 'String', 1000);
+    errordlg('Minimum value input must be smaller than Maximum value input','Error');
+end
+
+% Hints: get(hObject,'String') returns contents of edit_pRatio_max as text
+%        str2double(get(hObject,'String')) returns contents of edit_pRatio_max as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function edit_pRatio_max_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to edit_pRatio_max (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+function edit_pRatio_SampNum_Callback(hObject, eventdata, handles)
+% hObject    handle to edit_pRatio_SampNum (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+pRatio_SampNum  = str2double(get(handles.edit_pRatio_SampNum,'string'));
+if isnan(pRatio_SampNum )
+    set(handles.edit_pRatio_SampNum, 'String', 11);
+    errordlg('Input must be a number','Error');
+end
+if pRatio_SampNum <=0
+    set(handles.edit_pRatio_SampNum, 'String', 11);
+    errordlg('Input must be a positive integer','Error');
+end
+if rem(pRatio_SampNum ,1)~=0
+    set(handles.edit_pRatio_SampNum, 'String', num2str(ceil(datEdit)));
+end
+
+% Hints: get(hObject,'String') returns contents of edit_pRatio_SampNum as text
+%        str2double(get(hObject,'String')) returns contents of edit_pRatio_SampNum as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function edit_pRatio_SampNum_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to edit_pRatio_SampNum (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+% --- Executes on slider movement.
+function slider_pRatio_Callback(hObject, eventdata, handles)
+% hObject    handle to slider_pRatio (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+global CI
+ValueSlider     = get(hObject,'Value');
+indexShow       = round(ValueSlider);
+set(handles.edit_pRatio,'string',num2str(CI.EIG.FDF.pRatioSp(indexShow)));
+%
+data_num(:,1)   = abs(imag(CI.EIG.Scan.EigValCol{indexShow})./2./pi);
+data_num(:,2)   = real(CI.EIG.Scan.EigValCol{indexShow});
+data_cell       = num2cell(data_num);
+set(handles.uitable,'data',data_cell);         % Update the table
+%
+% Update the plotType choices
+pop_PlotType = get(handles.pop_PlotType, 'Value');
+switch pop_PlotType
+    case 1
+        set(handles.pop_numMode,        'visible','off',...
+                                        'enable','on');
+    case 2
+        set(handles.pop_numMode,        'visible','on',...
+                                        'enable','on',...
+                                        'Value',1); 
+        % Renew the number of modes with this u-ratio
+        eigenvalue          = CI.EIG.Scan.EigValCol{indexShow};
+        for k = 1:1:length(eigenvalue)
+        StringMode{k} = ['Mode number: ' num2str(k)]; 
+        end
+        set(handles.pop_numMode,    'string',StringMode);
+        
+    case 3
+        set(handles.pop_numMode,        'visible','on',...
+                                        'enable','on',...
+                                        'Value',1);
+        % The number of modes is always the same as that of the first group
+        eigenvalue          = CI.EIG.Scan.EigValCol{1};
+        for k = 1:1:length(eigenvalue)
+        StringMode{k} = ['Mode number: ' num2str(k)]; 
+        end
+        set(handles.pop_numMode,     'string',StringMode);
+end
+guidata(hObject, handles);
+GUI_FREQ_EigCal_PLOT(hObject)
+
+% Hints: get(hObject,'Value') returns position of slider
+%        get(hObject,'Min') and get(hObject,'Max') to determine range of slider
+
+
+% --- Executes during object creation, after setting all properties.
+function slider_pRatio_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to slider_pRatio (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: slider controls usually have a light gray background.
+if isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor',[.9 .9 .9]);
+end
+
+
+
+function edit_pRatio_Callback(hObject, eventdata, handles)
+% hObject    handle to edit_pRatio (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+% Hints: get(hObject,'String') returns contents of edit_pRatio as text
+%        str2double(get(hObject,'String')) returns contents of edit_pRatio as a double
+datEdit = str2double(get(hObject, 'String'));
+if isnan(datEdit)
+    set(hObject, 'String', 0);
+    errordlg('Input must be a number','Error');
+end
+set(handles.pb_PlotC_M,     'enable','off');
+set(handles.pb_AOC_Plot,  'enable','off');
+set(handles.edit_indexMode1,'enable','off');
+guidata(hObject, handles);
+
+
+% --- Executes during object creation, after setting all properties.
+function edit_pRatio_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to edit_pRatio (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
 
 % ---------------------------Pannel axes-----------------------------------
 %

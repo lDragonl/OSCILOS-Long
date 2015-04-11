@@ -524,7 +524,7 @@ if(ishandle(main))
     changeMain = mainHandles.INI_BC;
     set(changeMain, 'Enable', 'on');
     String_Listbox=get(mainHandles.listbox_Info,'string');
-    ind=find(ismember(String_Listbox,'<HTML><FONT color="blue">Information 3:'));
+    ind=find(ismember(String_Listbox,'<HTML><FONT color="blue">Information 4:'));
     nLength=size(String_Listbox);
     if isempty(ind)
         indStart=nLength(1);
@@ -534,7 +534,7 @@ if(ishandle(main))
             String_Listbox(i)=[];
         end
     end
-    String_Listbox{indStart+1}=['<HTML><FONT color="blue">Information 3:'];
+    String_Listbox{indStart+1}=['<HTML><FONT color="blue">Information 4:'];
     String_Listbox{indStart+2}=['<HTML><FONT color="blue"> (Flame) models:'];
     String_Listbox{indStart+3}=['The unsteady heat source(s) is(are) located at:'];
     String_Listbox{indStart+4}=[num2str(CI.CD.x_sample(CI.CD.indexHP)) ' m' ];

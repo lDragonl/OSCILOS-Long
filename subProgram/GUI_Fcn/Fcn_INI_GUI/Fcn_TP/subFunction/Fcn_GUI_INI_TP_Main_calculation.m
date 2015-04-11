@@ -61,6 +61,12 @@ for ss = 1:CI.TP.numSection-1
     CI.TP.Theta(ss)  = (CI.CD.r_sample(ss+1)./CI.CD.r_sample(ss)).^2;       % Surface area ratio S2/S1
 end
 %
+% --------------------------------
+% Begin adding by Dong Yang
+Liner_Flag = 1; % Initialize the flag of the Liner considered by the loop
+HR_Flag = 1;    % Initialize the flag of the HR considered by the loop
+% End adding by Dong Yang
+% --------------------------------
 indexHA_num = 0;                % set the initial value to zero and it will be increased by 1 after every HA interface
 for ss = 1:CI.TP.numSection-1 
     % In every interface, the changes are splitted to two steps:
@@ -138,6 +144,37 @@ for ss = 1:CI.TP.numSection-1
             end
                     mass = CI.TP.rho_mean(2,ss+1).*CI.TP.u_mean(2,ss+1).*CI.CD.r_sample(ss+1).^2.*pi; % mass flow rate before HA
                     CI.TP.Q(indexHA_num)  = CI.TP.DeltaHr(indexHA_num).*mass;       % heat release rate
+                    
+        % Begin adding by Dong Yang
+        case 2            
+            % Typically, it can be assumed that mean flow will not be affect by the HR, anyway, 
+            % the following procedure is an alternate way to calculate mean parameters across the crosssection where the resonator is installed.      
+            
+            section_Num=ss;
+            [   CI.TP.T_mean(1,ss+1),...               
+                CI.TP.rho_mean(1,ss+1),...
+                CI.TP.u_mean(1,ss+1),...
+                CI.TP.Cp(1,ss+1),...
+                CI.TP.gamma(1,ss+1)] = ...
+            Fcn_calculation_TP_mean_across_HR( HR_Flag,...
+                                               section_Num,...
+                                               CI.TP.T_mean(2,ss+1),...
+                                               CI.TP.rho_mean(2,ss+1),...
+                                               CI.TP.u_mean(2,ss+1));
+                CI.TP.p_mean(1:2,ss+1)  = CI.TP.T_mean(1,ss+1).*CI.TP.rho_mean(1,ss+1)*(CI.TP.gamma(1,ss+1)-1)./CI.TP.gamma(1,ss+1)*CI.TP.Cp(1,ss+1);
+                CI.TP.c_mean(1:2,ss+1)  = ((CI.TP.gamma(1,ss+1) - 1).*CI.TP.Cp(1,ss+1).*CI.TP.T_mean(1,ss+1)).^0.5;
+                CI.TP.M_mean(1:2,ss+1)  = CI.TP.u_mean(1,ss+1)./CI.TP.c_mean(1,ss+1); 
+            HR_Flag = HR_Flag+1;
+        case 30
+            % Nothing happens because mean flow properties are constant
+            % across the inlet side cross-section of the lined duct
+        case 31
+            % It is assumed only mean flow velocity will increase a bit in
+            % the lined duct region.
+            [ CI.TP.u_mean(1,ss+1)] = Fcn_calculation_TP_mean_across_Liner(Liner_Flag,ss+1);
+            CI.TP.M_mean(1,ss+1)=CI.TP.u_mean(1,ss+1)/CI.TP.c_mean(1,ss+1);
+            Liner_Flag = Liner_Flag+1;
+        % End adding by Dong Yang                
     end
 end
 %

@@ -938,24 +938,39 @@ global CI
 % Obtain handles using GUIDATA with the caller's handle 
 if(ishandle(main))
     mainHandles = guidata(main);
-    %%% add a questdlg:
-    selection = questdlg('Do you want to use passsive dampers?',...
-      'Passive damper',...
-      'Yes','No','No'); 
-    switch selection 
-        case 'Yes'
-            changeMain = mainHandles.INI_PD;
-            set(changeMain, 'Enable', 'on');
-            set(changeMain, 'Visible', 'on');
-            changeMain = mainHandles.INI_CD;
-            set(changeMain, 'Enable', 'off');
-            set(changeMain, 'Visible', 'off');
-        case 'No'
-            changeMain = mainHandles.INI_TP;
-            set(changeMain, 'Enable', 'on');
-            changeMain = mainHandles.INI_PD;
-            set(changeMain, 'Visible', 'off');
+    %%
+selection = questdlg('Do you want to save current data?',...
+  'Save current session to a Mat file',...
+  'Yes','No','Yes'); 
+switch selection 
+    case 'Yes',
+    [filename, pathname] = uiputfile(...
+                                         {'Case1.mat'},...
+                                         'Save as');
+    if filename~=0
+        try
+            % ------------------------------------
+            Menu{1} = findobj('-regexp','Tag','FILE');
+            Menu{2} = findobj('-regexp','Tag','INI');
+            Menu{3} = findobj('-regexp','Tag','FREQ');
+            Menu{4} = findobj('-regexp','Tag','TD');
+            for ss = 1 : length(Menu)
+                CI.Menu.Enable{ss}  = get(Menu{ss},'enable');
+                CI.Menu.Visible{ss} = get(Menu{ss},'visible');
+                CI.Menu.Lable{ss}   = get(Menu{ss},'label');
+            end
+            assignin('base','CI',CI)
+            % ------------------------------------
+            matfile = fullfile(pathname, filename);
+            save(matfile,'CI') 
+        catch 
+        end
     end
+  case 'No'
+  return 
+end
+    changeMain = mainHandles.INI_PD;
+    set(changeMain, 'Enable', 'on');
     String_Listbox=get(mainHandles.listbox_Info,'string');
     ind=find(ismember(String_Listbox,'<HTML><FONT color="blue">Information 1:'));
     nLength=size(String_Listbox);
