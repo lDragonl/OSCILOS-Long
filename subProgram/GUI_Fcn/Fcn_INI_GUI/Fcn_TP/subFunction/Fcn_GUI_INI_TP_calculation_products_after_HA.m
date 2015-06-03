@@ -9,12 +9,12 @@ function [TRatio, cMean2, DeltaHr, gamma2, Cp2] =...
 % pMean1 denotes the incident mean pressure
 % TRatio is the temperature jump ratio
 % cMean2 denotes the speed of sound after the interface
-% DeltaHr denotes the heat addtion
+% DeltaHr denotes the heat addtion, or heat release rate from flame
 % gamma2 denotes the specific heat ratio
 % Cp2 denotes the heat capacity at constant pressure after the interface
 %
 % first created: 2014-12-03
-% last modified: 2014-12-03
+% last modified: 2015-06-03
 % author: Jingxuan LI (jingxuan.li@imperial.ac.uk)
 global CI
 ss          = indexHA_num;
@@ -24,41 +24,29 @@ switch HA_style
         % temperature determined
         TRatio  = CI.TP.TRatio(ss);
         TMean2  = TMean1*TRatio;
-        [temp1,cMean2,DeltaHr,Cp2] = Fcn_calculation_c_q_air(TMean1,TMean2);
-        gamma2  = Cp2./(Cp2-CI.R_air);     
+        [cMean1,gamma1,Delta_hsMass1,cpMole1,cpMass,Rg1, meanMW]    = FcnCalHeatPropertiesAir(TMean1);
+        [cMean2,gamma2,Delta_hsMass2,cpMole2,Cp2,Rg2, meanMW]       = FcnCalHeatPropertiesAir(TMean2);
+        DeltaHr = Delta_hsMass2 - Delta_hsMass1;  
     case 2
         % fuel determined
-%         CI.TP.indexFuel = get(handles.pop_FD_fuel,'value');                     % index of fuel
-%         CI.TP.eff       = str2num(get(handles.edit_FD_effi,     'string'));     % combustion efficiency
-%         CI.TP.Phi       = str2num(get(handles.edit_FD_phi,      'string'));     % equivalence ratio
-%         CI.TP.dil       = str2num(get(handles.edit_FD_dilute,   'string'));     % diluted ratio
-    [   TMean2,...
-        chi,...
-        DeltaHr,...
-        cMean2,...
-        Cp2,...
-        WProd ]   = ...
-            Fcn_calculation_combustion_products(CI.TP.indexFuel(ss),...
-                                                CI.TP.Phi(ss),...
-                                                TMean1,...
-                                                pMean1,...
-                                                CI.TP.eff(ss),...
-                                                CI.TP.dil(ss));
-        index_cMean_calculation  = 1;
-        % if index_cMean_calculation == 1, then consider the burnt gases as
-        % air and use the air program to calculate the cMean
-        % if index_cMean_calculation == 2, then use the burnt gases
-        % mixture and use the corresponding program to calculate cMean
-        switch index_cMean_calculation 
-            case 1
-                [temp1,cMean2,temp2,Cp2] = Fcn_calculation_c_q_air(TMean2);
-                 RProd               = CI.R_air;
-                gamma2  = Cp2./(Cp2-CI.R_air);  
-            case 2
-                RProd               = CI.Ru./(WProd).*1000;                     % gas constant per mass for the combustion product
-                gamma2              = Cp2./(Cp2-RProd);
-        end
-        TRatio              = TMean2./TMean1;                           % Temperature jump ratio
+        load THERMO.mat;
+        % ------------------
+        % hot gases after the heat addtion interface are considered to be
+        % combustion products when FlagAir == 0, otherwise hot gases are considered
+        % to be hot air
+        FlagAir     = 0;
+        TMean2      = FcnTadFlameCal(CI.TP.indexFuel(ss),CI.TP.Phi(ss),TMean1,CI.TP.eff(ss),pMean1,THERMO);
+        x           = THERMO.Fuel.MolNumXY(CI.TP.indexFuel(ss),1);
+        y           = THERMO.Fuel.MolNumXY(CI.TP.indexFuel(ss),2);
+        [chi,nt]    = FcnMole_Fraction_6Species(x,y,CI.TP.Phi(ss),TMean2,pMean1,THERMO);
+        [cpMass,gamma,Delta_hsMass,c,Rg,meanMW] = FcnCalHeatProperties(TMean1,TMean2,chi,FlagAir,2,THERMO);
+        %
+        DeltaHr     = diff(Delta_hsMass);
+        cMean2      = c(2);
+        Cp2         = cpMass(2);
+        WProd       = meanMW(2);
+        gamma2      = gamma(2);
+        TRatio      = TMean2./TMean1;                           % Temperature jump ratio
     otherwise
         % Code for when there is no match.
 end

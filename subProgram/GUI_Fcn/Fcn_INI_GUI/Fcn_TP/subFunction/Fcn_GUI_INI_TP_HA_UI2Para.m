@@ -3,7 +3,7 @@ function Fcn_GUI_INI_TP_HA_UI2Para(hObject,HA_num)
 % addition for a selected heat addition interface
 % Use the value of ui to update the value of different parameters
 % first created: 2014-12-04
-% last modified: 2014-12-04
+% last modified: 2015-06-03
 % author: Jingxuan LI (jingxuan.li@imperial.ac.uk)
 %
 global CI
@@ -19,7 +19,8 @@ CI.TP.TRatio(HA_num)    = str2num(get(handles.edit_TD_Tratio,   'string'));     
 CI.TP.indexFuel(HA_num) = get(handles.pop_FD_fuel,'value');                     % index of fuel
 CI.TP.eff(HA_num)       = str2num(get(handles.edit_FD_effi,     'string'));     % combustion efficiency
 CI.TP.Phi(HA_num)       = str2num(get(handles.edit_FD_phi,      'string'));     % equivalence ratio
-CI.TP.dil(HA_num)       = str2num(get(handles.edit_FD_dilute,   'string'));     % diluted ratio
+% CI.TP.dil(HA_num)       = str2num(get(handles.edit_FD_dilute,
+% 'string'));     % diluted ratio, which is not used any more
 %
 assignin('base','CI',CI);
 %

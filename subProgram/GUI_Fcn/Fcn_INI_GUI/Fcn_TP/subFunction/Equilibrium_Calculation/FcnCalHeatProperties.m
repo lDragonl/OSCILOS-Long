@@ -50,7 +50,7 @@ else
             end
             R                   = THERMO.R;
             WProd               = THERMO.Prod.W(1:6);
-            meanMW(2)           = sum(WProd(1:6).*chi(1:6));
+            meanMW(2)           = sum(WProd(1:6)'.*chi(1:6));
             Rg(2)               = R*1e3/meanMW(2);
             cpMole(2)           = sum(cpMoleProd(1:6).*chi(1:6));
             cvMole(2)           = cpMole(2) - R;
