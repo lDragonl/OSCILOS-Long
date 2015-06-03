@@ -173,10 +173,14 @@ switch CI.IsRun.GUI_FREQ_EigCal
         end
         set(handles.pop_numMode,    'string',StringMode)
         %
-        data_num(:,1)=abs(imag(eigenvalue)./2./pi);
-        data_num(:,2)=real(eigenvalue);
-        data_cell=num2cell(data_num);
-        set(handles.uitable,'data',data_cell);         % Update the table
+        if isempty(eigenvalue)
+             errordlg('The searching frequency and growth rate range is not enough large, please increase them','Error');
+        else
+            data_num(:,1)=abs(imag(eigenvalue)./2./pi);
+            data_num(:,2)=real(eigenvalue);
+            data_cell=num2cell(data_num);
+            set(handles.uitable,'data',data_cell);         % Update the table
+        end
         guidata(hObject, handles);
 end
 switch CI.EIG.APP_style
