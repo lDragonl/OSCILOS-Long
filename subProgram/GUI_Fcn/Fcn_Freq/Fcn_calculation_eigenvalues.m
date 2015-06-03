@@ -31,7 +31,9 @@ for ss = 1:length(GRSp)
             case 1                                                                  % linear flame model
                 [x,fval,exitflag] = fsolve(@Fcn_DetEqn_Linear,s0,options);                             
             case 2                                                                  % nonlinear flame model
-                [x,fval,exitflag] = fsolve(@Fcn_DetEqn_frozen_nonlinear,s0,options);                
+                [x,fval,exitflag] = fsolve(@Fcn_DetEqn_frozen_nonlinear,s0,options); 
+            case 3                                                                  % inlcude two situations: there are nonlinear dampers; there are more than one NL explicit FM (and no EXP FM)
+                [x,fval,exitflag] = fsolve(@Fcn_DetEqn_nonlinear_dampers,s0,options); 
         end
         if exitflag==1;
             EIG.eigenvalue(eigen_num) = x;

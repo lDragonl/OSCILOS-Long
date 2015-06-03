@@ -17,22 +17,14 @@ handles = guidata(hObject);
 global CI
 
 idExistHR = any(strcmp('HR_config',fieldnames(CI.CD)));
-switch idExistHR
-    case 0          
-        id = 1;         % without HR
+switch idExitHR
+    case 0
+        id = 1;
     case 1
-        if isempty(CI.CD.HR_config) == 1
-            id = 1;
-        else
-            if isempty(find(CI.CD.HR_config(:,3)==1)) == 0;
-                id = 2;     % with HR and with nonlinear HR
-            else
-                id = 1;     % with HR and without nonlinear HR
-            end
-        end
-end
+        if 
+
 % if isempty(CI.CD.HR_config) || isempty(find(CI.CD.HR_config(:,3)==1)) 
-if id == 1
+if idExistHR == 1 || isempty(find(CI.CD.HR_config(:,3)==1)) 
     % There is no nonlinear dampers in the system
     if isempty(CI.CD.indexHP)                       % without heat perturbation
         CI.EIG.APP_style = 11;                      % without heat addition

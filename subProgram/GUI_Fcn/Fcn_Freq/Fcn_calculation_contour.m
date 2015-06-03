@@ -15,7 +15,9 @@ for ss = 1:n
             case 1                                                                
                 F(ss,kk) = Fcn_DetEqn_Linear(s);                             
             case 2   
-                F(ss,kk) = Fcn_DetEqn_frozen_nonlinear(s);                  
+                F(ss,kk) = Fcn_DetEqn_frozen_nonlinear(s); 
+            case 3
+                F(ss,kk) = Fcn_DetEqn_nonlinear_dampers(s);
         end
     end
 end

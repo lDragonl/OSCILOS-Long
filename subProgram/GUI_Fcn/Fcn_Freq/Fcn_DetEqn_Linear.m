@@ -1,4 +1,3 @@
-
 function F = Fcn_DetEqn_Linear(s)
 % This function only accounts for linear cases
 % 
@@ -16,6 +15,12 @@ tau_c       = CI.TP.tau_c;
 %--------------------------------
 indexHA = 0;            % index of heat addition
 indexHP = 0;            % index of heat perturbation
+HR_Flag=1;
+Liner_Flag=1;
+% Initial wave amplitudes
+A_0_n=1;
+A_0_p=A_0_n*R1;
+A_E_0=0;
 G = eye(3);
 for ss = 1:CI.TP.numSection-1 
     D1 = diag([ exp(-s*tau_plus(ss)),...
@@ -45,6 +50,29 @@ for ss = 1:CI.TP.numSection-1
             BC1     = Bsum*CI.TPM.C1;
             BC2     = CI.TPM.B2{2,ss}*CI.TPM.C2;
             Z       = (BC2\BC1)*D1;
+        case 2
+            HR_Num   =HR_Flag;
+            i_omega  =s;                               %  s is used here directory as the real part of it is assumed to be small and thus will not affect the HR performance much.
+            % Calculate pressure wave values at the inlet of the HR (not useful for linear model but needed for nonlinear model)
+            w_1=D1*G*[A_0_p; A_0_n; A_E_0];
+            A_1_p=w_1(1);
+            A_1_n=w_1(2);
+            Mtr_HR_33=Fcn_calculation_Oscillations_across_HR(ss,HR_Num,i_omega, A_1_p,A_1_n);
+            E=[1,0,0;0,1,0;0,0,0];
+            Z        =E*Mtr_HR_33*D1; 
+            HR_Flag  =HR_Flag+1;
+        case 30
+            Z=eye(3)*D1;
+            
+        case 31
+            Liner_Num    =Liner_Flag;
+            i_omega      =s;                           % s is used here directory as the real part of it is assumed to be small and thus will not affect the liner performance much.
+            Mtr_Liner_33 = Fcn_calculation_Oscillations_across_Liner(ss,Liner_Num,i_omega);
+            D_Liner      =diag([ 1,...
+                                 1,...
+                                 exp(-s*tau_c(ss))]);  % It is assumed that only acoustic waves are considered in the liner damping model. Entropy wave convects from left side to the right side.
+            Z            =Mtr_Liner_33*D_Liner;
+            Liner_Flag   =Liner_Flag+1;
     end
     G = Z*G;
 end

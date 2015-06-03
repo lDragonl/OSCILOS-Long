@@ -1,11 +1,11 @@
-function [x_resample,p,u]=Fcn_calculation_eigenmode_frozen_nonlinear(s_star)
+function [x_resample,p,u]=Fcn_calculation_eigenmode_nonlinear_dampers(s_star)
 % This function is used to plot the modeshape of slected mode, 
 % Linear
 global CI
 global FDF
 
 [R1,R2]     = Fcn_boundary_condition(s_star);
-Rs          = -0.5*CI.TP.M_mean(end)./(1 + 0.5*(CI.TP.gamma(end) - 1 ).*CI.TP.M_mean(end)).*CI.TP.rho_mean(1,end).*CI.TP.c_mean(1,end).^2./CI.TP.p_mean(1,end);
+Rs          = -0.5*CI.TP.M_mean(end)./(1 + 0.5*(CI.TP.gamma(end) - 1 ).*CI.TP.M_mean(end));
 %
 %
 Te          = Fcn_TF_entropy_convection(s_star);
@@ -15,10 +15,13 @@ tau_minus   = CI.TP.tau_minus;
 tau_c       = CI.TP.tau_c;
 %
 % -------------------------------------------------------------------------
-A_minus(1)  = 1;
-E(1)        = 0;
-A_plus(1)   = R1.*A_minus(1);
-Array(:,1)  = [A_plus(1),A_minus(1),E(1)]';
+A_minus(1)=CI.EIG.PR.A1minus_this_step;
+   if abs(A_minus(1)) < 0.1
+      A_minus(1) = 0.1;
+   end
+A_plus(1)         = R1.*A_minus(1);
+E(1)              = 0;  
+Array(:,1)  = [A_plus(1); A_minus(1); E(1)];
 %
 indexHA = 0;            % index of heat addition
 indexHP = 0;            % index of heat perturbation
@@ -43,14 +46,14 @@ for ss = 1:CI.TP.numSection-1
         case 11
             indexHA = indexHA + 1;
             indexHP = indexHP + 1;
-            if indexHP == CI.FM.indexMainHPinHp
-                FTF = Fcn_nonlinear_flame_model(s_star);
-            else
-                FTF = Fcn_linear_flame_model(s_star,indexHP);
-            end
             B2b     = zeros(3);
             temp    = D1*Array(:,ss);
             uRatio  = abs((temp(1) - temp(2))./(CI.TP.c_mean(1,ss).*CI.TP.rho_mean(1,ss).*CI.TP.u_mean(1,ss)));         % velocity ratio before the flame
+            if CI.FM.indexFM(indexHP)==1
+                 FTF= Fcn_linear_flame_model(s_star,indexHP);
+             else
+                 FTF= Fcn_flame_model_nonlinear_Damper(s_star,uRatio,indexHP);
+            end
             B2b(3,2)= CI.TP.DeltaHr(indexHA)./CI.TP.c_mean(2,ss+1)./CI.TP.c_mean(1,ss)./CI.TP.Theta(ss).*FTF;
             Bsum    = CI.TPM.B1{2,ss}*(CI.TPM.B2{1,ss}\CI.TPM.B1{1,ss}) + B2b;
             BC1     = Bsum*CI.TPM.C1;
@@ -80,6 +83,7 @@ for ss = 1:CI.TP.numSection-1
             D_Liner        =diag([ 1    1    exp(-tau_c(ss).*s_star)]);  % It is assumed that only acoustic waves are considered in the liner damping model. Entropy wave convects from left side to the right side.
             CI.TPM.Z{ss}   =CI.TPM.BC{ss}*D_Liner;
             Liner_Flag     =Liner_Flag+1;
+            
     end
     Array(:,ss+1)    = CI.TPM.Z{ss}*Array(:,ss);
 end
@@ -98,10 +102,6 @@ c_mean      = CI.TP.c_mean(1,:);
 u_mean      = CI.TP.u_mean(1,:);
 rho_mean    = CI.TP.rho_mean(1,:);
 %     
-if FDF.uRatio < 1e-6
-    FDF.uRatio = 1e-6;
-end
-
 for k = 1:length(CI.CD.x_sample)-1
     Liner_Flag=1;
     if CI.CD.SectionIndex(k)==30
@@ -145,15 +145,14 @@ tau     = CI.BC.ET.Dispersion.Delta_tauCs;
 k       = CI.BC.ET.Dissipation.k;
 switch CI.BC.ET.pop_type_model
     case 1
-        Te = k;
+        Te = 0;
     case 2
         Te = k.*exp((tau.*s).^2./4);
     case 3
         if tau == 0
             tau = eps;
         end
-%         Te = k.*(exp(tau*s) - exp(-tau*s))./(2*tau);
-        Te = k.*sinc(tau*s./pi);
+        Te = k.*(exp(tau*s) - exp(-tau*s))./(2*tau);
 end                        
 % ----------------------linear Flame transfer function --------------------
 %         
@@ -164,28 +163,52 @@ num     = HP.FTF.num;
 den     = HP.FTF.den;
 tauf    = HP.FTF.tauf;
 F       = polyval(num,s)./polyval(den,s).*exp(-s.*tauf);          
-%
-% ---------------------- Nonlinear flame transfer function ----------------
-%
-function F = Fcn_nonlinear_flame_model(s)
-global FDF
+% %
+% % ---------------------- Nonlinear flame transfer function ----------------
+% %
+% function F = Fcn_nonlinear_flame_model(s)
+% global FDF
+% global CI
+% global HP
+% F = polyval(FDF.num,s)./polyval(FDF.den,s).*exp(-s.*FDF.tauf);
+% if  CI.EIG.APP_style == 21    % from model
+%     switch HP.NL.style
+%         case 2
+%             uRatio = FDF.uRatio;
+%             if FDF.uRatio == 0
+%                 uRatio = eps;
+%             end
+%         qRatioLinear = abs(F).*uRatio; 
+%         Lf = interp1(  HP.NL.Model2.qRatioLinear,...
+%                        HP.NL.Model2.Lf,...
+%                        qRatioLinear,'linear','extrap');                                    
+%         F = F.*Lf; 
+%     %     otherwise
+%     end
+% end
+% clear FDF
+%----------------------- Nonlinear flame transfer function ----------------
+function F = Fcn_flame_model_nonlinear_Damper(s,uRatio,indexHP)  % Should be checked carefully!
 global CI
-global HP
-F = polyval(FDF.num,s)./polyval(FDF.den,s).*exp(-s.*FDF.tauf);
-if  CI.EIG.APP_style == 21    % from model
-    switch HP.NL.style
-        case 2
-            uRatio = FDF.uRatio;
-            if FDF.uRatio == 0
-                uRatio = eps;
-            end
+HP      = CI.FM.HP{indexHP}; % This can be used to distinguish different Nonlinear 
+                             % flame models in the system 
+num     = HP.FTF.num;
+den     = HP.FTF.den;
+tauf    = HP.FTF.tauf;
+F       = polyval(num,s)./polyval(den,s).*exp(-s.*tauf); 
+
+% Nonlinear flame models can be added below
+switch HP.NL.style
+    case 1 
+    case 2
+        if uRatio > 1                                
+            uRatio = 1;
+        end
         qRatioLinear = abs(F).*uRatio; 
         Lf = interp1(  HP.NL.Model2.qRatioLinear,...
                        HP.NL.Model2.Lf,...
                        qRatioLinear,'linear','extrap');                                    
         F = F.*Lf; 
-    %     otherwise
-    end
+    case 3
 end
-clear FDF
 % -----------------------------end-----------------------------------------
