@@ -2,7 +2,7 @@ function Fcn_GUI_INI_TP_HA_initialization(varargin)
 % This function is used to check the heat addition in the initialization
 % stage and initialize some heat addition properties
 % first created: 2014-12-03
-% last modified: 2014-12-04
+% last modified: 2015-06-03
 % author: Jingxuan LI (jingxuan.li@imperial.ac.uk)
 %
 global CI
@@ -34,7 +34,7 @@ if CI.CD.isHA == 0
     CI.TP.indexFuel(k)  = 1;                     % index of fuel
     CI.TP.eff(k)        = 1;                     % combustion efficiency
     CI.TP.Phi(k)        = 1;                     % equivalence ratio
-    CI.TP.dil(k)        = 0;                     % diluted ratio
+%     CI.TP.dil(k)        = 0;                     % diluted ratio
     CI.TP.Q(k)          = 0;                     % heat release rate   
     CI.TP.DeltaHr(k)    = 0;                     % heat release rate per mass flow rate 
     CI.TP.HA_num        = 1;                     % the flag is defaultly set to the 1 to indicate the first HA interface
@@ -48,7 +48,7 @@ else
         CI.TP.indexFuel(k)  = 1;                     % index of fuel
         CI.TP.eff(k)        = 1;                     % combustion efficiency
         CI.TP.Phi(k)        = 1;                     % equivalence ratio
-        CI.TP.dil(k)        = 0;                     % diluted ratio
+%         CI.TP.dil(k)        = 0;                     % diluted ratio
         CI.TP.Q(k)          = 0;                     % heat release rate   
         CI.TP.DeltaHr(k)    = 0;                     % heat release rate per mass flow rate 
         CI.TP.HA_num        = 1;                     % the flag is defaultly set to the 1 to indicate the first HA interface

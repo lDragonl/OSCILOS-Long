@@ -6,7 +6,7 @@ function Fcn_GUI_INI_TP_plot(hAxes,handles)
 % 2. Mean temperature
 %
 % first created: 2014-12-03
-% last modified: 2014-12-04
+% last modified: 2015-06-03
 %
 global CI
 %
@@ -33,7 +33,12 @@ switch pop_plot
         ylabel(hAxes,'$\overline{u}$ [m/s]','Color','k','Interpreter','LaTex','FontSize',handles.FontSize(1));
     case 2 % mean temperature
         for ss = 1:N-1
-            y_plots(1:2,ss) = CI.TP.T_mean(1,ss);
+            switch CI.CD.TubeIndex(ss)
+                case 0
+                    y_plots(1:2,ss) = CI.TP.T_mean(1,ss);
+                case {1,2}
+                    y_plots(1:2,ss) = NaN;
+            end  
         end
         ylabel(hAxes,'$\overline{T}$ [K]','Color','k','Interpreter','LaTex','FontSize',handles.FontSize(1));
 end
@@ -67,26 +72,41 @@ if CI.CD.isHA == 1
     end
 end
 % ------------
-
 switch pop_plot
     case 1  % mean velocity
         for ss = 1:N-1
+            a = ss
             switch CI.CD.TubeIndex(ss)
                 case 0
                     % Nothing happens
                 case {1,2}
-%                     xSp     = linspace(CI.CD.x_sample(ss),CI.CD.x_sample(ss+1),50);
-%                     l       = CI.CD.x_sample(ss+1) - CI.CD.x_sample(ss);
-%                     uSp     = CI.TP.u_mean(1,ss)./(1+(CI.CD.r_sample(ss+1)./CI.CD.r_sample(ss) - 1).*(xSp - CI.CD.x_sample(ss))./l).^2;
-%                     uSp(end) = CI.TP.u_mean(1,ss+1);
-%                     plot(xSp,uSp,'-','color',ColorUDF{ss},'linewidth',2)
-                    y_plots(1:2,ss) = CI.TP.u_mean(1,ss:ss+1);
+                    if ss == N-1
+                        y_plots(1:2,ss) = CI.TP.u_mean(1,ss);
+                    else
+                        y_plots(1:2,ss) = CI.TP.u_mean(1,ss:ss+1);
+                    end
                     plot(hAxes,[x_plots(1,ss),x_plots(2,ss)],[y_plots(1,ss),y_plots(2,ss)],...
                         'color',ColorUDF{ss},'linewidth',2,'linestyle','-');
 
             end   
         end
     case 2 % mean temperature
+        for ss = 1:N-1
+            a = ss
+            switch CI.CD.TubeIndex(ss)
+                case 0
+                    % Nothing happens
+                case {1,2}
+                    if ss == N-1
+                        y_plots(1:2,ss) = CI.TP.T_mean(1,ss);
+                    else
+                        y_plots(1:2,ss) = CI.TP.T_mean(1,ss:ss+1);
+                    end
+                    plot(hAxes,[x_plots(1,ss),x_plots(2,ss)],[y_plots(1,ss),y_plots(2,ss)],...
+                        'color',ColorUDF{ss},'linewidth',2,'linestyle','-');
+
+            end   
+        end
         
 end
         

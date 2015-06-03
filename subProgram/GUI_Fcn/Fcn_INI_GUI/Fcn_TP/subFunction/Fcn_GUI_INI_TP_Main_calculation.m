@@ -1,7 +1,7 @@
 function Fcn_GUI_INI_TP_Main_calculation(varargin)
 % This function is used to calculate the mean properties in every section
 % first created: 2014-04-01
-% last modified: 2014-12-04
+% last modified: 2015-06-03
 % author: Jingxuan LI (jingxuan.li@imperial.ac.uk)
 hObject     = varargin{1};
 handles     = guidata(hObject);
@@ -112,11 +112,9 @@ for ss = 1:CI.TP.numSection-1
             CI.TP.T_mean(1,ss+1)    = CI.TP.TRatio(indexHA_num).*CI.TP.T_mean(2,ss+1);
             switch CI.TP.index_gamma
                 case 1
-                        % % % % % % % % % 
-                        CI.TP.gamma(1,ss+1)     = gamma_cst;
-                        CI.TP.Cp(1,ss+1)        = Cp_cst;
-                        CI.TP.c_mean(1,ss+1)    = Fcn_c_gamma_cst(CI.TP.T_mean(1,ss+1));
-                         % % % % % % % % %                     
+                    CI.TP.gamma(1,ss+1)     = gamma_cst;
+                    CI.TP.Cp(1,ss+1)        = Cp_cst;
+                    CI.TP.c_mean(1,ss+1)    = Fcn_c_gamma_cst(CI.TP.T_mean(1,ss+1));                
                 case 2
                     % nothing happens!
             end
@@ -134,11 +132,9 @@ for ss = 1:CI.TP.numSection-1
                                                             CI.TP.T_mean(1,ss+1));
                     CI.TP.M_mean(1,ss+1)  = CI.TP.u_mean(1,ss+1)./CI.TP.c_mean(1,ss+1);
             switch CI.TP.index_gamma
-                case 1
-                        % % % % % % % % % 
-                        CI.TP.DeltaHr(indexHA_num) = CI.TP.Cp(1,ss+1).*(CI.TP.T_mean(1,ss+1) - CI.TP.T_mean(2,ss+1))...
-                            + 0.5*(CI.TP.u_mean(1,ss+1).^2 - CI.TP.u_mean(1,ss).^2);
-                         % % % % % % % % %                     
+                case 1  % constant Cp and gamma
+                    CI.TP.DeltaHr(indexHA_num) = CI.TP.Cp(1,ss+1).*(CI.TP.T_mean(1,ss+1) - CI.TP.T_mean(2,ss+1))...
+                        + 0.5*(CI.TP.u_mean(1,ss+1).^2 - CI.TP.u_mean(1,ss).^2);              
                 case 2
                     % nothing happens!
             end
