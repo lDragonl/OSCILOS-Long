@@ -16,7 +16,7 @@ tau_c       = CI.TP.tau_c;
 A_minus(1)  = 1;
 E(1)        = 0;
 A_plus(1)   = R1.*A_minus(1);
-Array(:,1)  = [A_plus(1),A_minus(1),E(1)]';
+Array(:,1)  = [A_plus(1),A_minus(1),E(1)].'
 %
 indexHA = 0;            % index of heat addition
 indexHP = 0;            % index of heat perturbation
@@ -76,8 +76,16 @@ for ss = 1:CI.TP.numSection-1
             CI.TPM.Z{ss}   =CI.TPM.BC{ss}*D_Liner;
             Liner_Flag     =Liner_Flag+1;
     end
-    Array(:,ss+1)    = CI.TPM.Z{ss}*Array(:,ss);
+    Array(:,ss+1)    = CI.TPM.Z{ss}*Array(:,ss)
 end
+
+% ss = 1;
+% D122 = diag([ exp(-s_star*tau_plus(ss)),...
+%                 exp( s_star*tau_minus(ss)),...
+%                 exp(-s_star*tau_c(ss))]);
+%             
+%             
+% Array1 =  D122*Array(:, 1)
 %
 for k = 1:CI.TP.numSection-1
     A_plus(k+1)     = Array(1,k+1);
@@ -112,6 +120,7 @@ for k = 1:length(CI.CD.x_sample)-1
     else
     kw1_plus(k)  = s_star./(c_mean(k)+u_mean(k));
     kw1_minus(k) = s_star./(c_mean(k)-u_mean(k));
+
     p(k,:) =    A_plus(k).*exp(-kw1_plus(k).*(x_resample(k,:)-x_resample(k,1)))+...
                 A_minus(k).*exp( kw1_minus(k).*(x_resample(k,:)-x_resample(k,1)));
     u(k,:) =    (A_plus(k).*exp(-kw1_plus(k).*(x_resample(k,:)-x_resample(k,1)))-...

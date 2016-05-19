@@ -48,7 +48,7 @@ for ss = 1:CI.TP.numSection-1
                 FTF = Fcn_linear_flame_model(s,indexHP);
             end
             B2b     = zeros(3);
-            B2b(3,2)= CI.TP.DeltaHr(indexHA)./CI.TP.c_mean(2,ss+1)./CI.TP.c_mean(1,ss)./CI.TP.Theta(ss).*FTF;
+            B2b(3,2)= 1.00*CI.TP.DeltaHr(indexHA)./CI.TP.c_mean(2,ss+1)./CI.TP.c_mean(1,ss)./CI.TP.Theta(ss).*FTF;
             Bsum    = CI.TPM.B1{2,ss}*(CI.TPM.B2{1,ss}\CI.TPM.B1{1,ss}) + B2b;
             BC1     = Bsum*CI.TPM.C1;
             BC2     = CI.TPM.B2{2,ss}*CI.TPM.C2;

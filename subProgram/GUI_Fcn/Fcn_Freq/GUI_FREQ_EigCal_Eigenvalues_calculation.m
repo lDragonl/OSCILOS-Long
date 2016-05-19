@@ -121,7 +121,7 @@ elseif CI.EIG.APP_style == 22  % From experimental FDF
         FTF = HP.FMEXP.FTF{ss};
         CI.EIG.FDF.num{ss}  = FTF.num;
         CI.EIG.FDF.den{ss}  = FTF.den;
-        CI.EIG.FDF.tauf(ss) = FTF.tau_correction;  % Be careful: we always use a = a0 exp(-a*tau)
+        CI.EIG.FDF.tauf(ss) = FTF.tau_correction;  % Be careful: we always use a = a0 exp(-a*tau) % confirmed on 2015/07/23
     end
 end
 CI.EIG.FDF.uRatioNum = uRatioNum;

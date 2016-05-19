@@ -804,7 +804,8 @@ F.Freq      = fmin:1:fmax;
 F.Gain      = abs(interp1(FGain(:,1)',FGain(:,2)',F.Freq,'linear','extrap'));
 F.Phase     = interp1(FPhase(:,1)',FPhase(:,2)',F.Freq,'linear','extrap');
 F.FTF       = F.Gain.*exp(1i.*F.Phase);
-F.FTF_corr  = F.FTF.*exp(1i.*2*pi*F.Freq.*tau_correction);
+F.FTF_corr  = F.FTF.*exp(1i.*2*pi*F.Freq.*tau_correction);  % confirmed on 2015/07/23
+
 %-------------------
 switch flag
     case 1
