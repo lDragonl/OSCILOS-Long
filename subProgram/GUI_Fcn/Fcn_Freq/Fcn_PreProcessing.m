@@ -56,7 +56,7 @@ M1      = CI.TP.M_mean(2,ss+1);
 M2      = CI.TP.M_mean(1,ss+1);
 gamma1  = CI.TP.gamma(2,ss+1);
 gamma2  = CI.TP.gamma(1,ss+1);
-HA      = CI.TP.DeltaHr(indexHA)./CI.TP.c_mean(2,ss+1).^2;
+HA      = 1.00*CI.TP.DeltaHr(indexHA)./CI.TP.c_mean(2,ss+1).^2;
 % ----------------------------------       
 B1a(1,1) =   0;
 B1a(1,2) =   cRatio;
