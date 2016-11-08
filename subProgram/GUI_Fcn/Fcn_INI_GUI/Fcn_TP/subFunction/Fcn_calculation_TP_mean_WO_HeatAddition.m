@@ -8,7 +8,7 @@ function [p_mean2,rho_mean2,u_mean2] =...
 % gamma is considered constant before and after the flame separately.
 % global MF
 %
-% updated by Jingxuan Li on 28/03/2016
+% last updated on 08/11/2016
 %
 % reference values
 MF.p1       = p_mean1;
@@ -25,6 +25,19 @@ options = optimset('Display','off');        % the calculation results by fsolve 
 x0      = [1,1,1];  
 F       = @(x)myfun(x, MF);
 x2      = fsolve(F, x0, options);   % solve equation
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% this part has been changed on 08/11/2016
+iternum     = 0;
+exitflag    = 0;
+while exitflag > 4 || exitflag < 1 && iternum <20
+    [x2, ~, exitflag]   = fsolve(F, x0, options);   % solve equation
+    iternum = iternum + 1;
+    x0      = x2;
+end
+if iternum>19
+    h = msgbox('The mean flow calculation is not converged!'); 
+end
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 p_mean2     = x2(1)*MF.p1;               
 rho_mean2   = x2(2)*MF.rho1;
 u_mean2     = x2(3)*MF.u1;

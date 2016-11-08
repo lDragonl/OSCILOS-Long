@@ -1,7 +1,11 @@
 function F = Fcn_DetEqn_nonlinear_dampers(s)
 global CI
 [R1,R2]     = Fcn_boundary_condition(s);
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Rs has been corrected
+% last updated on 08/11/2016
 Rs          = -0.5*CI.TP.M_mean(end)./(1 + 0.5*(CI.TP.gamma(end) - 1 ).*CI.TP.M_mean(end));
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 Te = Fcn_TF_entropy_convection(s);
 %--------------------------------

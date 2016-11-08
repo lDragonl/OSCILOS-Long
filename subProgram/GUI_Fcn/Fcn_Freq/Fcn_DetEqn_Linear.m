@@ -4,8 +4,11 @@ function F = Fcn_DetEqn_Linear(s)
 global CI
 % boundary condition
 [R1,R2]     = Fcn_boundary_condition(s);
-Rs          = -0.5*CI.TP.M_mean(end)./(1 + 0.5*(CI.TP.gamma(end) - 1 ).*CI.TP.M_mean(end)).*CI.TP.rho_mean(1,end).*CI.TP.c_mean(1,end).^2./CI.TP.p_mean(1,end);
-%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Rs has been corrected
+% last updated on 08/11/2016
+Rs          = -0.5*CI.TP.M_mean(end)./(1 + 0.5*(CI.TP.gamma(end) - 1 ).*CI.TP.M_mean(end));
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 Te = Fcn_TF_entropy_convection(s);
 %--------------------------------
