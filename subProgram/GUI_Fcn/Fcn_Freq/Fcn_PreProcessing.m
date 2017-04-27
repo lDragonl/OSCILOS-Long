@@ -56,13 +56,13 @@ M1      = CI.TP.M_mean(2,ss+1);
 M2      = CI.TP.M_mean(1,ss+1);
 gamma1  = CI.TP.gamma(2,ss+1);
 gamma2  = CI.TP.gamma(1,ss+1);
-HA      = CI.TP.DeltaHr(indexHA)./CI.TP.c_mean(2,ss+1).^2;
+HA      = 1.00*CI.TP.DeltaHr(indexHA)./CI.TP.c_mean(2,ss+1).^2;
 % ----------------------------------       
 B1a(1,1) =   0;
 B1a(1,2) =   cRatio;
 B1a(1,3) =   M1.*cRatio;
 B1a(2,1) =   1;
-B1a(2,2) = 2*M1;
+B1a(2,2) =   2*M1;
 B1a(2,3) =   M1.^2;
 B1a(3,1) =   M1.*gamma1./(gamma1-1);
 B1a(3,2) =   M1.^2 - HA;
@@ -72,7 +72,7 @@ B2(1,1) =   0;
 B2(1,2) =   1;
 B2(1,3) =   M2;
 B2(2,1) =   1;
-B2(2,2) = 2*M2;
+B2(2,2) =   2*M2;
 B2(2,3) =   M2.^2;
 B2(3,1) =   cRatio.*M2.*gamma2./(gamma2-1);
 B2(3,2) =   cRatio.*M2.^2;
@@ -107,10 +107,10 @@ B2(3,3) =  -cRatio.* Theta.*M2./(gamma2-1);
 % ---------------------------------- 
  if Theta>=1
     B1(2,1) =   Theta;
-    B1(2,2) = 2*M1;
+    B1(2,2) =   2*M1;
     B1(2,3) =   M1.^2;
     B2(2,1) =   Theta;
-    B2(2,2) = 2*Theta.*M2;
+    B2(2,2) =   2*Theta.*M2;
     B2(2,3) =   Theta.*M2.^2;
  elseif Theta<1
     B1(2,1) = 1/rho1.^gamma1;

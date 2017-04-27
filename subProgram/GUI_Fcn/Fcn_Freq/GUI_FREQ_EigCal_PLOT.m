@@ -108,7 +108,7 @@ switch CI.EIG.pop_PlotType
     s_star = Eigenvalue(CI.EIG.pop_numMode);             % eigenvalue
     
     switch CI.EIG.APP_style
-    case {11,12}  
+    case {11,12,13}  
         [x_resample,p,u] = Fcn_calculation_eigenmode_Linear(s_star);
     case {21,22}                             % nonlinear flame model
         global HP
@@ -191,7 +191,7 @@ switch CI.EIG.pop_PlotType
     %--------------------------------
     case 3 %'Evolution of eigenvalue with velocity ratio'
     
-    if CI.EIG.APP_style==11 || CI.EIG.APP_style==12 
+    if CI.EIG.APP_style==11 || CI.EIG.APP_style==12 || CI.EIG.APP_style==13  
        set(hObject, 'String', 0);
        errordlg('There is not any evolution result','Error');
     elseif CI.EIG.APP_style==21 || CI.EIG.APP_style==22
@@ -270,7 +270,7 @@ switch CI.EIG.pop_PlotType
     xtickUD=linspace(xlimitUD(1),xlimitUD(2),6);
     set(hAxes1,'YColor','k','Box','on');
     set(hAxes1,'FontName','Helvetica','FontSize',fontSize1,'LineWidth',1);
-    if CI.EIG.APP_style==11 || CI.EIG.APP_style==12 
+    if CI.EIG.APP_style==11 || CI.EIG.APP_style==12  || CI.EIG.APP_style==13
       xlabel(hAxes1,'$\hat{u}_1/\bar{u}_1 $ [-]','Color','k','Interpreter','LaTex','FontSize',fontSize1);
     else
       xlabel(hAxes1,'$\hat{p}_1/\bar{p}_1 $ [$\times 10^{-5}$]','Color','k','Interpreter','LaTex','FontSize',fontSize1);

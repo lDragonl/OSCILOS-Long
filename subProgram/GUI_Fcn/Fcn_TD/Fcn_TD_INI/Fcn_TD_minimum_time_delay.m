@@ -15,7 +15,9 @@ tauMin = min(   min(CI.TP.tau_plus),...
 % Inlet boundary:
 tauMin = min(tauMin, CI.TP.tau_minus(1) + CI.BC.tau_d1);
 % Outlet boundary:
-tauMin = min(tauMin, CI.TP.tau_plus(1)  + CI.BC.tau_d2);
+%AO: this should be the wave hitting the outlet, so the last wave, not the first!!
+%tauMin = min(tauMin, CI.TP.tau_plus(1)  + CI.BC.tau_d2); %Original OSCILOS line
+tauMin = min(tauMin, CI.TP.tau_plus(end)  + CI.BC.tau_d2); %AO update
 %
 % --------------------------------
 % flame transfer function
@@ -48,10 +50,18 @@ if ~isempty(CI.CD.indexHP)    % if there are heat perturbations
             case 4 % G-equation, the time delay here is fixed through GUI  
                 taufMin(ss) = HP.GEQU.tau_f;
                 
+            %AO
+            case 5
+                taufMin(ss) = 0; % There is no need for a time delay with a convective G-equation model. It is the convective process
+                %that automatically accounts for the "time delay" (time lag). 
+                
         end
         taufMin0 = min(taufMin);
     end
-    tauMin = min(tauMin, taufMin0);
+    %AO: if tauFlame = 0, the next line should not be executed. There is just no time dealy associated with the flame.
+	if CI.FM.indexFM(ss) ~= 5
+		tauMin = min(tauMin, taufMin0);
+	end
 else  % in case without heat perturbation
     taufMin = [];
 end

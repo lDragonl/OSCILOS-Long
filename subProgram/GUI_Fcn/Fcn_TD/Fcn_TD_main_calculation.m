@@ -67,6 +67,11 @@ for mm = 1:CI.TD.nPeriod
             Fcn_TD_calculation_one_period(mm)
             % --------------------------
             Fcn_TD_main_calculation_period_uRatio_envelope(mm)   % calculate the envelope
+            
+        case 5 % AO: Convective G-equation
+            error(['not implemented yet. The equations (flame, acoustics and convection) here are fully'... 
+            ' coupled and need to be solved simultanosuly. I do not like the approach above to split the acoustics and flame (is it even correct?).'])
+            
         otherwise
             % --------------------------
             Fcn_TD_calculation_one_period(mm)

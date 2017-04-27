@@ -1,4 +1,4 @@
-function F = Fcn_DetEqn_Linear(s)
+    function F = Fcn_DetEqn_Linear(s)
 % This function only accounts for linear cases
 % 
 global CI
@@ -40,7 +40,11 @@ for ss = 1:CI.TP.numSection-1
         case 11
             indexHA = indexHA + 1;
             indexHP = indexHP + 1;
-            FTF     = Fcn_flame_model(s,indexHP);
+            if CI.EIG.APP_style == 13
+                FTF     = Fcn_flame_model_Geq_Conv_Linear(s,indexHP);
+            else
+                FTF     = Fcn_flame_model(s,indexHP);            
+            end
             B2b     = zeros(3);
             % in case there are two heat addition, but the first one is a
             % steady one and the second one is unsteady  ????
@@ -130,3 +134,19 @@ tauf    = HP.FTF.tauf;
 F       = polyval(num,s)./polyval(den,s).*exp(-s.*tauf);          
 %
 % -----------------------------end-----------------------------------------
+
+% AO: analytical G-equation model
+function F = Fcn_flame_model_Geq_Conv_Linear(s,indexHP)
+global CI
+beta = CI.FM.HP{indexHP}.GEQU_CONV.Lf/CI.FM.HP{indexHP}.GEQU_CONV.rb;
+gamma = (CI.FM.HP{indexHP}.GEQU_CONV.rb-CI.FM.HP{indexHP}.GEQU_CONV.ra)/CI.FM.HP{indexHP}.GEQU_CONV.rb;
+K = CI.FM.HP{indexHP}.GEQU_CONV.Ugs/CI.FM.HP{indexHP}.GEQU_CONV.UC;
+
+eta = K*beta^2/(beta^2+gamma^2);
+%St = imag(s)*CI.FM.HP{indexHP}.GEQU_CONV.Lf/(CI.FM.HP{indexHP}.GEQU_CONV.Ugs);
+St = -s*CI.FM.HP{indexHP}.GEQU_CONV.Lf/(1i*CI.FM.HP{indexHP}.GEQU_CONV.Ugs);
+St2 = St*(beta^2+gamma^2)/beta^2;
+
+F = 2*(exp(1i*eta*St2).*(gamma-1i*eta*St2) - eta*exp(1i*St2).*(gamma-1i*St2) + gamma*(eta-1))./(eta*St2.^2*(2-gamma)*(eta-1));
+% -----------------------------end--------------------------
+

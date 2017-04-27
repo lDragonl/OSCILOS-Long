@@ -144,7 +144,7 @@ for ss = 1:CI.TP.numSection-1
         % Begin adding by Dong Yang
         case 2            
             % Typically, it can be assumed that mean flow will not be affect by the HR, anyway, 
-            % the following procedure is an alternate way to calculate mean parameters across the crosssection where the resonator is installed.      
+            % the following procedure is an alternate way to calculate mean parameters across the cross section where the resonator is installed.      
             
             section_Num=ss;
             [   CI.TP.T_mean(1,ss+1),...               

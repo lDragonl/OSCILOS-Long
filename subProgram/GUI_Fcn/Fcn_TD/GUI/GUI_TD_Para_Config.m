@@ -639,6 +639,9 @@ ExtForceInfo.b      = str2double(get(handles.edit_e4,'String'));
 ExtForceInfo.f      = str2double(get(handles.edit_e5,'String')); 
 ExtForceInfo.t(1)   = str2double(get(handles.edit_e6,'String'));
 ExtForceInfo.t(2)   = str2double(get(handles.edit_e7,'String'));
+% AO: this sets the time step to the user value. The default is 1e-4. For
+% TD simulations, however, a CFL conditon needs to be satisfied. Add a
+% function somewhere here that takes care of it.
 Fcn_TD_INI(dt,tEndRaw,uRatioMax,nGapRatio,NoiseInfo,ExtForceInfo)
 CI.IsRun.GUI_TD_Para_Config = 1;
 assignin('base','CI',CI)

@@ -10,19 +10,24 @@ function Fcn_TD_INI_flame_model
 % Last edit: 2014-12-15
 %
 global CI
-uRatio0 = 0;                                                                % for weak velocity perturbations
+uRatio0 = 0;                                            % for weak velocity perturbations
 
-if ~isempty(CI.CD.indexHP)    % if there are heat perturbations                   
-    numHP                   = length(CI.CD.indexHP);                        % number of heat perturbations
-    CI.TD.tauf      = zeros(numHP,CI.TD.nTotal);                             % Nonlinear time delay, which varies with velocity perturbations
-    CI.TD.Lf        = zeros(numHP,CI.TD.nTotal);                               % Nonlinear model, which describes the saturation of heat release rate with velocity perturbations
-    CI.TD.taufRem   = zeros(numHP,CI.TD.nTotal); 
+if ~isempty(CI.CD.indexHP)                              % if there are heat perturbations                   
+    numHP                   = length(CI.CD.indexHP);    % number of heat perturbations
+    CI.TD.tauf      = zeros(numHP,CI.TD.nTotal);        % Nonlinear time delay, which varies with velocity perturbations
+    CI.TD.Lf        = zeros(numHP,CI.TD.nTotal); % Nonlinear model, which describes the saturation of heat release rate with velocity perturbations
+    CI.TD.taufRem   = zeros(numHP,CI.TD.nTotal); %AO: What is this?!?
+    
     for ss = 1 : numHP
+        
         HP = CI.FM.HP{ss};
-        switch CI.FM.indexFM(ss)
+        
+        switch CI.FM.indexFM(ss)            
+            
             case 1 
                 Lf(ss)      = 1;
                 tauf(ss)    = HP.FTF.tauf;
+                
             case 2
                 switch HP.NL.style
                     case {1,2}
@@ -32,18 +37,30 @@ if ~isempty(CI.CD.indexHP)    % if there are heat perturbations
                         [Lf(ss),tauf(ss)] = Fcn_flame_model_NL_JLi_AMorgans(uRatio0, ss);
                     otherwise
                 end
+                
             case 3
                 error('The current version does not support this situation!');
                 % ************* need further change **************
+                
             case 4 % G-equation case, these are filled for coherency with other models. 
                 Lf(ss) = 1;
                 tauf(ss) = HP.GEQU.tau_f;
                 % ************* need further change **************
+                
+            case 5 % AO: Convective G-equation model;
+                Lf(ss) = 1; %Nonlinear saturatio
+                tauf(ss) = 0; %Intrinsic time delay
+
+                
             otherwise
+                error('The flame model has not been assigned to an existing model');
+                
         end
+        
         CI.TD.tauf(ss,:)    = CI.TD.tauf(ss,:) + tauf(ss);
         CI.TD.taufRem(ss,:) = CI.TD.tauf(ss,:) - CI.TD.taufMin(ss);
         CI.TD.Lf(ss,:)      = CI.TD.Lf(ss,:) + Lf(ss);
+        
     end
 end    
 %

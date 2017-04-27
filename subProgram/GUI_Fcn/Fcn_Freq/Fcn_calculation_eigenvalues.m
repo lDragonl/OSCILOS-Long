@@ -36,6 +36,9 @@ for ss = 1:length(GRSp)
                 [x,fval,exitflag] = fsolve(@Fcn_DetEqn_nonlinear_dampers,s0,options); 
         end
         if exitflag==1;
+%             disp([num2str(real(x)),' ',num2str(imag(x))]);
+%             disp([num2str(real(fval)),' ',num2str(imag(fval))]);
+%             disp([' ']);
             EIG.eigenvalue(eigen_num) = x;
             EIG.eigenvalue_prec(eigen_num) = floor(EIG.eigenvalue(eigen_num)./10).*10;      % this is used to set the precision
             eigen_num = eigen_num+1;

@@ -39,19 +39,22 @@ uratio = amp * (alpha * cos(freq* t_vec) + beta * sin(freq * t_vec));
 
 % and compute the value of xi based on these values of uratio
 % First with a loop
-figure
+
 xi = xi_steady;
 q_ratio = zeros(1,nb_iter);
-time_integration = 1;
+
+for time_integration = 1:3
 bash_data = zeros(1,nb_points,3);
 for runner = 2:nb_iter % first time step is steady state
     [q_ratio(runner),xi,bash_data] = Fcn_TD_Gequ_interface( SU, xi, y_vec, dt, t_vec(runner), U1, area_ratio, uratio(runner),Q_mean, deltah,rho1,bash_data,runner-1,time_integration );
     
+    figure(6)
     title('real time flame')
     plot(xi,y_vec);
     xlabel('xi');
     ylabel('r [m]');
     drawnow 
+    
 end
 
 % Sinon on essaye avec un calcul vectoriel
@@ -61,8 +64,14 @@ end
 % time_integration = 1;
 % [q_ratio,xi, bash_data] = Fcn_TD_Gequ_interface( SU, xi, y_vec, dt, 0, U1, area_ratio, uratio,Q_mean, deltah,rho1,bash_data,IT,time_integration );
 
-figure
+figure(7)
 plot(t_vec,q_ratio)
+hold on
 title('q ratio as a function of time')
 xlabel('time [s]')
 ylabel('q ratio')
+drawnow
+
+end
+
+legend('1','2','3')

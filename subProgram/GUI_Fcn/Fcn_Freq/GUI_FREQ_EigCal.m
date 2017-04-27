@@ -91,7 +91,7 @@ switch handles.indexEdit
         guidata(hObject, handles);
         if dontOpen
            disp('-----------------------------------------------------');
-           disp('This program cannot be currently lauched due to some reasons.') 
+           disp('This program cannot be currently lauched due to some reasons. (Best error message ever!!)') 
            disp('-----------------------------------------------------');
         else
 %            uiwait(hObject);

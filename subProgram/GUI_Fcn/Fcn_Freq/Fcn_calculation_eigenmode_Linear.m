@@ -1,5 +1,5 @@
 function [x_resample,p,u]=Fcn_calculation_eigenmode_Linear(s_star)
-% This function is used to plot the modeshape of slected mode, 
+% This function is used to plot the modeshape of slected mode,
 % Linear
 global CI
 [R1,R2]     = Fcn_boundary_condition(s_star);
@@ -16,17 +16,17 @@ tau_c       = CI.TP.tau_c;
 A_minus(1)  = 1;
 E(1)        = 0;
 A_plus(1)   = R1.*A_minus(1);
-Array(:,1)  = [A_plus(1),A_minus(1),E(1)]';
+Array(:,1)  = [A_plus(1),A_minus(1),E(1)].'
 %
 indexHA = 0;            % index of heat addition
 indexHP = 0;            % index of heat perturbation
 HR_Flag=1;
 Liner_Flag=1;
 % -------------------------------------------------------------------------
-for ss = 1:CI.TP.numSection-1 
+for ss = 1:CI.TP.numSection-1
     D1 = diag([ exp(-s_star*tau_plus(ss)),...
-                exp( s_star*tau_minus(ss)),...
-                exp(-s_star*tau_c(ss))]);
+        exp( s_star*tau_minus(ss)),...
+        exp(-s_star*tau_c(ss))]);
     switch CI.CD.SectionIndex(ss+1)
         case 0
             CI.TPM.Z{ss}       = CI.TPM.BC{ss}*D1;
@@ -42,7 +42,11 @@ for ss = 1:CI.TP.numSection-1
             % linear flame transfer function
             indexHA = indexHA + 1;
             indexHP = indexHP + 1;
-            FTF     = Fcn_flame_model(s_star,indexHP);
+            if CI.EIG.APP_style == 13
+                FTF = Fcn_flame_model_Geq_Conv_Linear(s_star,indexHP);
+            else
+                FTF     = Fcn_flame_model(s_star,indexHP);
+            end
             B2b     = zeros(3);
             temp    = D1*Array(:,ss);
             uf      = abs((temp(1) - temp(2))./(CI.TP.c_mean(1,ss).*CI.TP.rho_mean(1,ss)));         % velocity before the flame
@@ -53,19 +57,19 @@ for ss = 1:CI.TP.numSection-1
             CI.TPM.Z{ss}       = (BC2\BC1)*D1;
         case 2
             HR_Num         =HR_Flag;
-            i_omega        =s_star;                               
+            i_omega        =s_star;
             w_0            =[Array(1,ss); Array(2,ss); Array(3,ss)]; % These values are useless in the linear HR model, but need to be defined for the HR function
             Array_LeftInt  =D1*w_0;
             Mtr_HR_33=Fcn_calculation_Oscillations_across_HR(ss,HR_Num,i_omega, Array_LeftInt(1),Array_LeftInt(2));
-            CI.TPM.BC{ss}  =Mtr_HR_33; 
+            CI.TPM.BC{ss}  =Mtr_HR_33;
             CI.TPM.Z{ss}   =CI.TPM.BC{ss}*D1;
             HR_Flag  =HR_Flag+1;
         case 30
             % Refer to the transfer matrix calculated by an outer liner
             % wave calculation function
             CI.TPM.BC{ss}  =diag([1,...
-                                  1,...
-                                  1]);
+                1,...
+                1]);
             CI.TPM.Z{ss}   = CI.TPM.BC{ss}*D1;
         case 31
             Liner_Num      =Liner_Flag;
@@ -76,8 +80,16 @@ for ss = 1:CI.TP.numSection-1
             CI.TPM.Z{ss}   =CI.TPM.BC{ss}*D_Liner;
             Liner_Flag     =Liner_Flag+1;
     end
-    Array(:,ss+1)    = CI.TPM.Z{ss}*Array(:,ss);
+    Array(:,ss+1)    = CI.TPM.Z{ss}*Array(:,ss)
 end
+
+% ss = 1;
+% D122 = diag([ exp(-s_star*tau_plus(ss)),...
+%                 exp( s_star*tau_minus(ss)),...
+%                 exp(-s_star*tau_c(ss))]);
+%
+%
+% Array1 =  D122*Array(:, 1)
 %
 for k = 1:CI.TP.numSection-1
     A_plus(k+1)     = Array(1,k+1);
@@ -92,7 +104,7 @@ end
 c_mean      = CI.TP.c_mean(1,:);
 u_mean      = CI.TP.u_mean(1,:);
 rho_mean    = CI.TP.rho_mean(1,:);
-%     
+%
 for k = 1:length(CI.CD.x_sample)-1
     Liner_Flag=1;
     if CI.CD.SectionIndex(k)==30
@@ -105,17 +117,18 @@ for k = 1:length(CI.CD.x_sample)-1
             wave_k=Osc_trans_Mtr_across_Liner(step_k-1).mat*[A_plus_k(1);A_minus_k(1);E_k(1)];
             A_plus_k(step_k)   =wave_k(1);
             A_minus_k(step_k)  =wave_k(2);
-        end   
+        end
         p(k,:)      =A_plus_k+A_minus_k;
         u(k,:)      =(A_plus_k-A_minus_k)./rho_mean(k)./c_mean(k);
         Liner_Flag  =Liner_Flag+1;
     else
-    kw1_plus(k)  = s_star./(c_mean(k)+u_mean(k));
-    kw1_minus(k) = s_star./(c_mean(k)-u_mean(k));
-    p(k,:) =    A_plus(k).*exp(-kw1_plus(k).*(x_resample(k,:)-x_resample(k,1)))+...
-                A_minus(k).*exp( kw1_minus(k).*(x_resample(k,:)-x_resample(k,1)));
-    u(k,:) =    (A_plus(k).*exp(-kw1_plus(k).*(x_resample(k,:)-x_resample(k,1)))-...
-                A_minus(k).*exp( kw1_minus(k).*(x_resample(k,:)-x_resample(k,1))))./rho_mean(k)./c_mean(k);
+        kw1_plus(k)  = s_star./(c_mean(k)+u_mean(k));
+        kw1_minus(k) = s_star./(c_mean(k)-u_mean(k));
+        
+        p(k,:) =    A_plus(k).*exp(-kw1_plus(k).*(x_resample(k,:)-x_resample(k,1)))+...
+            A_minus(k).*exp( kw1_minus(k).*(x_resample(k,:)-x_resample(k,1)));
+        u(k,:) =    (A_plus(k).*exp(-kw1_plus(k).*(x_resample(k,:)-x_resample(k,1)))-...
+            A_minus(k).*exp( kw1_minus(k).*(x_resample(k,:)-x_resample(k,1))))./rho_mean(k)./c_mean(k);
     end
 end
 
@@ -143,18 +156,34 @@ switch CI.BC.ET.pop_type_model
         if tau == 0
             tau = eps;
         end
-%         Te = k.*(exp(tau*s) - exp(-tau*s))./(2*tau);
+        %         Te = k.*(exp(tau*s) - exp(-tau*s))./(2*tau);
         Te = k.*sinc(tau*s./pi);
-end                        
+end
 %
 % ----------------------linear Flame transfer function --------------------
-%         
+%
 function F = Fcn_flame_model(s,indexHP)
 global CI
 HP      = CI.FM.HP{indexHP};
 num     = HP.FTF.num;
 den     = HP.FTF.den;
 tauf    = HP.FTF.tauf;
-F       = polyval(num,s)./polyval(den,s).*exp(-s.*tauf);          
+F       = polyval(num,s)./polyval(den,s).*exp(-s.*tauf);
 %
-% -----------------------------end-----------------------------------------
+% AO: analytical G-equation model
+function F = Fcn_flame_model_Geq_Conv_Linear(s,indexHP)
+global CI
+
+beta = CI.FM.HP{indexHP}.GEQU_CONV.Lf/CI.FM.HP{indexHP}.GEQU_CONV.rb;
+gamma = (CI.FM.HP{indexHP}.GEQU_CONV.rb-CI.FM.HP{indexHP}.GEQU_CONV.ra)/CI.FM.HP{indexHP}.GEQU_CONV.rb;
+K = CI.FM.HP{indexHP}.GEQU_CONV.Ugs/CI.FM.HP{indexHP}.GEQU_CONV.UC;
+
+eta = K*beta^2/(beta^2+gamma^2);
+%St = imag(s)*CI.FM.HP{indexHP}.GEQU_CONV.Lf/(CI.FM.HP{indexHP}.GEQU_CONV.Ugs);
+St = s*CI.FM.HP{indexHP}.GEQU_CONV.Lf/(1i*CI.FM.HP{indexHP}.GEQU_CONV.Ugs);
+St2 = St*(beta^2+gamma^2)/beta^2;
+
+F = 2*(exp(1i*eta*St2).*(gamma-1i*eta*St2) - eta*exp(1i*St2).*(gamma-1i*St2) + gamma*(eta-1))./...
+    (eta*St2.^2*(2-gamma)*(eta-1));
+% -----------------------------end--------------------------
+

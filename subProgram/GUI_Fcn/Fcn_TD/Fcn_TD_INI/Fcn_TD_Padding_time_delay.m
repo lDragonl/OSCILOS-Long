@@ -5,7 +5,7 @@ global CI
 % --------------------------------
 % Convection time of the acoustic waves in different sections
 tauPadding      = max(  max(CI.TP.tau_plus),...
-                        max(CI.TP.tau_minus));
+    max(CI.TP.tau_minus));
 tauPadding      = max(tauPadding,max(CI.TP.tau_c));
 %
 % --------------------------------
@@ -13,11 +13,13 @@ tauPadding      = max(tauPadding,max(CI.TP.tau_c));
 % Inlet boundary:
 tauPadding = max(tauPadding, CI.TP.tau_minus(1) + CI.BC.tau_d1);
 % Outlet boundary:
-tauPadding = max(tauPadding, CI.TP.tau_plus(1)  + CI.BC.tau_d2);
+% AO: This is the wave hitting the outlet boundary. It should be the last wave, not the first!!
+%tauPadding = max(tauPadding, CI.TP.tau_plus(1)  + CI.BC.tau_d2); %OSCILOS original line
+tauPadding = max(tauPadding, CI.TP.tau_plus(end)  + CI.BC.tau_d2); %AO update
 %
 % flames
 % --------------------------------
-if ~isempty(CI.CD.indexHP)    % if there are heat perturbations                   
+if ~isempty(CI.CD.indexHP)    % if there are heat perturbations
     numHP                   = length(CI.CD.indexHP);                                % number of heat perturbations
     for ss = 1 : numHP
         HP = CI.FM.HP{ss};
@@ -37,8 +39,8 @@ if ~isempty(CI.CD.indexHP)    % if there are heat perturbations
                         % We must define a maximum velocity ratio value
                         uRatioLimit     = [0 1];
                         LfLimit         = interp1(  HP.NL.Model3.uRatio,...
-                                                    HP.NL.Model3.Lf,...
-                                                    uRatioLimit,'linear','extrap');
+                            HP.NL.Model3.Lf,...
+                            uRatioLimit,'linear','extrap');
                         taufNLimit      = HP.NL.Model3.taufN.*(1 - LfLimit);
                         taufLimit       = HP.FTF.tauf + taufNLimit;
                     otherwise
@@ -46,10 +48,14 @@ if ~isempty(CI.CD.indexHP)    % if there are heat perturbations
             case 3
                 error('The current version does not support this situation!')
             case 4
-                 % ************* need further change **************
+                % ************* need further change **************
                 taufNLimit      = 0;  % G-equation
                 taufLimit = HP.GEQU.tau_f + taufNLimit;
-                 % ************* need further change **************s
+                % ************* need further change **************
+            case 5 %AO Convective G-equation
+                taufNLimit      = 0;  % G-equation
+                taufLimit = 0 + taufNLimit;
+                % ************* need further change **************
         end
         tauPadding = max(tauPadding, max(taufLimit));
     end

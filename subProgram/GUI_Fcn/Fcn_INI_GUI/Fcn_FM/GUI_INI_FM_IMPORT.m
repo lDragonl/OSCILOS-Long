@@ -625,19 +625,19 @@ plot(hAxes2,    handles.FMFit.Phase_exp(:,1),...
                 'Linewidth',2,'markersize',6);
 try
     plot(hAxes2,handles.FMFit.xfit,...
-                unwrap(angle(handles.FMFit.yfit),1.9*pi)./pi,'-',...
+                unwrap(atan2(imag(handles.FMFit.yfit),real(handles.FMFit.yfit)))./pi,'-',...
                 'color',colorPlot{2},'Linewidth',2); 
 end
-ymax        = 0;
-ymin        = round(min(handles.FMFit.Phase_exp(:,2)./pi));
-yTickset    = ymin:1:ymax;
+% ymax        = round(max(handles.FMFit.Phase_exp(:,2)./pi));
+% ymin        = round(min(handles.FMFit.Phase_exp(:,2)./pi));
+% yTickset    = ymin:1:ymax;
 set(hAxes2,'YColor','k','Box','on','ygrid','on','xgrid','on');
 set(hAxes2,'FontName','Helvetica','FontSize',fontSize1,'LineWidth',1)
 xlabel(hAxes2,'$f$ [Hz]','Color','k','Interpreter','LaTex','FontSize',fontSize1);
 ylabel(hAxes2,'Phase/$\pi$ [-]','Color','k','Interpreter','LaTex','FontSize',fontSize1)
 set(hAxes2,'xlim',get(hAxes1,'xlim'),'xTick',get(hAxes1,'xTick'),...
 'YAxisLocation','left','Color','w');
-set(hAxes2,'ylim',[ymin ymax],'yTick',yTickset)
+% set(hAxes2,'ylim',[ymin ymax],'yTick',yTickset)
 hold off     
 %
 guidata(hObject,handles);
@@ -800,11 +800,15 @@ function [F,den,num]=Fcn_fitfrd(FGain, FPhase, freq_band, tau_correction,fitting
 % tau_correction is used to better fitting
 fmin        = freq_band(1);
 fmax        = freq_band(2);
-F.Freq      = fmin:1:fmax;
-F.Gain      = abs(interp1(FGain(:,1)',FGain(:,2)',F.Freq,'linear','extrap'));
-F.Phase     = interp1(FPhase(:,1)',FPhase(:,2)',F.Freq,'linear','extrap');
+% F.Freq      = fmin:1:fmax;
+% F.Gain      = abs(interp1(FGain(:,1)',FGain(:,2)',F.Freq,'linear','extrap'));
+% F.Phase     = interp1(FPhase(:,1)',FPhase(:,2)',F.Freq,'linear','extrap');
+F.Freq      = FGain(:,1)';
+F.Gain      = FGain(:,2)';
+F.Phase     = FPhase(:,2)';
 F.FTF       = F.Gain.*exp(1i.*F.Phase);
-F.FTF_corr  = F.FTF.*exp(1i.*2*pi*F.Freq.*tau_correction);
+F.FTF_corr  = F.FTF.*exp(1i.*2*pi*F.Freq.*tau_correction);  % confirmed on 2015/07/23
+
 %-------------------
 switch flag
     case 1

@@ -92,7 +92,8 @@ global CI
 CI.FM.ModelType = {     'Linear FTF model';...
                         'Nonlinear FDF model';...
                         'Experimental/CFD fitted FDF';...
-                        'Fully non-linear G-Equation model'};
+                        'Fully non-linear G-Equation model';...
+                        'Fully nonlinear convective G-equation model'};
 assignin('base','CI',CI);
 %--------------------------------------
 % positions reconfiguration
@@ -129,7 +130,8 @@ msg={   '<HTML><FONT color="blue">This GUI is used to choose (flame) model for e
         '<HTML><FONT color="blue">linear (flame) transfer function (FTF) model.';...
         '<HTML><FONT color="blue">3. Experimental/CFD (flame) transfer functions(loaded from a file) for';...
         '<HTML><FONT color="blue">different velocities, and fit the FTF data with state-space models.';...
-        '<HTML><FONT color="blue">4. The fully non-linear G-Equation model (Williams 1988)'};
+        '<HTML><FONT color="blue">4. The fully non-linear G-Equation model (Williams 1988)';...
+        '<HTML><FONT color="blue">5. The fully non-linear convective G-Equation model (Schuller-Lieuwen-Orchini)'};
 set(handles.listbox1,...
                         'units', 'points',...
                         'fontunits','points',...
@@ -433,6 +435,15 @@ switch indexFM
         HP.FMEXP.indexModify    = 0;
     case 4
         
+        
+    case 5 
+        % AO: One can set here internal parameters to the flame model.
+        % For now I have defined them in the GUI_INI_GEQU_CONV file so that
+        % they can be modified by the user via the graphic interface
+        
+    otherwise
+        error('Flame model has not been assigned correctly');
+        
 end
 %
 % --- Executes on button press in pb_Edit.
@@ -468,6 +479,9 @@ switch indexFM
         GUI_INI_FMEXP(handles.figure, HP_num, indexFM);
     case 4 % G-equation case
         GUI_INI_GEQU(handles.figure, HP_num, indexFM);
+    case 5 % AO: G-equation case
+        GUI_INI_GEQU_CONV(handles.figure, HP_num, indexFM);
+        %GUI_INI_GEQU_CONV_New(handles.figure, HP_num, indexFM);
 end
 assignin('base','CI',CI);
 guidata(hObject, handles);

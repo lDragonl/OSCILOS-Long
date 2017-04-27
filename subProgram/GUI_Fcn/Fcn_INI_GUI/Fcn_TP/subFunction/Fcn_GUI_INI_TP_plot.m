@@ -75,7 +75,6 @@ end
 switch pop_plot
     case 1  % mean velocity
         for ss = 1:N-1
-            a = ss
             switch CI.CD.TubeIndex(ss)
                 case 0
                     % Nothing happens
@@ -92,7 +91,6 @@ switch pop_plot
         end
     case 2 % mean temperature
         for ss = 1:N-1
-            a = ss
             switch CI.CD.TubeIndex(ss)
                 case 0
                     % Nothing happens

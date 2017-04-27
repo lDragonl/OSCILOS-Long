@@ -137,4 +137,9 @@ switch indexFM
         HP.FMEXP.nFTF           = 0;
         HP.FMEXP.indexModify    = 0;
     case 4
+        
+    case 5
+        %AO: Nothing is done here. Is this fine?!?!?!
+    otherwise
+        error('The flame model index has not been assigned correctly.')
 end

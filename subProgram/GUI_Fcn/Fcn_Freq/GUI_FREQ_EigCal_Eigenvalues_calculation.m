@@ -14,12 +14,14 @@ Fcn_Para_initialization
 % -------------------------% calculation depend on nonlinearities----------
 % 
 switch CI.EIG.APP_style
-    case {11,12}  
+    case {11,12,13}  
         Fcn_calculation_APP_1(hObject)
     case {21,22}                             % nonlinear flame model with enforcing before the flame
         Fcn_calculation_APP_2(hObject)
     case {3}
         Fcn_calculation_APP_3(hObject)       % nonlinear system with enforcing at the inlet
+    otherwise
+        error('Error: APP_style does not correspond to any known method')
 end
 handles = guidata(hObject);
 guidata(hObject, handles);
@@ -40,7 +42,7 @@ guidata(hObject, handles);
 % -------------------------------------------------------------------------
 %
 function Fcn_calculation_APP_1(varargin)
-% CI.EIG.APP_style = {11, 12} 
+% CI.EIG.APP_style = {11, 12, 13} 
 % linear
 hObject = varargin{1};
 handles = guidata(hObject);
@@ -121,7 +123,7 @@ elseif CI.EIG.APP_style == 22  % From experimental FDF
         FTF = HP.FMEXP.FTF{ss};
         CI.EIG.FDF.num{ss}  = FTF.num;
         CI.EIG.FDF.den{ss}  = FTF.den;
-        CI.EIG.FDF.tauf(ss) = FTF.tau_correction;  % Be careful: we always use a = a0 exp(-a*tau)
+        CI.EIG.FDF.tauf(ss) = FTF.tau_correction;  % Be careful: we always use a = a0 exp(-a*tau) % confirmed on 2015/07/23
     end
 end
 CI.EIG.FDF.uRatioNum = uRatioNum;

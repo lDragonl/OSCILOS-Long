@@ -18,6 +18,7 @@ nMax        = floor(tauMax/dt);
 index0      = Var(1) - (nMax + 1) : Var(2) - nMin;
 indexIntp   = (Var(1):Var(2)) - tau./dt;
 z0          = y(index0);
-z           = interp1(index0,z0,indexIntp,'linear','extrap');
+%z           = interp1(index0,z0,indexIntp,'linear','extrap');
+z           = interp1(index0,z0,indexIntp,'linear');
 %
 % ------------------------ end --------------------------------------------

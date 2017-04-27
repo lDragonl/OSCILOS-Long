@@ -33,7 +33,8 @@ for ss = 1:CI.TP.numSection-1
             indexHP = indexHP + 1;
             % heat addition coefficient
             K       = CI.TP.DeltaHr(indexHA)./CI.TP.c_mean(2,ss+1)./CI.TP.c_mean(1,ss)./CI.TP.Theta(ss);
-            % right side, first term
+            disp(['Kappa = ', num2str(K)])
+	    % right side, first term
             B1a     = CI.TPM.B1{2,ss}*(CI.TPM.B2{1,ss}\CI.TPM.B1{1,ss});
             BC1a    = B1a*CI.TPM.C1;
             % left side

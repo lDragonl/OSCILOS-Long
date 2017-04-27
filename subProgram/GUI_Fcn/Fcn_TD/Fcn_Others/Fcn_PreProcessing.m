@@ -15,9 +15,12 @@ assignin('base','CI',CI)
 function Fcn_calculation_Matrix_elements
 %
 global CI
+%AO: I prefer to leave the matrix C1 "full". Setting the element (3,3) of C1 to zero would mean that entropy waves are entirely dissipated. To achieve this, it would be better to add a flag to the code that switches the -1 into a zero (something like -1+boolDissipationFlag would work fine).
+%Note that C2 CANNOT be changed on the other hand. Setting a C2 element to zero would break the energy conservation equation. Change C1 is fine because it affects the input values, not the output.
 CI.TPM.C1 =  [      1   1   0;...
                     1  -1   0;...
-                    1   1   0];
+                    1   1   -1];
+
 CI.TPM.C2 =  [      1   1   0;...
                     1  -1   0;...
                     1   1  -1];
@@ -62,7 +65,7 @@ B1a(1,1) =   0;
 B1a(1,2) =   cRatio;
 B1a(1,3) =   M1.*cRatio;
 B1a(2,1) =   1;
-B1a(2,2) = 2*M1;
+B1a(2,2) =   2*M1;
 B1a(2,3) =   M1.^2;
 B1a(3,1) =   M1.*gamma1./(gamma1-1);
 B1a(3,2) =   M1.^2 - HA;
@@ -72,7 +75,7 @@ B2(1,1) =   0;
 B2(1,2) =   1;
 B2(1,3) =   M2;
 B2(2,1) =   1;
-B2(2,2) = 2*M2;
+B2(2,2) =   2*M2;
 B2(2,3) =   M2.^2;
 B2(3,1) =   cRatio.*M2.*gamma2./(gamma2-1);
 B2(3,2) =   cRatio.*M2.^2;
@@ -107,10 +110,10 @@ B2(3,3) =  -cRatio.* Theta.*M2./(gamma2-1);
 % ---------------------------------- 
  if Theta>=1
     B1(2,1) =   Theta;
-    B1(2,2) = 2*M1;
+    B1(2,2) =   2*M1;
     B1(2,3) =   M1.^2;
     B2(2,1) =   Theta;
-    B2(2,2) = 2*Theta.*M2;
+    B2(2,2) =   2*Theta.*M2;
     B2(2,3) =   Theta.*M2.^2;
  elseif Theta<1
     B1(2,1) = 1/rho1.^gamma1;
